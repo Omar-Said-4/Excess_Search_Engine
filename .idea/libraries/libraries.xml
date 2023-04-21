@@ -1,0 +1,27 @@
+<component name="libraryTable">
+  <library name="libraries">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/Server/libraries/lucene-analyzers-common-8.11.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Server/libraries/lucene-core-8.11.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Server/libraries/jsoup-1.15.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Server/libraries/commons-cli-1.5.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Server/libraries/httpclient5-5.2.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Server/libraries/httpclient5-cache-5.2.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Server/libraries/httpclient5-fluent-5.2.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Server/libraries/httpclient5-testing-5.2.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Server/libraries/httpclient5-win-5.2.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Server/libraries/httpcore5-5.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Server/libraries/httpcore5-h2-5.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Server/libraries/httpcore5-reactive-5.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Server/libraries/httpcore5-testing-5.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Server/libraries/jna-5.12.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Server/libraries/jna-platform-5.12.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Server/libraries/reactive-streams-1.0.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Server/libraries/rxjava-2.2.21.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Server/libraries/rxjava-3.1.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Server/libraries/slf4j-api-1.7.36.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

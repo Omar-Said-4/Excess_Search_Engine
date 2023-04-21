@@ -37,9 +37,6 @@ class query {
         System.out.println(words);
     }
 
-    public static void main(String[] args) {
-        QueryProcessor("This is a new play field");
-        QueryProcessor("Hello world from the computer department with a new computing power");
-    }
+
 }
 
