@@ -20,8 +20,12 @@
       <root url="jar://$PROJECT_DIR$/Server/libraries/rxjava-2.2.21.jar!/" />
       <root url="jar://$PROJECT_DIR$/Server/libraries/rxjava-3.1.5.jar!/" />
       <root url="jar://$PROJECT_DIR$/Server/libraries/slf4j-api-1.7.36.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../selenium" />
+      <root url="file://$PROJECT_DIR$/../../selenium/lib" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/../../selenium" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/../../selenium/lib" recursive="false" />
   </library>
 </component>

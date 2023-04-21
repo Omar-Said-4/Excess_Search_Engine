@@ -45,7 +45,12 @@ public class Crawler implements  Runnable{
             if(con.response().statusCode()==200)
             {
 
-
+                String []type = con.response().contentType().split(";");
+                if(type[0].compareTo("text/html")!=0)
+                {
+                    System.out.println("Not an HTML Page");
+                    return null;
+                }
                 Elements paragraphs = doc.select("p");
                 StringBuilder builder = new StringBuilder();
 
