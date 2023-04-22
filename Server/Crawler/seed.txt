@@ -1,16 +1,14 @@
 https://edition.cnn.com/
-https://www.wikipedia.org/
-https://www.quora.com/
+https://en.wikipedia.org/wiki/Main_Page
+https://www.javatpoint.com/
 https://www.bbc.com/
 https://stackoverflow.com/
 https://www.economist.com/
 https://www.rottentomatoes.com/
 https://www.ign.com/
-https://www.history.com/
-https://www.polygon.com/
-https://www.chess.com/
-https://boardgamegeek.com/
+https://www.seat.com/
 https://www.amazon.com/
+https://www.reddit.com/
 https://www.webmd.com/
 https://www.theguardian.com/
 https://medium.com/
@@ -18,3 +16,5 @@ https://www.psychologytoday.com/
 https://www.goodreads.com/
 https://www.cnet.com/
 https://www.healthline.com/
+https://chess24.com/en
+https://www.polygon.com/

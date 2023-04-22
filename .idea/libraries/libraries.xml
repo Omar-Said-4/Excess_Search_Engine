@@ -67,6 +67,7 @@
       <root url="jar://$PROJECT_DIR$/Server/libraries/opentelemetry-sdk-trace-1.25.0.jar!/" />
       <root url="jar://$PROJECT_DIR$/Server/libraries/opentelemetry-semconv-1.25.0-alpha.jar!/" />
       <root url="jar://$PROJECT_DIR$/Server/libraries/slf4j-api-2.0.7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../jsoup-1.15.4.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

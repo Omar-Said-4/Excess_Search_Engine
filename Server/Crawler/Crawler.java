@@ -6,7 +6,12 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 
@@ -31,7 +36,107 @@ public class Crawler implements  Runnable{
             return false;
         }
     }
+    public  String normalizeUrl(String url) throws URISyntaxException {
+        URI uri = new URI(url);
+        URI normalizedUri = uri.normalize();
+        return normalizedUri.toString();
+    }
 
+    private boolean RobotAllowed(String URl) throws IOException {
+        URL cURl=new URL(URl);
+        String host=cURl.getHost();
+        String RobotsURl = cURl.getProtocol()+"://"+host+(cURl.getPort()>-1?":"+cURl.getPort():"")+"/robots.txt";
+        URL RobotUrl;
+        String path =cURl.getPath();
+        try{
+            RobotUrl= new URL(RobotsURl);
+        }
+        catch (MalformedURLException e)
+        {
+            return  true;
+        }
+        BufferedReader Robotfile;
+        try{
+            Robotfile = new BufferedReader(new InputStreamReader(RobotUrl.openStream()));
+        }
+        catch (IOException e)
+        {
+            return  false;
+        }
+        boolean check=false;
+        String lineCheck;
+        while((lineCheck=Robotfile.readLine())!=null)
+        {
+            lineCheck.trim();
+            if((!check)&&(lineCheck.toLowerCase().startsWith("user-agent")))
+            {
+               int si=lineCheck.indexOf(':')+1;
+               int ei=lineCheck.length();
+               String agentCheck=lineCheck.substring(si,ei).trim();
+               if(agentCheck=="*")
+               {
+                   check=true;
+               }
+            }
+            else if((check)&&(lineCheck.toLowerCase().startsWith("user-agent")))
+            {
+                Robotfile.close();
+                return true;
+            }
+            else if(check&&lineCheck.toLowerCase().startsWith("disallow"))
+            {
+                int si=lineCheck.indexOf(':')+1;
+                int ei=lineCheck.length();
+                String disallowedPath=lineCheck.substring(si,ei).trim();
+                if(disallowedPath=="/")
+                {
+                    Robotfile.close();
+                    return false;
+                }
+                else if(disallowedPath.length()==0)
+                {
+                    Robotfile.close();
+                    return true;
+                }
+                else if(disallowedPath.length()<=path.length())
+                {
+                    String checkPath=path.substring(0,disallowedPath.length());
+                    if(checkPath.equals(disallowedPath))
+                    {
+                        Robotfile.close();
+                        return false;
+                    }
+                }
+            }
+            else if(check&&lineCheck.toLowerCase().startsWith("allow"))
+            {
+                int si=lineCheck.indexOf(':')+1;
+                int ei=lineCheck.length();
+                String allowedPath=lineCheck.substring(si,ei).trim();
+                if(allowedPath=="/")
+                {
+                    Robotfile.close();
+                    return true;
+                }
+                else if(allowedPath.length()==0)
+                {
+                    Robotfile.close();
+                    return false;
+                }
+                else if(allowedPath.length()<=path.length())
+                {
+                    String checkPath=path.substring(0,allowedPath.length());
+                    if(checkPath.equals(allowedPath))
+                    {
+                        Robotfile.close();
+                        return true;
+                    }
+                }
+            }
+        }
+        Robotfile.close();
+        return true;
+    }
     private Document request (String URl)
     {
 
@@ -49,6 +154,11 @@ public class Crawler implements  Runnable{
                 if(type[0].compareTo("text/html")!=0)
                 {
                     System.out.println("Not an HTML Page");
+                    return null;
+                }
+                if(!RobotAllowed(URl))
+                {
+                    System.out.println("Access denied by robots.txt");
                     return null;
                 }
                 Elements paragraphs = doc.select("p");
@@ -87,12 +197,11 @@ public class Crawler implements  Runnable{
             return null;
         }
         return null;
-    }
-    @Override
+    }    @Override
     public void run() {
         int count=0;
         localseed.add(startLink);
-        while(count<400&&!localseed.isEmpty())
+        while(count<500&&!localseed.isEmpty())
         {
             String currURL=localseed.peek();
             if(!localseed.isEmpty()) {
@@ -113,7 +222,7 @@ public class Crawler implements  Runnable{
             }
 
         }
-      System.out.println("thread " + Thread.currentThread().getName()+" finished");
+      System.out.println("thread " + Thread.currentThread().getName()+" finished with "+ count +" websites");
     }
 
 }
