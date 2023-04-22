@@ -4,6 +4,7 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -50,7 +51,6 @@ public class Crawler implements  Runnable{
         String host=cURl.getHost();
         // blocked due to cookies validation
         if(host.equals("www.pinterest.com")||host.equals("www.medscape.com")) {
-            System.out.println("dasssssad");
             return false;
         }
         String RobotsURl = cURl.getProtocol()+"://"+host+(cURl.getPort()>-1?":"+cURl.getPort():"")+"/robots.txt";
@@ -188,7 +188,7 @@ public class Crawler implements  Runnable{
 //                    //  System.out.println(firstLetter); // print the first letter
 //                }
                 String dspec = builder.toString().trim();
-                Boolean add=false;
+                boolean add=false;
                 synchronized (this.Doc_Spec_txt)
                 {
                     if(!Doc_Spec_txt.contains(dspec))
@@ -199,8 +199,8 @@ public class Crawler implements  Runnable{
                     }
                 }
                 if(add = true) {
-                    System.out.println("Link: "+ URl);
-                    System.out.println(doc.title());
+                 //   System.out.println("Link: "+ URl);
+                  //  System.out.println(doc.title());
                     visited.add(URl);
                     return doc;
                 }
@@ -216,7 +216,7 @@ public class Crawler implements  Runnable{
     public void run() {
         int count=0;
         localseed.add(startLink);
-        while(count<10 &&!localseed.isEmpty())
+        while(count<5 &&!localseed.isEmpty())
         {
             String currURL=localseed.peek();
             try {
@@ -236,11 +236,17 @@ public class Crawler implements  Runnable{
                     synchronized (this.URL_Docs) {
                         URL_Docs.put(currURL, doc);
                     }
-                    for (Element link : doc.select("a[href]")) {
-                        String next_link = link.attr("abs:href");
+                    Elements links = doc.select("a[href]");
+                    for (Element link : links) {
+                        String next_link = link.absUrl("href");
                             if (isValidURL(next_link)) {
                                 localseed.add(next_link);
                         }
+                    }
+                    System.out.println( Thread.currentThread().getName()+" "+localseed.size());
+                    if(localseed.size()<=10) {
+                        System.out.println(localseed);
+                        System.out.println(doc);
                     }
                 }
                 count++;
