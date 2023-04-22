@@ -4,7 +4,6 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -49,6 +48,11 @@ public class Crawler implements  Runnable{
     private boolean RobotAllowed(String URl) throws IOException {
         URL cURl=new URL(URl);
         String host=cURl.getHost();
+        // blocked due to cookies validation
+        if(host.equals("www.pinterest.com")||host.equals("www.medscape.com")) {
+            System.out.println("dasssssad");
+            return false;
+        }
         String RobotsURl = cURl.getProtocol()+"://"+host+(cURl.getPort()>-1?":"+cURl.getPort():"")+"/robots.txt";
         URL RobotUrl;
         String path =cURl.getPath();
@@ -143,8 +147,13 @@ public class Crawler implements  Runnable{
     }
     private Document request (String URl) throws URISyntaxException {
         URl=normalizeUrl(URl);
-        try{
 
+        try{
+            if(!RobotAllowed(URl))
+            {
+                System.out.println("Access denied by robots.txt");
+                return null;
+            }
             Connection con= Jsoup.connect(URl);
 
 
@@ -160,34 +169,36 @@ public class Crawler implements  Runnable{
                     System.out.println("Not an HTML Page");
                     return null;
                 }
-                if(!RobotAllowed(URl))
-                {
-                    System.out.println("Access denied by robots.txt");
-                    return null;
-                }
-                Elements paragraphs = doc.select("p");
-                StringBuilder builder = new StringBuilder();
 
-                for (Element paragraph : paragraphs) {
-                    String text = paragraph.text();// get the text of the paragraph
-                    if(text.length()>0) {
-                        char firstLetter = text.charAt(0);
-                        builder.append(firstLetter);
-                    }
-                    // get the first letter of the text
-                    //  System.out.println(firstLetter); // print the first letter
+                String textonly = doc.text();
+                String[] lines = textonly.split("\n");
+                // Elements paragraphs = doc.select("p");
+                StringBuilder builder = new StringBuilder();
+                for (String line : lines) {
+                    if(!line.isEmpty())
+                    builder.append(line.charAt(0));
                 }
-                String dspec = builder.toString();
+//                for (Element paragraph : paragraphs) {
+//                    String text = paragraph.text();// get the text of the paragraph
+//                    if(text.length()>0) {
+//                        char firstLetter = text.charAt(0);
+//                        builder.append(firstLetter);
+//                    }
+//                    // get the first letter of the text
+//                    //  System.out.println(firstLetter); // print the first letter
+//                }
+                String dspec = builder.toString().trim();
                 Boolean add=false;
                 synchronized (this.Doc_Spec_txt)
                 {
                     if(!Doc_Spec_txt.contains(dspec))
                     {
+                        if(!dspec.isEmpty())
                         Doc_Spec_txt.add(dspec);
                         add=true;
                     }
                 }
-                if(add) {
+                if(add=true) {
                     System.out.println("Link: "+ URl);
                     System.out.println(doc.title());
                     visited.add(URl);
