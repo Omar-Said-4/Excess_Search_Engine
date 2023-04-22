@@ -216,22 +216,21 @@ public class Crawler implements  Runnable{
     public void run() {
         int count=0;
         localseed.add(startLink);
-        while(count<5 &&!localseed.isEmpty())
+        while(count<15 &&!localseed.isEmpty())
         {
             String currURL=localseed.peek();
+            localseed.remove();
             try {
                 currURL=normalizeUrl(currURL);
             } catch (URISyntaxException e) {
                 throw new RuntimeException(e);
             }
-            if(!localseed.isEmpty()) {
                 Document doc = null;
                 try {
                     doc = request(currURL);
                 } catch (URISyntaxException e) {
                     throw new RuntimeException(e);
                 }
-                localseed.remove();
                 if (doc != null) {
                     synchronized (this.URL_Docs) {
                         URL_Docs.put(currURL, doc);
@@ -250,7 +249,7 @@ public class Crawler implements  Runnable{
                     }
                 }
                 count++;
-            }
+
 
         }
       System.out.println("thread " + Thread.currentThread().getName()+" finished with "+ count +" websites");
