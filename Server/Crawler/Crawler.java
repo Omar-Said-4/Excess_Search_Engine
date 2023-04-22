@@ -37,8 +37,10 @@ public class Crawler implements  Runnable{
         }
     }
     public  String normalizeUrl(String url) throws URISyntaxException {
-        URI uri = new URI(url);
+        String encodedUrl = url.replaceAll("\\{", "%7B").replaceAll("\\}", "%7D");
+        URI uri = new URI(encodedUrl);
         URI normalizedUri = uri.normalize();
+
         return normalizedUri.toString();
     }
 
@@ -137,9 +139,8 @@ public class Crawler implements  Runnable{
         Robotfile.close();
         return true;
     }
-    private Document request (String URl)
-    {
-
+    private Document request (String URl) throws URISyntaxException {
+        URl=normalizeUrl(URl);
         try{
 
             Connection con= Jsoup.connect(URl);
@@ -150,8 +151,9 @@ public class Crawler implements  Runnable{
             if(con.response().statusCode()==200)
             {
 
-                String []type = con.response().contentType().split(";");
-                if(type[0].compareTo("text/html")!=0)
+
+                String type = con.response().contentType();
+                if(type==null||!type.startsWith("text/html"))
                 {
                     System.out.println("Not an HTML Page");
                     return null;
@@ -201,18 +203,23 @@ public class Crawler implements  Runnable{
     public void run() {
         int count=0;
         localseed.add(startLink);
-        while(count<500&&!localseed.isEmpty())
+        while(count<400&&!localseed.isEmpty())
         {
             String currURL=localseed.peek();
             if(!localseed.isEmpty()) {
-                Document doc = request(localseed.peek());
+                Document doc = null;
+                try {
+                    doc = request(localseed.peek());
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
                 localseed.remove();
                 if (doc != null) {
                     synchronized (this.URL_Docs) {
                         URL_Docs.put(currURL, doc);
                     }
                     for (Element link : doc.select("a[href]")) {
-                        String next_link = link.absUrl("href");
+                        String next_link = link.attr("abs:href");
                         if (visited.contains(next_link) == false&&isValidURL(next_link)) {
                             localseed.add(next_link);
                         }
