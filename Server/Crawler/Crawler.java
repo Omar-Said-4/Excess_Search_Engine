@@ -38,6 +38,8 @@ public class Crawler implements  Runnable{
     }
     public  String normalizeUrl(String url) throws URISyntaxException {
         String encodedUrl = url.replaceAll("\\{", "%7B").replaceAll("\\}", "%7D");
+        encodedUrl=encodedUrl.replaceAll("&#038;", "&").replaceAll(" ","%20");
+
         URI uri = new URI(encodedUrl);
         URI normalizedUri = uri.normalize();
 
@@ -220,8 +222,10 @@ public class Crawler implements  Runnable{
                     }
                     for (Element link : doc.select("a[href]")) {
                         String next_link = link.attr("abs:href");
-                        if (visited.contains(next_link) == false&&isValidURL(next_link)) {
-                            localseed.add(next_link);
+                        synchronized (this.visited) {
+                            if (visited.contains(next_link) == false && isValidURL(next_link)) {
+                                localseed.add(next_link);
+                            }
                         }
                     }
                 }
