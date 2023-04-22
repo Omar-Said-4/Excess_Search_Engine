@@ -18,9 +18,9 @@ public class Crawler implements  Runnable{
 
     String startLink;
     Queue<String> localseed = new LinkedList<>();
-    ArrayList<String>visited=new ArrayList<String>();
-    Map<String, Document> URL_Docs;
-    List<String> Doc_Spec_txt;
+    ArrayList<String>visited= new ArrayList<>();
+    final Map<String, Document> URL_Docs;
+    final List<String> Doc_Spec_txt;
     public Crawler(String stl, Map<String, Document>UD, List<String> DST)
     {
         startLink=stl;
@@ -75,13 +75,13 @@ public class Crawler implements  Runnable{
         String lineCheck;
         while((lineCheck=Robotfile.readLine())!=null)
         {
-            lineCheck.trim();
+            lineCheck = lineCheck.trim();
             if((!check)&&(lineCheck.toLowerCase().startsWith("user-agent")))
             {
                int si=lineCheck.indexOf(':')+1;
                int ei=lineCheck.length();
                String agentCheck=lineCheck.substring(si,ei).trim();
-               if(agentCheck=="*")
+               if(agentCheck.equals("*"))
                {
                    check=true;
                }
@@ -96,7 +96,7 @@ public class Crawler implements  Runnable{
                 int si=lineCheck.indexOf(':')+1;
                 int ei=lineCheck.length();
                 String disallowedPath=lineCheck.substring(si,ei).trim();
-                if(disallowedPath=="/")
+                if(disallowedPath.equals("/"))
                 {
                     Robotfile.close();
                     return false;
@@ -121,7 +121,7 @@ public class Crawler implements  Runnable{
                 int si=lineCheck.indexOf(':')+1;
                 int ei=lineCheck.length();
                 String allowedPath=lineCheck.substring(si,ei).trim();
-                if(allowedPath=="/")
+                if(allowedPath.equals("/"))
                 {
                     Robotfile.close();
                     return true;
@@ -198,7 +198,7 @@ public class Crawler implements  Runnable{
                         add=true;
                     }
                 }
-                if(add=true) {
+                if(add = true) {
                     System.out.println("Link: "+ URl);
                     System.out.println(doc.title());
                     visited.add(URl);
@@ -216,7 +216,7 @@ public class Crawler implements  Runnable{
     public void run() {
         int count=0;
         localseed.add(startLink);
-        while(count<400&&!localseed.isEmpty())
+        while(count<5&&!localseed.isEmpty())
         {
             String currURL=localseed.peek();
             try {

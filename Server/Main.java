@@ -25,7 +25,7 @@ public class Main {
       //  System.out.println(seed);
         //Crawling
         //crawling threads
-        Thread threads[] = new Thread[20];
+        Thread[] threads = new Thread[20];
         for (int i = 0; i < 20; i++) {
             threads[i] = new Thread(new Crawler(seed.peek(),URl_Docs,Doc_Spec_txt));
             threads[i].setName(Integer.toString(i));
