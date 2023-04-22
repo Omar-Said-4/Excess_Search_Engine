@@ -6,7 +6,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  background-color: rgb(245, 242, 242); /* set background color */
+  background-color: rgb(235, 239, 251); /* set background color */
   /* background-image: url('path/to/image.jpg'); set background image */
   background-repeat: no-repeat;
   background-size: cover;
