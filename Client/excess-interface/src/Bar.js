@@ -1,11 +1,11 @@
 import SearchField from "./SearchField";
 import logo from "./logo.png";
 
-const Bar = () => {
+const Bar = ({query}) => {
 
     return <div className="bar">
         <img src={logo} alt="logo" className="logo"></img>
-        <SearchField/>
+        <SearchField query={query}/>
     </div>
 }
 
