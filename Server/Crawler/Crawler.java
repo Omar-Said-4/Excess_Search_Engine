@@ -216,7 +216,7 @@ public class Crawler implements  Runnable{
     public void run() {
         int count=0;
         localseed.add(startLink);
-        while(count<5&&!localseed.isEmpty())
+        while(count<10 &&!localseed.isEmpty())
         {
             String currURL=localseed.peek();
             try {
