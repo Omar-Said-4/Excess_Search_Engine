@@ -146,8 +146,8 @@ public class Crawler implements  Runnable{
         return true;
     }
     private Document request (String URl) throws URISyntaxException {
-        URl=normalizeUrl(URl);
-
+        if(visited.contains(URl))
+            return null;
         try{
             if(!RobotAllowed(URl))
             {
@@ -219,10 +219,15 @@ public class Crawler implements  Runnable{
         while(count<400&&!localseed.isEmpty())
         {
             String currURL=localseed.peek();
+            try {
+                currURL=normalizeUrl(currURL);
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
             if(!localseed.isEmpty()) {
                 Document doc = null;
                 try {
-                    doc = request(localseed.peek());
+                    doc = request(currURL);
                 } catch (URISyntaxException e) {
                     throw new RuntimeException(e);
                 }
@@ -233,12 +238,8 @@ public class Crawler implements  Runnable{
                     }
                     for (Element link : doc.select("a[href]")) {
                         String next_link = link.attr("abs:href");
-                        try {
-                            if (visited.contains(normalizeUrl(next_link)) == false && isValidURL(next_link)) {
+                            if (isValidURL(next_link)) {
                                 localseed.add(next_link);
-                        }
-                        } catch (URISyntaxException e) {
-                            throw new RuntimeException(e);
                         }
                     }
                 }
