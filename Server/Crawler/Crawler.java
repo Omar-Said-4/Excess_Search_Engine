@@ -233,10 +233,12 @@ public class Crawler implements  Runnable{
                     }
                     for (Element link : doc.select("a[href]")) {
                         String next_link = link.attr("abs:href");
-                        synchronized (this.visited) {
-                            if (visited.contains(next_link) == false && isValidURL(next_link)) {
+                        try {
+                            if (visited.contains(normalizeUrl(next_link)) == false && isValidURL(next_link)) {
                                 localseed.add(next_link);
-                            }
+                        }
+                        } catch (URISyntaxException e) {
+                            throw new RuntimeException(e);
                         }
                     }
                 }
