@@ -50,8 +50,8 @@ public class Crawler implements  Runnable{
     }
 
     public  String normalizeUrl(String url) throws URISyntaxException {
-        String encodedUrl = url.replaceAll("\\{", "%7B").replaceAll("\\}", "%7D").replaceAll("\\(", "%28").replaceAll("\\)", "%29").replaceAll(":", "%3A");;
-        encodedUrl=encodedUrl.replaceAll("&#038;", "&").replaceAll(" ","%20").replace("|", "%7C").replace(":", "%3A");;;
+        String encodedUrl = url.replaceAll("\\{", "%7B").replaceAll("\\}", "%7D");
+        encodedUrl=encodedUrl.replaceAll("&#038;", "&").replaceAll(" ","%20").replace("|", "%7C");
 
         URI uri = new URI(encodedUrl);
         URI normalizedUri = uri.normalize();
@@ -91,13 +91,13 @@ public class Crawler implements  Runnable{
             lineCheck = lineCheck.trim();
             if((!check)&&(lineCheck.toLowerCase().startsWith("user-agent")))
             {
-               int si=lineCheck.indexOf(':')+1;
-               int ei=lineCheck.length();
-               String agentCheck=lineCheck.substring(si,ei).trim();
-               if(agentCheck.equals("*"))
-               {
-                   check=true;
-               }
+                int si=lineCheck.indexOf(':')+1;
+                int ei=lineCheck.length();
+                String agentCheck=lineCheck.substring(si,ei).trim();
+                if(agentCheck.equals("*"))
+                {
+                    check=true;
+                }
             }
             else if((check)&&(lineCheck.toLowerCase().startsWith("user-agent")))
             {
@@ -188,36 +188,36 @@ public class Crawler implements  Runnable{
                 StringBuilder builder = new StringBuilder();
                 for (String line : lines) {
                     if(!line.isEmpty())
-                    builder.append(line.charAt(0));
-                   if(builder.length()>30)
+                        builder.append(line.charAt(0));
+                    if(builder.length()>30)
                         break;
                 }
 
                 String dspec = builder.toString().trim().replaceAll("\\s+", "");;
                 boolean add=false;
-         //       synchronized (this.Doc_Spec_txt)
-           //     {
-                    if(!Doc_Spec_txt.contains(dspec))
-                    {
-                        if(!dspec.isEmpty())
+                //       synchronized (this.Doc_Spec_txt)
+                //     {
+                if(!Doc_Spec_txt.contains(dspec))
+                {
+                    if(!dspec.isEmpty())
                         Doc_Spec_txt.add(dspec);
-                        add=true;
-                    }
-                  //  else {
+                    add=true;
+                }
+                //  else {
 //                        System.out.println(dspec);
 //                        System.out.println(Doc_Spec_txt);
 //                        System.out.println(URl);
-                    //}
-               // }
+                //}
+                // }
                 if(add) {
                     System.out.println("Link: "+ URl);
                     System.out.println(doc.title());
-                  //  synchronized (this.links) {
-                        links.add(URl);
-                   // }
+                    //  synchronized (this.links) {
+                    links.add(URl);
+                    // }
 
                     if(add)
-                    return doc;
+                        return doc;
                     else
                         return null;
                 }
@@ -233,7 +233,7 @@ public class Crawler implements  Runnable{
     public void run() {
         int c=Globals.portion;
         localseed.add(startLink);
-     //   System.out.println(startLink);
+         //  System.out.println(startLink);
 
 
         while(c>0 &&!localseed.isEmpty())
@@ -241,9 +241,9 @@ public class Crawler implements  Runnable{
             String currURL=localseed.peek();
             localseed.remove();
             boolean proceed=true;
-         //   synchronized (this.links) {
-                if (links.contains(currURL))
-                    proceed=false;
+            //   synchronized (this.links) {
+            if (links.contains(currURL))
+                proceed=false;
             //}
             if(!proceed)continue;
             try {
@@ -251,38 +251,38 @@ public class Crawler implements  Runnable{
             } catch (URISyntaxException e) {
                 continue;
             }
-                Document doc = null;
-                try {
-                    doc = request(currURL);
-                } catch (URISyntaxException e) {
-                    throw new RuntimeException(e);
-                }
-                if (doc != null) {
-                   // synchronized (this.URL_Docs) {
-                     //   URL_Docs.clear();
-                       // URL_Docs.put(currURL, doc);
-                     //   Globals.count--;
-                        c--;
-                    //}
-                    Elements links = doc.select("a[href]");
-                    for (Element link : links) {
-                        String next_link = link.absUrl("href");
-                            if (isValidURL(next_link)) {
-                                localseed.add(next_link);
-                        }
+            Document doc = null;
+            try {
+                doc = request(currURL);
+            } catch (URISyntaxException e) {
+                continue;
+            }
+            if (doc != null) {
+                // synchronized (this.URL_Docs) {
+                //   URL_Docs.clear();
+                // URL_Docs.put(currURL, doc);
+                //   Globals.count--;
+                c--;
+                //}
+                Elements links = doc.select("a[href]");
+                for (Element link : links) {
+                    String next_link = link.absUrl("href");
+                    if (isValidURL(next_link)) {
+                        localseed.add(next_link);
                     }
-                   // System.out.println( Thread.currentThread().getName()+" "+localseed.size());
+                }
+                // System.out.println( Thread.currentThread().getName()+" "+localseed.size());
 //                    if(localseed.size()<=10) {
 //                        System.out.println(localseed);
 //                        System.out.println(doc);
 //                    }
-                }
+            }
 
-System.out.println("Thread : " + Thread.currentThread().getName()+" remaining: "+c+" curr local seed size: "+localseed.size());
+            System.out.println("Thread : " + Thread.currentThread().getName()+" remaining: "+c+" curr local seed size: "+localseed.size());
 
         }
         localseed.clear();
-      System.out.println("thread " + Thread.currentThread().getName()+" finished with "+(Globals.portion-c) +" websites");
+        System.out.println("thread " + Thread.currentThread().getName()+" finished with "+(Globals.portion-c) +" websites");
     }
 
 }

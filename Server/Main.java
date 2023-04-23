@@ -24,7 +24,7 @@ public class Main {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
-      //  System.out.println(seed);
+        //  System.out.println(seed);
         //Crawling
         //crawling threads
         System.out.println("Please, enter the desired number of threads");
@@ -38,7 +38,7 @@ public class Main {
             threads[i] = new Thread(new Crawler((!seed.isEmpty())?seed.peek():null,seed,links,Doc_Spec_txt));
             threads[i].setName(Integer.toString(i));
             if(!seed.isEmpty())
-            seed.remove();
+                seed.remove();
             threads[i].start();
         }
 
