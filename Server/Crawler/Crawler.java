@@ -18,14 +18,15 @@ import java.util.*;
 public class Crawler implements  Runnable{
 
     String startLink;
+    Set<String>links;
+
     Queue<String> localseed = new LinkedList<>();
-    ArrayList<String>visited= new ArrayList<>();
-    final Map<String, Document> URL_Docs;
-    final List<String> Doc_Spec_txt;
-    public Crawler(String stl, Map<String, Document>UD, List<String> DST)
+
+    List<String> Doc_Spec_txt;
+    public Crawler(String stl,  Set<String>links, List<String> DST)
     {
         startLink=stl;
-        URL_Docs=UD;
+        this.links=links;
         Doc_Spec_txt=DST;
     }
     private boolean isValidURL(String url) {
@@ -69,7 +70,7 @@ public class Crawler implements  Runnable{
         }
         catch (IOException e)
         {
-            return  false;
+            return  true;
         }
         boolean check=false;
         String lineCheck;
@@ -146,8 +147,7 @@ public class Crawler implements  Runnable{
         return true;
     }
     private Document request (String URl) throws URISyntaxException {
-        if(visited.contains(URl))
-            return null;
+
         try{
             if(!RobotAllowed(URl))
             {
@@ -189,20 +189,28 @@ public class Crawler implements  Runnable{
 //                }
                 String dspec = builder.toString().trim();
                 boolean add=false;
-                synchronized (this.Doc_Spec_txt)
-                {
+               /// synchronized (this.Doc_Spec_txt)
+               // {
                     if(!Doc_Spec_txt.contains(dspec))
                     {
                         if(!dspec.isEmpty())
-                        Doc_Spec_txt.add(dspec);
+                       // Doc_Spec_txt.add(dspec);
                         add=true;
                     }
-                }
+              //  }
                 if(add = true) {
-                 //   System.out.println("Link: "+ URl);
-                  //  System.out.println(doc.title());
-                    visited.add(URl);
+                    System.out.println("Link: "+ URl);
+                    System.out.println(doc.title());
+                    synchronized (this.links) {
+                        if (!links.contains(URl))
+                        links.add(URl);
+                        else
+                            add=false;
+                    }
+                    if(add)
                     return doc;
+                    else
+                        return null;
                 }
             }
             else
@@ -214,9 +222,10 @@ public class Crawler implements  Runnable{
         return null;
     }    @Override
     public void run() {
-        int count=0;
+        int c=350;
         localseed.add(startLink);
-        while(count<15 &&!localseed.isEmpty())
+
+        while(c>0 &&!localseed.isEmpty())
         {
             String currURL=localseed.peek();
             localseed.remove();
@@ -232,9 +241,12 @@ public class Crawler implements  Runnable{
                     throw new RuntimeException(e);
                 }
                 if (doc != null) {
-                    synchronized (this.URL_Docs) {
-                        URL_Docs.put(currURL, doc);
-                    }
+                   // synchronized (this.URL_Docs) {
+                     //   URL_Docs.clear();
+                       // URL_Docs.put(currURL, doc);
+                     //   Globals.count--;
+                        c--;
+                    //}
                     Elements links = doc.select("a[href]");
                     for (Element link : links) {
                         String next_link = link.absUrl("href");
@@ -242,17 +254,17 @@ public class Crawler implements  Runnable{
                                 localseed.add(next_link);
                         }
                     }
-                    System.out.println( Thread.currentThread().getName()+" "+localseed.size());
+                   // System.out.println( Thread.currentThread().getName()+" "+localseed.size());
                     if(localseed.size()<=10) {
                         System.out.println(localseed);
                         System.out.println(doc);
                     }
                 }
-                count++;
 
+System.out.println(Thread.currentThread().getName()+" "+c+" "+localseed.size());
 
         }
-      System.out.println("thread " + Thread.currentThread().getName()+" finished with "+ count +" websites");
+      System.out.println("thread " + Thread.currentThread().getName()+" finished with "+(350-c) +" websites");
     }
 
 }

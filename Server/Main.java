@@ -9,8 +9,8 @@ public class Main {
     public static void main(String[] args) throws InterruptedException {
         //reading seed from file
         Queue<String> seed = new LinkedList<>();
-        Map<String, Document> URl_Docs = new HashMap<>();
-        List<String> Doc_Spec_txt=new ArrayList<>();
+        List<String> Doc_Spec_txt=new ArrayList<String>();
+        Set<String>links=new HashSet<String>();
         try {
             File myObj = new File("Server/Crawler/seed.txt");
             Scanner myReader = new Scanner(myObj);
@@ -27,7 +27,7 @@ public class Main {
         //crawling threads
         Thread[] threads = new Thread[20];
         for (int i = 0; i < 20; i++) {
-            threads[i] = new Thread(new Crawler(seed.peek(),URl_Docs,Doc_Spec_txt));
+            threads[i] = new Thread(new Crawler(seed.peek(),links,Doc_Spec_txt));
             threads[i].setName(Integer.toString(i));
             seed.remove();
             threads[i].start();
@@ -36,9 +36,10 @@ public class Main {
 
         for (int i = 0; i < 20; i++) {
             threads[i].join();
+            System.out.println("Joined " + i );
         }
 
-        System.out.println("Crawler Finished got : "+ URl_Docs.size()+" websites");
+        System.out.println("Crawler Finished got : "+ links.size()+" websites");
         //User Query Processing
 //        query.QueryProcessor("This is a new play field");
 //        query.QueryProcessor("Hello world from the computer department with a new computing power");
