@@ -58,6 +58,8 @@ public class Crawler implements  Runnable{
 
         return normalizedUri.toString();
     }
+    private final Map<String, List<String>> robotCache = new HashMap<>();
+
 
     private boolean RobotAllowed(String URl) throws IOException {
         URL cURl=new URL(URl);
@@ -158,75 +160,65 @@ public class Crawler implements  Runnable{
         Robotfile.close();
         return true;
     }
-    private Document request (String URl) throws URISyntaxException {
-
-        try{
-            if(!RobotAllowed(URl))
-            {
+    private Document request(String url) throws URISyntaxException {
+        try {
+            if (!RobotAllowed(url)) {
                 System.out.println("Access denied by robots.txt");
                 return null;
             }
-            Connection con= Jsoup.connect(URl).timeout(20*1000);
 
+            Connection con = Jsoup.connect(url).timeout(20 * 1000);
+            Document doc = con.get();
 
-            Document doc=con.get();
+            int statusCode = con.response().statusCode();
+            if (statusCode != 200) {
+                return null;
+            }
 
-            if(con.response().statusCode()==200)
-            {
+            String contentType = con.response().contentType();
+            if (contentType == null || !contentType.startsWith("text/html")) {
+                System.out.println("Not an HTML Page");
+                return null;
+            }
 
-
-                String type = con.response().contentType();
-                if(type==null||!type.startsWith("text/html"))
-                {
-                    System.out.println("Not an HTML Page");
-                    return null;
-                }
-
-                String textonly = splitStringIntoLines(doc.text()).trim();
-
-                String[] lines = textonly.split("\n");
-                StringBuilder builder = new StringBuilder();
-                for (String line : lines) {
-                    if(!line.isEmpty())
-                        builder.append(line.charAt(0));
-                    if(builder.length()>30)
+            String textOnly = splitStringIntoLines(doc.text()).trim();
+            String[] lines = textOnly.split("\n");
+            StringBuilder builder = new StringBuilder();
+            for (String line : lines) {
+                if (!line.isEmpty()) {
+                    builder.append(line.charAt(0));
+                    if (builder.length() > 30) {
                         break;
-                }
-
-                String dspec = builder.toString().trim().replaceAll("\\s+", "");
-                boolean add=false;
-                //       synchronized (this.Doc_Spec_txt)
-                //     {
-                if(!Doc_Spec_txt.contains(dspec))
-                {
-                    if(!dspec.isEmpty())
-                        Doc_Spec_txt.add(dspec);
-                    add=true;
-                }
-                //  else {
-//                        System.out.println(dspec);
-//                        System.out.println(Doc_Spec_txt);
-//                        System.out.println(URl);
-                //}
-                // }
-                if(add) {
-                    System.out.println("Link: "+ URl);
-                    System.out.println(doc.title());
-                    //  synchronized (this.links) {
-                    links.add(URl);
-                    // }
-
-                    return doc;
+                    }
                 }
             }
-            else
-                return null;
-        }
-        catch (IOException e){
+
+            String docSpec = builder.toString().trim().replaceAll("\\s+", "");
+            boolean add = false;
+            if (!Doc_Spec_txt.contains(docSpec)) {
+                if (!docSpec.isEmpty()) {
+                    Doc_Spec_txt.add(docSpec);
+                }
+                add = true;
+            }
+
+            if (add) {
+                System.out.println("Link: " + url);
+                System.out.println(doc.title());
+                links.add(url);
+                return doc;
+            }
+
+        } catch (IOException e) {
+            System.err.println("Exception: " + e.getMessage());
             return null;
         }
         return null;
-    }    @Override
+    }
+
+    @Override
+
+
     public void run() {
         int c=Globals.portion;
         localseed.add(startLink);
