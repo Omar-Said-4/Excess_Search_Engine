@@ -249,7 +249,7 @@ public class Crawler implements  Runnable{
             try {
                 currURL=normalizeUrl(currURL);
             } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
+                continue;
             }
                 Document doc = null;
                 try {
