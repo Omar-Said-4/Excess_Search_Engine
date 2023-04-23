@@ -17,16 +17,17 @@ import java.util.*;
 
 public class Crawler implements  Runnable{
 
-    String startLink;
+    Queue<String> seed;
     Set<String>links;
-
+    String startLink;
     Queue<String> localseed = new LinkedList<>();
 
     List<String> Doc_Spec_txt;
-    public Crawler(String stl,  Set<String>links, List<String> DST)
+    public Crawler(String startLink,Queue<String>seed,  Set<String>links, List<String> DST)
     {
-        startLink=stl;
+        this.seed=seed;
         this.links=links;
+        this.startLink=startLink;
         Doc_Spec_txt=DST;
     }
     private boolean isValidURL(String url) {
@@ -222,13 +223,21 @@ public class Crawler implements  Runnable{
         return null;
     }    @Override
     public void run() {
-        int c=350;
+        int c=Globals.portion;
         localseed.add(startLink);
+        System.out.println(startLink);
+
 
         while(c>0 &&!localseed.isEmpty())
         {
             String currURL=localseed.peek();
             localseed.remove();
+            boolean proceed=true;
+            synchronized (this.links) {
+                if (links.contains(currURL))
+                    proceed=false;
+            }
+            if(!proceed)continue;
             try {
                 currURL=normalizeUrl(currURL);
             } catch (URISyntaxException e) {

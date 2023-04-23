@@ -1,4 +1,6 @@
+import Crawler.Globals;
 import Crawler.Crawler;
+
 import org.jsoup.nodes.Document;
 
 import java.io.File;
@@ -25,15 +27,22 @@ public class Main {
       //  System.out.println(seed);
         //Crawling
         //crawling threads
-        Thread[] threads = new Thread[20];
-        for (int i = 0; i < 20; i++) {
-            threads[i] = new Thread(new Crawler(seed.peek(),links,Doc_Spec_txt));
+        System.out.println("Please, enter the desired number of threads");
+
+        Scanner input = new Scanner(System.in);
+        Globals.numThreads = input.nextInt();
+        Globals.portion= (int) Math.ceil(Globals.count/Globals.numThreads);
+
+        Thread[] threads = new Thread[ Globals.numThreads];
+        for (int i = 0; i < Globals.numThreads; i++) {
+            threads[i] = new Thread(new Crawler((!seed.isEmpty())?seed.peek():null,seed,links,Doc_Spec_txt));
             threads[i].setName(Integer.toString(i));
+            if(!seed.isEmpty())
             seed.remove();
             threads[i].start();
         }
 
-
+        Globals.extra.set(Globals.numThreads>20?Globals.numThreads-20:0);
         for (int i = 0; i < 20; i++) {
             threads[i].join();
             System.out.println("Joined " + i );
