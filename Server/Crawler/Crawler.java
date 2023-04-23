@@ -40,12 +40,12 @@ public class Crawler implements  Runnable{
     }
     public static String splitStringIntoLines(String input) {
         StringBuilder sb = new StringBuilder();
+        char[] chars = input.toCharArray();
 
-        for (int i = 0; i < input.length(); i += 30) {
-            int endIndex = Math.min(i + 30, input.length());
-            sb.append(input.substring(i, endIndex)).append("\n");
+        for (int i = 0; i < chars.length; i += 30) {
+            int endIndex = Math.min(i + 30, chars.length);
+            sb.append(chars, i, endIndex - i).append(System.lineSeparator());
         }
-
         return sb.toString();
     }
 
@@ -193,7 +193,7 @@ public class Crawler implements  Runnable{
                         break;
                 }
 
-                String dspec = builder.toString().trim().replaceAll("\\s+", "");;
+                String dspec = builder.toString().trim().replaceAll("\\s+", "");
                 boolean add=false;
                 //       synchronized (this.Doc_Spec_txt)
                 //     {
@@ -216,10 +216,7 @@ public class Crawler implements  Runnable{
                     links.add(URl);
                     // }
 
-                    if(add)
-                        return doc;
-                    else
-                        return null;
+                    return doc;
                 }
             }
             else
@@ -240,10 +237,8 @@ public class Crawler implements  Runnable{
         {
             String currURL=localseed.peek();
             localseed.remove();
-            boolean proceed=true;
+            boolean proceed= !links.contains(currURL);
             //   synchronized (this.links) {
-            if (links.contains(currURL))
-                proceed=false;
             //}
             if(!proceed)continue;
             try {
@@ -251,7 +246,7 @@ public class Crawler implements  Runnable{
             } catch (URISyntaxException e) {
                 continue;
             }
-            Document doc = null;
+            Document doc;
             try {
                 doc = request(currURL);
             } catch (URISyntaxException e) {
