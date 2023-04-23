@@ -22,8 +22,8 @@ public class Crawler implements  Runnable{
     String startLink;
     Queue<String> localseed = new LinkedList<>();
 
-    List<String> Doc_Spec_txt;
-    public Crawler(String startLink,Queue<String>seed,  Set<String>links, List<String> DST)
+    Set<String> Doc_Spec_txt;
+    public Crawler(String startLink,Queue<String>seed,  Set<String>links, Set<String> DST)
     {
         this.seed=seed;
         this.links=links;
@@ -38,6 +38,17 @@ public class Crawler implements  Runnable{
             return false;
         }
     }
+    public static String splitStringIntoLines(String input) {
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < input.length(); i += 30) {
+            int endIndex = Math.min(i + 30, input.length());
+            sb.append(input.substring(i, endIndex)).append("\n");
+        }
+
+        return sb.toString();
+    }
+
     public  String normalizeUrl(String url) throws URISyntaxException {
         String encodedUrl = url.replaceAll("\\{", "%7B").replaceAll("\\}", "%7D");
         encodedUrl=encodedUrl.replaceAll("&#038;", "&").replaceAll(" ","%20");
@@ -171,43 +182,40 @@ public class Crawler implements  Runnable{
                     return null;
                 }
 
-                String textonly = doc.text();
+                String textonly = splitStringIntoLines(doc.text()).trim();
+
                 String[] lines = textonly.split("\n");
-                // Elements paragraphs = doc.select("p");
                 StringBuilder builder = new StringBuilder();
                 for (String line : lines) {
                     if(!line.isEmpty())
                     builder.append(line.charAt(0));
+                   if(builder.length()>30)
+                        break;
                 }
-//                for (Element paragraph : paragraphs) {
-//                    String text = paragraph.text();// get the text of the paragraph
-//                    if(text.length()>0) {
-//                        char firstLetter = text.charAt(0);
-//                        builder.append(firstLetter);
-//                    }
-//                    // get the first letter of the text
-//                    //  System.out.println(firstLetter); // print the first letter
-//                }
-                String dspec = builder.toString().trim();
+
+                String dspec = builder.toString().trim().replaceAll("\\s+", "");;
                 boolean add=false;
-               /// synchronized (this.Doc_Spec_txt)
-               // {
+         //       synchronized (this.Doc_Spec_txt)
+           //     {
                     if(!Doc_Spec_txt.contains(dspec))
                     {
                         if(!dspec.isEmpty())
-                       // Doc_Spec_txt.add(dspec);
+                        Doc_Spec_txt.add(dspec);
                         add=true;
                     }
-              //  }
-                if(add = true) {
+                  //  else {
+//                        System.out.println(dspec);
+//                        System.out.println(Doc_Spec_txt);
+//                        System.out.println(URl);
+                    //}
+               // }
+                if(add) {
                     System.out.println("Link: "+ URl);
                     System.out.println(doc.title());
-                    synchronized (this.links) {
-                        if (!links.contains(URl))
+                  //  synchronized (this.links) {
                         links.add(URl);
-                        else
-                            add=false;
-                    }
+                   // }
+
                     if(add)
                     return doc;
                     else
@@ -225,7 +233,7 @@ public class Crawler implements  Runnable{
     public void run() {
         int c=Globals.portion;
         localseed.add(startLink);
-        System.out.println(startLink);
+     //   System.out.println(startLink);
 
 
         while(c>0 &&!localseed.isEmpty())
@@ -233,10 +241,10 @@ public class Crawler implements  Runnable{
             String currURL=localseed.peek();
             localseed.remove();
             boolean proceed=true;
-            synchronized (this.links) {
+         //   synchronized (this.links) {
                 if (links.contains(currURL))
                     proceed=false;
-            }
+            //}
             if(!proceed)continue;
             try {
                 currURL=normalizeUrl(currURL);
@@ -264,16 +272,17 @@ public class Crawler implements  Runnable{
                         }
                     }
                    // System.out.println( Thread.currentThread().getName()+" "+localseed.size());
-                    if(localseed.size()<=10) {
-                        System.out.println(localseed);
-                        System.out.println(doc);
-                    }
+//                    if(localseed.size()<=10) {
+//                        System.out.println(localseed);
+//                        System.out.println(doc);
+//                    }
                 }
 
-System.out.println(Thread.currentThread().getName()+" "+c+" "+localseed.size());
+System.out.println("Thread : " + Thread.currentThread().getName()+" remaining: "+c+" curr local seed size: "+localseed.size());
 
         }
-      System.out.println("thread " + Thread.currentThread().getName()+" finished with "+(350-c) +" websites");
+        localseed.clear();
+      System.out.println("thread " + Thread.currentThread().getName()+" finished with "+(Globals.portion-c) +" websites");
     }
 
 }

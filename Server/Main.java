@@ -1,7 +1,6 @@
 import Crawler.Globals;
 import Crawler.Crawler;
-
-import org.jsoup.nodes.Document;
+import java.util.concurrent.ConcurrentHashMap;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,8 +10,9 @@ public class Main {
     public static void main(String[] args) throws InterruptedException {
         //reading seed from file
         Queue<String> seed = new LinkedList<>();
-        List<String> Doc_Spec_txt=new ArrayList<String>();
-        Set<String>links=new HashSet<String>();
+        Set<String> Doc_Spec_txt=ConcurrentHashMap.newKeySet();
+        Set<String>links= ConcurrentHashMap.newKeySet();
+
         try {
             File myObj = new File("Server/Crawler/seed.txt");
             Scanner myReader = new Scanner(myObj);

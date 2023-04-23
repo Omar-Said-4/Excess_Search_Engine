@@ -5,7 +5,6 @@ https://www.bbc.com/
 https://stackoverflow.com/
 https://www.seat.com/
 https://www.cnet.com/
-https://www.healthline.com/
 https://chess24.com/en
 https://www.happify.com/
 https://www.polygon.com/
@@ -18,3 +17,4 @@ https://www.webmd.com/
 https://www.ign.com/
 https://www.economist.com/
 https://www.javatpoint.com/
+https://www.medicalnewstoday.com/
