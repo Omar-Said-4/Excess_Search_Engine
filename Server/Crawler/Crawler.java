@@ -50,8 +50,8 @@ public class Crawler implements  Runnable{
     }
 
     public  String normalizeUrl(String url) throws URISyntaxException {
-        String encodedUrl = url.replaceAll("\\{", "%7B").replaceAll("\\}", "%7D");
-        encodedUrl=encodedUrl.replaceAll("&#038;", "&").replaceAll(" ","%20");
+        String encodedUrl = url.replaceAll("\\{", "%7B").replaceAll("\\}", "%7D").replaceAll("\\(", "%28").replaceAll("\\)", "%29").replaceAll(":", "%3A");;
+        encodedUrl=encodedUrl.replaceAll("&#038;", "&").replaceAll(" ","%20").replace("|", "%7C").replace(":", "%3A");;;
 
         URI uri = new URI(encodedUrl);
         URI normalizedUri = uri.normalize();
@@ -166,7 +166,7 @@ public class Crawler implements  Runnable{
                 System.out.println("Access denied by robots.txt");
                 return null;
             }
-            Connection con= Jsoup.connect(URl);
+            Connection con= Jsoup.connect(URl).timeout(20*1000);
 
 
             Document doc=con.get();

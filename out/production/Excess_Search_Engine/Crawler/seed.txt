@@ -3,7 +3,7 @@ https://www.jumia.com.eg/
 https://en.wikipedia.org/wiki/Main_Page
 https://www.bbc.com/
 https://stackoverflow.com/
-https://www.seat.com/
+https://www.autonews.com/
 https://www.cnet.com/
 https://chess24.com/en
 https://www.happify.com/
@@ -16,5 +16,5 @@ https://www.reddit.com/
 https://www.webmd.com/
 https://www.ign.com/
 https://www.economist.com/
+https://www.news-medical.net/
 https://www.javatpoint.com/
-https://www.medicalnewstoday.com/
