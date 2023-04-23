@@ -9,10 +9,8 @@ import org.jsoup.select.Elements;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.io.UnsupportedEncodingException;
+import java.net.*;
 import java.util.*;
 
 public class Crawler implements  Runnable{
@@ -49,14 +47,97 @@ public class Crawler implements  Runnable{
         return sb.toString();
     }
 
-    public  String normalizeUrl(String url) throws URISyntaxException {
-        String encodedUrl = url.replaceAll("\\{", "%7B").replaceAll("\\}", "%7D");
-        encodedUrl=encodedUrl.replaceAll("&#038;", "&").replaceAll(" ","%20").replace("|", "%7C");
+    public  String normalizeUrl(String Url) throws URISyntaxException {
+        URL url = null;
+        try {
+            url = new URL(Url);
+        } catch (MalformedURLException e) {
+            return null;
+        }
+        URI uri = null;
+        try {
+            if(url!=null) {
+                uri = new URI(url.getProtocol(),
+                        url.getUserInfo(),
+                        url.getHost(),
+                        url.getPort(),
+                        url.getPath(),
+                        url.getQuery(),
+                        url.getRef());
+            }
+        } catch (URISyntaxException e) {
+            return null;
+        }
 
-        URI uri = new URI(encodedUrl);
-        URI normalizedUri = uri.normalize();
 
-        return normalizedUri.toString();
+        StringBuffer sb = new StringBuffer(uri.toString());
+        int index = sb.indexOf("%");
+        while (index >= 0) {
+            if(sb.charAt(index)>=97 && sb.charAt(index)<=122)
+            {
+                sb.replace(index, index+1, Character.toString(sb.charAt(index)-32));
+            }
+            if(sb.charAt(index+1)>=97 && sb.charAt(index+1)<=122)
+            {
+                sb.replace(index+1, index+2,  Character.toString(sb.charAt(index+1)-32));
+            }
+            index = sb.indexOf("%", index + 1);
+        }
+
+        sb = new StringBuffer(uri.toString());
+
+
+
+
+        String result;
+        uri = uri.normalize();
+        try{result = URLDecoder.decode(sb.toString(), "UTF-8").replaceAll("\\+", "%20")
+                .replaceAll("\\%7E", "~").replaceAll("%2D", "-").replaceAll("%2E", ".").replaceAll("%5F", "_");} catch (UnsupportedEncodingException e)
+        {
+            result = sb.toString();
+        }
+        try
+        {
+            url = new URL (result);
+
+
+                try {
+                    uri = new URI(url.getProtocol(),
+                            url.getUserInfo(),
+                            url.getHost(),
+                            url.getPort(),
+                            url.getPath(),
+                            url.getQuery(),
+                            url.getRef());
+
+                }
+                catch (URISyntaxException e) {
+                    return null;
+
+                }
+
+        } catch (MalformedURLException e) {
+            return null;
+        }
+
+        uri = uri.normalize();
+
+        sb = new StringBuffer(uri.toString());
+        String NormalizedUrl=sb.toString();
+        if(sb.charAt(sb.length()-1) == '/')
+        {
+            NormalizedUrl=NormalizedUrl.substring(0,NormalizedUrl.length()-1);
+        }
+
+
+        return NormalizedUrl;
+//        String encodedUrl = url.replaceAll("\\{", "%7B").replaceAll("\\}", "%7D");
+//        encodedUrl=encodedUrl.replaceAll("&#038;", "&").replaceAll(" ","%20").replace("|", "%7C");
+//
+//        URI uri = new URI(encodedUrl);
+//        URI normalizedUri = uri.normalize();
+//
+//        return normalizedUri.toString();
     }
 
     private boolean RobotAllowed(String URl) throws IOException {
@@ -242,9 +323,9 @@ public class Crawler implements  Runnable{
             localseed.remove();
             boolean proceed=true;
             //   synchronized (this.links) {
-            if (links.contains(currURL))
+            if (links.contains(currURL)){
                 proceed=false;
-            //}
+            }
             if(!proceed)continue;
             try {
                 currURL=normalizeUrl(currURL);
