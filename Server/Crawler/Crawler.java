@@ -319,6 +319,11 @@ public class Crawler implements  Runnable{
 
         while(c>0 &&!localseed.isEmpty())
         {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             String currURL=localseed.peek();
             localseed.remove();
             boolean proceed=true;
