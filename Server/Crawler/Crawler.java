@@ -284,7 +284,6 @@ public class Crawler implements  Runnable{
             if (add) {
                 System.out.println("Link: " + url);
                 System.out.println(doc.title());
-                links.add(url);
                 return doc;
             }
 
@@ -298,7 +297,7 @@ public class Crawler implements  Runnable{
 
 
     public void run() {
-        while(Globals.count.get()>0)
+        while(true)
         {
             String currURL=null;;
             int currturn=-1;
@@ -349,7 +348,14 @@ public class Crawler implements  Runnable{
                 //   URL_Docs.clear();
                 // URL_Docs.put(currURL, doc);
                 //   Globals.count--;
-                Globals.count.decrementAndGet();
+                synchronized (Globals.count) {
+
+                    Globals.count.decrementAndGet();
+                    if(Globals.count.get()<=0)
+                        proceed=false;
+                }
+                if(!proceed)break;
+                else links.add(currURL);
                 //}
                 Elements links = doc.select("a[href]");
                 int maxcount=100;

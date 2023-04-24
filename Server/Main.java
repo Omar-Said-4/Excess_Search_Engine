@@ -38,7 +38,7 @@ public class Main {
 
         Thread[] threads = new Thread[ Globals.numThreads];
 
-        for(int i=0;i<22;i++)
+        for(int i=0;i<21;i++)
         {
             BFS[0].add(seed.peek());
             seed.remove();
@@ -50,7 +50,7 @@ public class Main {
             threads[i].start();
         }
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < Globals.numThreads; i++) {
             threads[i].join();
             System.out.println("Joined " + i );
         }
