@@ -1,4 +1,5 @@
 import logo from "./insta.png";
+import parse from "html-react-parser";
 
 const PageResult = ({ title, url, description }) => {
   const maxLength = 90;
@@ -12,13 +13,13 @@ const PageResult = ({ title, url, description }) => {
         <div className="img-span">
           <img src={logo} alt="test" className="result-image"></img>
         </div>
-        <div className="title">{title}</div>
+        <a className="title" href={url}>{title}</a>
       </div>
 
       <a href={url} className="url">
         {url}
       </a>
-      <p className="description">{description}</p>
+      <p className="description">{parse(description)}</p>
     </div>
   );
 };

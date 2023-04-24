@@ -1,25 +1,25 @@
 import Pagination from "react-bootstrap/Pagination";
 
-const PageBar = ({currentPage}) => {
+const PageBar = ({ currentPage, nextPage, firstPage, prevPage, changePage }) => {
   var previousDisabled = false;
 
-  if(currentPage === 1){
+  if (currentPage === 1) {
     previousDisabled = true;
   }
 
-
   return (
-    <Pagination style={{marginLeft:"9%"}}>
-      <Pagination.First />
-      <Pagination.Prev disabled={previousDisabled}/>   
-      <Pagination.Item active>{1}</Pagination.Item>
-      <Pagination.Item>{2}</Pagination.Item>
-      <Pagination.Item>{3}</Pagination.Item>
-      <Pagination.Item>{4}</Pagination.Item>
-      <Pagination.Item>{5}</Pagination.Item>
-      <Pagination.Ellipsis />
-      <Pagination.Next />
-      <Pagination.Last />
+    <Pagination style={{ marginLeft: "9%" }}>
+      <Pagination.First disabled={previousDisabled} onClick={firstPage} href=""/>
+      <Pagination.Prev disabled={previousDisabled} onClick={prevPage} />
+
+      {Array.from({ length: 5 }, (_, index) => (
+        <Pagination.Item key={index + 1} active={currentPage === index + 1} onClick={()=>{
+          changePage(index + 1)}}>
+          {index + 1}
+        </Pagination.Item>
+      ))}
+
+      <Pagination.Next disabled={currentPage === 5}  onClick={nextPage} />
     </Pagination>
   );
 };
