@@ -331,7 +331,8 @@ public class Crawler implements  Runnable{
             }
             else
                 continue;
-            if (currURL==null||links.contains(currURL)) {
+            if (links.contains(currURL)) {
+                Globals.levelNum.decrementAndGet();
                 proceed = false;
             }
             //   }
