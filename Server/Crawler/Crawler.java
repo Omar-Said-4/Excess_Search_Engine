@@ -54,13 +54,13 @@ public class Crawler implements  Runnable{
         }
         URI uri = null;
         try {
-                uri = new URI(url.getProtocol(),
-                        url.getUserInfo(),
-                        url.getHost(),
-                        url.getPort(),
-                        url.getPath(),
-                        url.getQuery(),
-                        url.getRef());
+            uri = new URI(url.getProtocol(),
+                    url.getUserInfo(),
+                    url.getHost(),
+                    url.getPort(),
+                    url.getPath(),
+                    url.getQuery(),
+                    url.getRef());
 
         } catch (URISyntaxException e) {
             return null;
@@ -97,20 +97,20 @@ public class Crawler implements  Runnable{
             url = new URL (result);
 
 
-                try {
-                    uri = new URI(url.getProtocol(),
-                            url.getUserInfo(),
-                            url.getHost(),
-                            url.getPort(),
-                            url.getPath(),
-                            url.getQuery(),
-                            url.getRef());
+            try {
+                uri = new URI(url.getProtocol(),
+                        url.getUserInfo(),
+                        url.getHost(),
+                        url.getPort(),
+                        url.getPath(),
+                        url.getQuery(),
+                        url.getRef());
 
-                }
-                catch (URISyntaxException e) {
-                    return null;
+            }
+            catch (URISyntaxException e) {
+                return null;
 
-                }
+            }
 
         } catch (MalformedURLException e) {
             return null;
@@ -333,7 +333,6 @@ public class Crawler implements  Runnable{
                 continue;
             if (links.contains(currURL)) {
                 Globals.levelNum.decrementAndGet();
-
                 proceed = false;
             }
             //   }
