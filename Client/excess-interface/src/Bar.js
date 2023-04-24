@@ -5,7 +5,7 @@ const Bar = ({query}) => {
 
     return <div className="bar">
         <img src={logo} alt="logo" className="logo"></img>
-        <SearchField query={query}/>
+        <SearchField query={query} placce={"result"}/>
     </div>
 }
 

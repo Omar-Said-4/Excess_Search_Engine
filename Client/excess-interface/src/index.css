@@ -11,6 +11,11 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
 }
+/* 
+body {
+  background: url("background.jpg") no-repeat center center fixed;
+  background-size: cover;
+} */
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
