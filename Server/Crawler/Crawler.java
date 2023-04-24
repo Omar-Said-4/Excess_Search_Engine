@@ -303,7 +303,6 @@ public class Crawler implements  Runnable{
             String currURL=null;;
             int currturn=-1;
             synchronized (this.BFS) {
-
                 if (BFS[Globals.turn.get()].isEmpty()&&Globals.levelNum.get()<=0) {
                     Globals.turn.set((Globals.turn.get() + 1));
                     Globals.levelNum.set(BFS[Globals.turn.get()].size());
@@ -352,9 +351,13 @@ public class Crawler implements  Runnable{
                 Globals.count.decrementAndGet();
                 //}
                 Elements links = doc.select("a[href]");
+                int maxcount=100;
                 for (Element link : links) {
+                    if(maxcount<=0)
+                        break;
                     String next_link = link.absUrl("href");
                     if (isValidURL(next_link)) {
+                        maxcount--;
                         BFS[currturn+1].add(next_link);
                     }
                 }
@@ -370,7 +373,7 @@ public class Crawler implements  Runnable{
                 Globals.levelNum.decrementAndGet();
             }
             //System.out.println("Thread : " + Thread.currentThread().getName()+" remaining: "+c+" curr local seed size: "+localseed.size());
-            System.out.println(Globals.count.get());
+            System.out.println(Globals.count.get() +" " + BFS[currturn].size()+" "+BFS[currturn+1].size()+" "+currturn+" "+Globals.levelNum.get());
         }
         // System.out.println("thread " + Thread.currentThread().getName()+" finished with "+(Globals.portion-c) +" websites");
 

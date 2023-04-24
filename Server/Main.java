@@ -38,7 +38,7 @@ public class Main {
 
         Thread[] threads = new Thread[ Globals.numThreads];
 
-        for(int i=0;i<25;i++)
+        for(int i=0;i<22;i++)
         {
             BFS[0].add(seed.peek());
             seed.remove();
