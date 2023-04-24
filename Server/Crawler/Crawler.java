@@ -12,20 +12,18 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Crawler implements  Runnable{
 
-    Queue<String> seed;
     Set<String>links;
-    String startLink;
-    Queue<String> localseed = new LinkedList<>();
+    ConcurrentLinkedQueue<String>[] BFS ;
 
     Set<String> Doc_Spec_txt;
-    public Crawler(String startLink,Queue<String>seed,  Set<String>links, Set<String> DST)
+    public Crawler(   ConcurrentLinkedQueue<String>[] BFS ,  Set<String>links, Set<String> DST)
     {
-        this.seed=seed;
         this.links=links;
-        this.startLink=startLink;
+        this.BFS=BFS;
         Doc_Spec_txt=DST;
     }
     private boolean isValidURL(String url) {
@@ -41,7 +39,7 @@ public class Crawler implements  Runnable{
 
         for (int i = 0; i < input.length(); i += 30) {
             int endIndex = Math.min(i + 30, input.length());
-            sb.append(input.substring(i, endIndex)).append("\n");
+            sb.append(input,i, endIndex).append("\n");
         }
 
         return sb.toString();
@@ -56,7 +54,6 @@ public class Crawler implements  Runnable{
         }
         URI uri = null;
         try {
-            if(url!=null) {
                 uri = new URI(url.getProtocol(),
                         url.getUserInfo(),
                         url.getHost(),
@@ -64,7 +61,7 @@ public class Crawler implements  Runnable{
                         url.getPath(),
                         url.getQuery(),
                         url.getRef());
-            }
+
         } catch (URISyntaxException e) {
             return null;
         }
@@ -84,13 +81,12 @@ public class Crawler implements  Runnable{
             index = sb.indexOf("%", index + 1);
         }
 
-        sb = new StringBuffer(uri.toString());
+//        sb = new StringBuffer(uri.toString());
 
 
 
 
         String result;
-        uri = uri.normalize();
         try{result = URLDecoder.decode(sb.toString(), "UTF-8").replaceAll("\\+", "%20")
                 .replaceAll("\\%7E", "~").replaceAll("%2D", "-").replaceAll("%2E", ".").replaceAll("%5F", "_");} catch (UnsupportedEncodingException e)
         {
@@ -291,7 +287,6 @@ public class Crawler implements  Runnable{
             }
 
         } catch (IOException e) {
-            System.err.println("Exception: " + e.getMessage());
             return null;
         }
         return null;
@@ -301,31 +296,34 @@ public class Crawler implements  Runnable{
 
 
     public void run() {
-        int c=Globals.portion;
-        localseed.add(startLink);
-         //  System.out.println(startLink);
-
-
-        while(c>0 &&!localseed.isEmpty())
+        while(Globals.count.get()>0)
         {
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+            String currURL=null;
+            synchronized (this.BFS) {
+
+                if (!BFS[Globals.turn.get()].isEmpty()) {
+                    currURL = BFS[Globals.turn.get()].peek();
+                    BFS[Globals.turn.get()].remove();
+                    Globals.turn.set((Globals.turn.get() + 1) % 13);
+                }
             }
-            String currURL=localseed.peek();
-            localseed.remove();
             boolean proceed=true;
-            //   synchronized (this.links) {
-            if (links.contains(currURL)){
-                proceed=false;
+            // synchronized (this.links) {
+            if(currURL!=null)
+            {
+                try {
+                    currURL=normalizeUrl(currURL);
+                } catch (URISyntaxException e) {
+                    continue;
+                }
             }
-            if(!proceed)continue;
-            try {
-                currURL=normalizeUrl(currURL);
-            } catch (URISyntaxException e) {
+            else
                 continue;
+            if (currURL==null||links.contains(currURL)) {
+                proceed = false;
             }
+            //   }
+            if(!proceed)continue;
             Document doc = null;
             try {
                 doc = request(currURL);
@@ -337,13 +335,13 @@ public class Crawler implements  Runnable{
                 //   URL_Docs.clear();
                 // URL_Docs.put(currURL, doc);
                 //   Globals.count--;
-                c--;
+                Globals.count.decrementAndGet();
                 //}
                 Elements links = doc.select("a[href]");
                 for (Element link : links) {
                     String next_link = link.absUrl("href");
                     if (isValidURL(next_link)) {
-                        localseed.add(next_link);
+                        BFS[Globals.turn.get()].add(next_link);
                     }
                 }
                 // System.out.println( Thread.currentThread().getName()+" "+localseed.size());
@@ -353,11 +351,11 @@ public class Crawler implements  Runnable{
 //                    }
             }
 
-            System.out.println("Thread : " + Thread.currentThread().getName()+" remaining: "+c+" curr local seed size: "+localseed.size());
-
+            //System.out.println("Thread : " + Thread.currentThread().getName()+" remaining: "+c+" curr local seed size: "+localseed.size());
+            System.out.println(Globals.count.get());
         }
-        localseed.clear();
-        System.out.println("thread " + Thread.currentThread().getName()+" finished with "+(Globals.portion-c) +" websites");
+        // System.out.println("thread " + Thread.currentThread().getName()+" finished with "+(Globals.portion-c) +" websites");
+
     }
 
 }

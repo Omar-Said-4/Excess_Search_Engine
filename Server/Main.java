@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Main {
     public static void main(String[] args) throws InterruptedException {
@@ -12,7 +13,10 @@ public class Main {
         Queue<String> seed = new LinkedList<>();
         Set<String> Doc_Spec_txt=ConcurrentHashMap.newKeySet();
         Set<String>links= ConcurrentHashMap.newKeySet();
-
+        ConcurrentLinkedQueue<String>[] BFS = new ConcurrentLinkedQueue[25];
+        for (int i = 0; i < 25; i++) {
+            BFS[i] = new ConcurrentLinkedQueue<>();
+        }
         try {
             File myObj = new File("Server/Crawler/seed.txt");
             Scanner myReader = new Scanner(myObj);
@@ -24,25 +28,27 @@ public class Main {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
-        //  System.out.println(seed);
+          //System.out.println(seed);
         //Crawling
         //crawling threads
         System.out.println("Please, enter the desired number of threads");
 
         Scanner input = new Scanner(System.in);
         Globals.numThreads = input.nextInt();
-        Globals.portion= (int) Math.ceil(Globals.count/Globals.numThreads);
 
         Thread[] threads = new Thread[ Globals.numThreads];
+
+        for(int i=0;i<25;i++)
+        {
+            BFS[i].add(seed.peek());
+            seed.remove();
+        }
         for (int i = 0; i < Globals.numThreads; i++) {
-            threads[i] = new Thread(new Crawler((!seed.isEmpty())?seed.peek():null,seed,links,Doc_Spec_txt));
+            threads[i] = new Thread(new Crawler(BFS,links,Doc_Spec_txt));
             threads[i].setName(Integer.toString(i));
-            if(!seed.isEmpty())
-                seed.remove();
             threads[i].start();
         }
 
-        Globals.extra.set(Globals.numThreads>20?Globals.numThreads-20:0);
         for (int i = 0; i < 20; i++) {
             threads[i].join();
             System.out.println("Joined " + i );
