@@ -272,11 +272,13 @@ public class Crawler implements  Runnable{
 
             String docSpec = builder.toString().trim().replaceAll("\\s+", "");
             boolean add = false;
-            if (!Doc_Spec_txt.contains(docSpec)) {
-                if (!docSpec.isEmpty()) {
-                    Doc_Spec_txt.add(docSpec);
+            synchronized (this.Doc_Spec_txt) {
+                if (!Doc_Spec_txt.contains(docSpec)) {
+                    if (!docSpec.isEmpty()) {
+                        Doc_Spec_txt.add(docSpec);
+                    }
+                    add = true;
                 }
-                add = true;
             }
 
             if (add) {
@@ -298,13 +300,23 @@ public class Crawler implements  Runnable{
     public void run() {
         while(Globals.count.get()>0)
         {
-            String currURL=null;
+            String currURL=null;;
+            int currturn=-1;
             synchronized (this.BFS) {
 
-                if (!BFS[Globals.turn.get()].isEmpty()) {
-                    currURL = BFS[Globals.turn.get()].peek();
-                    BFS[Globals.turn.get()].remove();
-                    Globals.turn.set((Globals.turn.get() + 1) % 13);
+                if (BFS[Globals.turn.get()].isEmpty()&&Globals.levelNum.get()<=0) {
+                    Globals.turn.set((Globals.turn.get() + 1));
+                    Globals.levelNum.set(BFS[Globals.turn.get()].size());
+                }
+                else if(BFS[Globals.turn.get()].isEmpty())
+                {
+                    currURL=null;
+                }
+                else
+                {
+                    currURL=BFS[Globals.turn.get()].peek();
+                    currURL=BFS[Globals.turn.get()].remove();
+                    currturn=Globals.turn.get();
                 }
             }
             boolean proceed=true;
@@ -314,6 +326,7 @@ public class Crawler implements  Runnable{
                 try {
                     currURL=normalizeUrl(currURL);
                 } catch (URISyntaxException e) {
+                    Globals.levelNum.decrementAndGet();
                     continue;
                 }
             }
@@ -328,6 +341,7 @@ public class Crawler implements  Runnable{
             try {
                 doc = request(currURL);
             } catch (URISyntaxException e) {
+                Globals.levelNum.decrementAndGet();
                 continue;
             }
             if (doc != null) {
@@ -341,16 +355,20 @@ public class Crawler implements  Runnable{
                 for (Element link : links) {
                     String next_link = link.absUrl("href");
                     if (isValidURL(next_link)) {
-                        BFS[Globals.turn.get()].add(next_link);
+                        BFS[currturn+1].add(next_link);
                     }
                 }
+                Globals.levelNum.decrementAndGet();
                 // System.out.println( Thread.currentThread().getName()+" "+localseed.size());
 //                    if(localseed.size()<=10) {
 //                        System.out.println(localseed);
 //                        System.out.println(doc);
 //                    }
             }
-
+            else
+            {
+                Globals.levelNum.decrementAndGet();
+            }
             //System.out.println("Thread : " + Thread.currentThread().getName()+" remaining: "+c+" curr local seed size: "+localseed.size());
             System.out.println(Globals.count.get());
         }

@@ -13,8 +13,8 @@ public class Main {
         Queue<String> seed = new LinkedList<>();
         Set<String> Doc_Spec_txt=ConcurrentHashMap.newKeySet();
         Set<String>links= ConcurrentHashMap.newKeySet();
-        ConcurrentLinkedQueue<String>[] BFS = new ConcurrentLinkedQueue[25];
-        for (int i = 0; i < 25; i++) {
+        ConcurrentLinkedQueue<String>[] BFS = new ConcurrentLinkedQueue[50];
+        for (int i = 0; i < 50; i++) {
             BFS[i] = new ConcurrentLinkedQueue<>();
         }
         try {
@@ -40,9 +40,10 @@ public class Main {
 
         for(int i=0;i<25;i++)
         {
-            BFS[i].add(seed.peek());
+            BFS[0].add(seed.peek());
             seed.remove();
         }
+        Globals.levelNum.set(BFS[0].size());
         for (int i = 0; i < Globals.numThreads; i++) {
             threads[i] = new Thread(new Crawler(BFS,links,Doc_Spec_txt));
             threads[i].setName(Integer.toString(i));
