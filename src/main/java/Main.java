@@ -1,14 +1,27 @@
-import Crawler.Globals;
 import Crawler.Crawler;
-import java.util.concurrent.ConcurrentHashMap;
+import Crawler.Globals;
+import MongoDB.MongoInterface;
+import org.bson.Document;
+import org.jsoup.Jsoup;
+import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 public class Main {
     public static void main(String[] args) throws InterruptedException {
+
+
+        MongoInterface.Initialize();
+        MongoInterface.deleteAllDocuments("URlS_DOCS");
+        MongoInterface.terminate();
+       // Thread.sleep(3000000);
         //reading seed from file
         Queue<String> seed = new LinkedList<>();
         Set<String> Doc_Spec_txt=ConcurrentHashMap.newKeySet();
@@ -18,7 +31,7 @@ public class Main {
             BFS[i] = new ConcurrentLinkedQueue<>();
         }
         try {
-            File myObj = new File("Server/Crawler/seed.txt");
+            File myObj = new File("src/main/java/Crawler/seed.txt");
             Scanner myReader = new Scanner(myObj);
             while (myReader.hasNext()) {
                 String link = myReader.next();
@@ -55,7 +68,25 @@ public class Main {
             System.out.println("Joined " + i );
         }
 
-        System.out.println("Crawler Finished got : "+ links.size()+" websites");
+        System.out.println("Crawler Finished got : "+ links.size()+" websites inserting them to ExcessDB");
+        MongoInterface.Initialize();
+
+        links.forEach(link -> {
+            try {
+
+                org.jsoup.nodes.Document doc = Jsoup.connect(link).get();
+                Document document = new Document("URL", link)
+                        .append("DOC", doc.toString());
+
+                // Insert the text into the MongoDB collection
+                MongoInterface.insertDocument("ExcessDB","URlS_DOCS",document);
+
+            } catch (IOException e) {
+                System.out.println("Error fetching URL: " + e.getMessage());
+            }
+        });
+        MongoInterface.terminate();
+
         //User Query Processing
 //        query.QueryProcessor("This is a new play field");
 //        query.QueryProcessor("Hello world from the computer department with a new computing power");

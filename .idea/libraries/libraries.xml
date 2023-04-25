@@ -19,7 +19,6 @@
       <root url="jar://$PROJECT_DIR$/Server/libraries/reactive-streams-1.0.4.jar!/" />
       <root url="jar://$PROJECT_DIR$/Server/libraries/rxjava-2.2.21.jar!/" />
       <root url="jar://$PROJECT_DIR$/Server/libraries/rxjava-3.1.5.jar!/" />
-      <root url="jar://$PROJECT_DIR$/Server/libraries/slf4j-api-1.7.36.jar!/" />
       <root url="file://$PROJECT_DIR$/../../selenium" />
       <root url="file://$PROJECT_DIR$/../../selenium/lib" />
       <root url="jar://$PROJECT_DIR$/Server/libraries/async-http-client-2.12.3.jar!/" />
@@ -66,7 +65,6 @@
       <root url="jar://$PROJECT_DIR$/Server/libraries/opentelemetry-sdk-metrics-1.25.0.jar!/" />
       <root url="jar://$PROJECT_DIR$/Server/libraries/opentelemetry-sdk-trace-1.25.0.jar!/" />
       <root url="jar://$PROJECT_DIR$/Server/libraries/opentelemetry-semconv-1.25.0-alpha.jar!/" />
-      <root url="jar://$PROJECT_DIR$/Server/libraries/slf4j-api-2.0.7.jar!/" />
       <root url="jar://$PROJECT_DIR$/../../jsoup-1.15.4.jar!/" />
     </CLASSES>
     <JAVADOC />
