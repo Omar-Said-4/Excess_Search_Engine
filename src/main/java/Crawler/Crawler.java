@@ -72,11 +72,11 @@ public class Crawler implements  Runnable{
         while (index >= 0) {
             if(sb.charAt(index)>=97 && sb.charAt(index)<=122)
             {
-                sb.replace(index, index+1, Character.toString(sb.charAt(index)-32));
+                sb.replace(index, index+1, Character.toString((char)(sb.charAt(index)-32)));
             }
             if(sb.charAt(index+1)>=97 && sb.charAt(index+1)<=122)
             {
-                sb.replace(index+1, index+2,  Character.toString(sb.charAt(index+1)-32));
+                sb.replace(index+1, index+2,  Character.toString((char)(sb.charAt(index+1)-32)));
             }
             index = sb.indexOf("%", index + 1);
         }
