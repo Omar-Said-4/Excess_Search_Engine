@@ -1,12 +1,12 @@
 package Indexer;
 
-import java.util.List;
+import java.util.*;
 
 public class wordAttr {
 
-    int priority;
+    int priority=0;
+    int TF=0;
     String link;
-    List<String>snippets;
-    int TF;
-
+    ArrayList<String> snippets = new ArrayList<>();
+    ArrayList<String> tags=new ArrayList<>();
 }

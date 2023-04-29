@@ -19,11 +19,7 @@ public class Main {
 
     public static void main(String[] args) throws InterruptedException {
 
-        ArrayList<Integer> indices = PhraseSearching.search("test kiro", "  test kiro testq kiro  test kiro testkiro");
 
-        for(int i = 0; i < indices.size(); i++){
-            System.out.println(indices.get(i));
-        }
 
         CrawlerState state = null;
         String filePath = "crawler_state.ser";
@@ -41,7 +37,7 @@ public class Main {
         }
 
         MongoInterface.Initialize();
-        MongoInterface.deleteAllDocuments("Snippets");
+        MongoInterface.deleteAllDocuments("URlS_DOCS");
         MongoInterface.terminate();
        // Thread.sleep(3000000);
         //reading seed from file

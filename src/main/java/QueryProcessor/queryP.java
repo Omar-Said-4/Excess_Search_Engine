@@ -4,12 +4,16 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.en.PorterStemFilter;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.pattern.PatternReplaceCharFilter;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+
+import java.io.Reader;
 import java.util.ArrayList;
 
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.regex.Pattern;
 
 
 public class queryP {
@@ -23,7 +27,22 @@ public class queryP {
             "who", "whoever", "whom", "whose", "why", "will", "with", "within", "without", "would", "yes", "yet", "you", "your"};
     public static ArrayList<String> QueryProcessor(String prompt) {
 
-
+        Pattern pattern = Pattern.compile("\\d"); // Match any digit
+        Reader reader = new StringReader(prompt);
+        Reader filteredReader = new PatternReplaceCharFilter(pattern, "", reader);
+        Pattern pattern2=Pattern.compile("[^a-zA-Z0-9\\s]");
+        filteredReader=new PatternReplaceCharFilter(pattern2, " ", filteredReader);
+        StringBuilder outputBuilder = new StringBuilder();
+        int ch;
+        while (true) {
+            try {
+                if (!((ch = filteredReader.read()) != -1)) break;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            outputBuilder.append((char) ch);
+        }
+        prompt = outputBuilder.toString();
         int flag = 0;
         ArrayList<String> words = new ArrayList<String>();
         Analyzer analyzer = new EnglishAnalyzer();
