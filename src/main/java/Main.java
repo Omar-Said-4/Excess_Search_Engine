@@ -44,8 +44,7 @@ public class Main {
         Set<String>links= ConcurrentHashMap.newKeySet();
         ConcurrentLinkedQueue<String>[] BFS = new ConcurrentLinkedQueue[50];
 
-
-
+        
         if (state==null || state.getFlag() == 1) {
             for (int i = 0; i < 50; i++) {
                 BFS[i] = new ConcurrentLinkedQueue<>();
