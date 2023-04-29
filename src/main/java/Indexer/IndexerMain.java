@@ -33,7 +33,7 @@ public class IndexerMain {
             Elements h1Tags = toParse.getElementsByTag("h1");
             for (Element h1Tag : h1Tags) {
                 ArrayList<String> currWords=queryP.QueryProcessor(h1Tag.text());
-                
+
 
             }
 
