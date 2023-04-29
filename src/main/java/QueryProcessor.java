@@ -9,8 +9,20 @@ import java.util.ArrayList;
 import java.io.IOException;
 import java.io.StringReader;
 
+
 class query {
+
+    static final String[] StopWords = new String[]{"a", "about", "actually", "almost", "also",
+            "although", "always", "am", "an", "and", "any", "are",
+            "as", "at", "be", "became", "become", "but", "by", "can", "could", "did", "do", "does",
+            "each", "either", "else", "for", "from", "had", "has", "have", "hence", "how", "i", "if", "in",
+            "is", "it", "its", "just", "may", "maybe", "me", "might", "mine", "must", "my", "neither", "nor",
+            "not", "of", "oh", "ok", "when", "whenever", "where", "whereas", "wherever", "whether", "which", "while",
+            "who", "whoever", "whom", "whose", "why", "will", "with", "within", "without", "would", "yes", "yet", "you", "your"};
     public static ArrayList<String> QueryProcessor(String prompt) {
+
+
+        int flag = 0;
         ArrayList<String> words = new ArrayList<String>();
         Analyzer analyzer = new EnglishAnalyzer();
         TokenStream tokenStream = analyzer.tokenStream(null, new StringReader(prompt));
@@ -31,8 +43,20 @@ class query {
                 throw new RuntimeException(e);
             }
             String term = termAtt.toString();
-            words.add(term);
+
+            for(String t : StopWords)
+            {
+                if(term.equals(t))
+                {
+                    flag = 1;
+                }
+            }
+
+            if(flag ==0)
+                words.add(term);
         }
+
+
 
         return words;
     }
