@@ -1,3 +1,5 @@
+package QueryProcessor;
+
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.en.PorterStemFilter;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
@@ -10,7 +12,7 @@ import java.io.IOException;
 import java.io.StringReader;
 
 
-class query {
+public class queryP {
 
     static final String[] StopWords = new String[]{"a", "about", "actually", "almost", "also",
             "although", "always", "am", "an", "and", "any", "are",

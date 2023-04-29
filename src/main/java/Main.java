@@ -151,8 +151,8 @@ public class Main {
         }
 
         //User Query Processing
-//        query.QueryProcessor("This is a new play field");
-//        query.QueryProcessor("Hello world from the computer department with a new computing power");
+//        QueryProcessor.query.QueryProcessor("This is a new play field");
+//        QueryProcessor.query.QueryProcessor("Hello world from the computer department with a new computing power");
     }
 
 }
