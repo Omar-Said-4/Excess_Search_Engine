@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.StringReader;
 
 class query {
-    public static void QueryProcessor(String prompt) {
+    public static ArrayList<String> QueryProcessor(String prompt) {
         ArrayList<String> words = new ArrayList<String>();
         Analyzer analyzer = new EnglishAnalyzer();
         TokenStream tokenStream = analyzer.tokenStream(null, new StringReader(prompt));
@@ -34,7 +34,7 @@ class query {
             words.add(term);
         }
 
-        System.out.println(words);
+        return words;
     }
 
 

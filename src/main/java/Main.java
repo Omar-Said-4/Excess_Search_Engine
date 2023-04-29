@@ -21,7 +21,6 @@ public class Main {
 
         CrawlerState state = null;
         String filePath = "crawler_state.ser";
-
         File file = new File(filePath);
 
         if (file.exists()) {
