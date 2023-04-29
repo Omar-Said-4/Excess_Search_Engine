@@ -13,11 +13,17 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
+import java.util.ArrayList;
 
 public class Main {
 
     public static void main(String[] args) throws InterruptedException {
+
+        ArrayList<Integer> indices = PhraseSearching.search("test kiro", "  test kiro testq kiro  test kiro testkiro");
+
+        for(int i = 0; i < indices.size(); i++){
+            System.out.println(indices.get(i));
+        }
 
         CrawlerState state = null;
         String filePath = "crawler_state.ser";
@@ -149,6 +155,8 @@ public class Main {
             MongoInterface.terminate();
 
         }
+
+
 
         //User Query Processing
 //        query.QueryProcessor("This is a new play field");
