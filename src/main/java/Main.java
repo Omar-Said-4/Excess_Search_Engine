@@ -35,7 +35,7 @@ public class Main {
         }
 
         MongoInterface.Initialize();
-        MongoInterface.deleteAllDocuments("URlS_DOCS");
+        MongoInterface.deleteAllDocuments("Snippets");
         MongoInterface.terminate();
        // Thread.sleep(3000000);
         //reading seed from file

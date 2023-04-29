@@ -4,10 +4,7 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoException;
 import com.mongodb.ServerApi;
 import com.mongodb.ServerApiVersion;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
@@ -107,6 +104,13 @@ public class MongoInterface {
         MongoCollection<Document> collection = database.getCollection("Indexer");
         collection.updateOne(Filters.eq("Word", word), Updates.push("Websites", doc));
         System.out.println("added website to word " + word);
+    }
+    public static MongoCursor<Document> getCursor(String c)
+    {
+        MongoDatabase database = mongoClient.getDatabase("ExcessDB");
+        MongoCollection<Document> collection = database.getCollection(c);
+        return collection.find().iterator();
+
     }
 
 }
