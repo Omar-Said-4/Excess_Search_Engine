@@ -44,6 +44,13 @@ public class IndexerMain {
             int count = words.length;
             //System.out.println(count);
             Indexer.ParseH1(toParse,toInsert,URl);
+            Indexer.ParseH2(toParse,toInsert,URl);
+            Indexer.ParseH3(toParse,toInsert,URl);
+            Indexer.ParseH4(toParse,toInsert,URl);
+            Indexer.ParseH5(toParse,toInsert,URl);
+            Indexer.ParseH6(toParse,toInsert,URl);
+
+            System.out.println(toInsert);
 
          toInsert.clear();
         }
