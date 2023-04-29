@@ -8,9 +8,16 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 import org.bson.Document;
 import org.bson.Document;
+import org.bson.types.ObjectId;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class MongoInterface {
     static MongoClient mongoClient;
     static String connectionString = "mongodb+srv://omarali:TAdkQngpQVbSjAiM@excess.f6qpdn9.mongodb.net/?retryWrites=true&w=majority";
@@ -59,6 +66,47 @@ public class MongoInterface {
 
         DeleteResult deleteResult = collection.deleteMany(new Document());
         System.out.println(deleteResult.getDeletedCount() + " documents deleted from collection " + collectionName);
+    }
+    public static String insertSnippet(String URl, String snippet)
+    {
+        try {
+            // Get the target database and collection
+            MongoDatabase database = mongoClient.getDatabase("ExcessDB");
+            MongoCollection<Document> collection = database.getCollection("Snippets");
+            Document document = new Document("URL", URl)
+                    .append("Snippet", snippet);
+            // Insert the document into the collection
+            collection.insertOne(document);
+
+            ObjectId id = document.getObjectId("_id");
+            System.out.println("Inserted Snippet with _id: " + id);
+            return id.toString();
+
+        } catch (MongoException e) {
+            System.err.println("Error while inserting document: " + e.getMessage());
+            return null;
+        }
+    }
+    public static void insertWord(String word, String pri, String tf, String link, List<String> snippets)
+    {
+        ArrayList<Document>docs=new ArrayList<>();
+        Document doc=new Document("URL",link).append("Pri",pri).append("TF",tf).append("Snippets",snippets);
+        docs.add(doc);
+        Document document = new Document("Word", word)
+                .append("Websites", docs);
+        MongoDatabase database = mongoClient.getDatabase("ExcessDB");
+        MongoCollection<Document> collection = database.getCollection("Indexer");
+        collection.insertOne(document);
+        System.out.println("Inserted  word " + word);
+    }
+
+    public static void addWebsiteToDoc(String word, String pri, String tf, String link, List<String> snippets)
+    {
+        Document doc=new Document("URL",link).append("Pri",pri).append("TF",tf).append("Snippets",snippets);
+        MongoDatabase database = mongoClient.getDatabase("ExcessDB");
+        MongoCollection<Document> collection = database.getCollection("Indexer");
+        collection.updateOne(Filters.eq("Word", word), Updates.push("Websites", doc));
+        System.out.println("added website to word " + word);
     }
 
 }
