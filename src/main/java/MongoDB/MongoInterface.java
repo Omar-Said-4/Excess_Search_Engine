@@ -108,8 +108,10 @@ public class MongoInterface {
     public static MongoCursor<Document> getCursor(String c)
     {
         MongoDatabase database = mongoClient.getDatabase("ExcessDB");
-        MongoCollection<Document> collection = database.getCollection(c);
-        return collection.find().iterator();
+        MongoCollection<Document> collection = database.getCollection("URlS_DOCS");
+
+        MongoCursor<Document> cursor=collection.find().limit(5).iterator();
+        return cursor;
 
     }
 

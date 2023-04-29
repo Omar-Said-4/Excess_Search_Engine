@@ -24,7 +24,7 @@ public class queryP {
             "each", "either", "else", "for", "from", "had", "has", "have", "hence", "how", "i", "if", "in",
             "is", "it", "its", "just", "may", "maybe", "me", "might", "mine", "must", "my", "neither", "nor",
             "not", "of", "oh", "ok", "when", "whenever", "where", "whereas", "wherever", "whether", "which", "while",
-            "who", "whoever", "whom", "whose", "why", "will", "with", "within", "without", "would", "yes", "yet", "you", "your"};
+            "who", "whoever", "whom", "whose", "why", "will", "with", "within", "without", "would", "yes", "yet", "you", "your","all"};
     public static ArrayList<String> QueryProcessor(String prompt) {
 
         Pattern pattern = Pattern.compile("\\d"); // Match any digit
