@@ -30,7 +30,7 @@ public class queryP {
         Pattern pattern = Pattern.compile("\\d"); // Match any digit
         Reader reader = new StringReader(prompt);
         Reader filteredReader = new PatternReplaceCharFilter(pattern, "", reader);
-        Pattern pattern2=Pattern.compile("[^a-zA-Z0-9\\s]");
+        Pattern pattern2=Pattern.compile("[^a-zA-Z0-9\\s-]");
         filteredReader=new PatternReplaceCharFilter(pattern2, " ", filteredReader);
         StringBuilder outputBuilder = new StringBuilder();
         int ch;

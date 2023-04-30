@@ -125,8 +125,6 @@ public class Main {
         }
 
         System.out.println("Crawler Finished got : "+ links.size()+" websites inserting them to ExcessDB");
-
-
         HashMap<String , String> webs = new HashMap<>() ;
 
         if (Globals.count.get() <= 0 ) {
@@ -153,17 +151,6 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
-
-
-
-
-
-
-
-
-
 
         //User Query Processing
 //        QueryProcessor.query.QueryProcessor("This is a new play field");
