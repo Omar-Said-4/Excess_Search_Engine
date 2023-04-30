@@ -13,7 +13,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.net.ServerSocket;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -24,47 +26,23 @@ import javax.print.Doc;
 import javax.swing.event.DocumentEvent;
 
 public class IndexerMain {
-    public static void main(String[] args) {
+
+    private static class IndexerT extends Thread{
+        String URl;
+        String document;
+
+        Set<String> parsedWords;
 
 
-        String filePath = "Websites.ser";
-        File file = new File(filePath);
-
-        HashMap<String, String> webs = new HashMap<>();
-
-        if (file.exists()) {
-            try (FileInputStream fileIn = new FileInputStream(file);
-                 ObjectInputStream in = new ObjectInputStream(fileIn)) {
-                webs = (HashMap<String, String>) in.readObject();
-                System.out.println("All websites loaded from file: " + filePath);
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
-                // Handle the exception appropriately
-            }
+        public IndexerT(String url, String doc ,  Set<String> parsedWords)
+        {
+            this.URl = url;
+            this.document = doc;
+            this.parsedWords = parsedWords;
         }
 
-
-        Set<String> parsedWords = new HashSet<String>();
-        MongoInterface.Initialize();
-        DistinctIterable<String> distinctWords=MongoInterface.getWords();
-        for (String name : distinctWords) {
-
-            parsedWords.add(name);
-        }
-
-        // MongoInterface.terminate();
-        //int c=0;
-        HashMap<String, wordAttr> toInsert = new HashMap<>();
-       // int c=0;
-        for (Map.Entry<String, String> Wentry : webs.entrySet()) {
-
-            //System.out.println(c++);
-
-            String URl =Wentry.getKey();
-            String document=Wentry.getValue();;
-            System.out.println(URl);
-            System.out.println(document);
-
+        public void run() {
+            HashMap<String, wordAttr> toInsert = new HashMap<>();
             org.jsoup.nodes.Document toParse = Jsoup.parse(document);
             String text = toParse.text();
 
@@ -77,7 +55,7 @@ public class IndexerMain {
             // Count the number of words
             double count = words.length;
             String title=toParse.title().toString();
-           // System.out.println(count);
+            // System.out.println(count);
             Indexer.ParseH1(toParse,toInsert,URl,title);
             Indexer.ParseH2(toParse,toInsert,URl,title);
             Indexer.ParseH3(toParse,toInsert,URl,title);
@@ -102,23 +80,80 @@ public class IndexerMain {
             }
             //System.out.println(toInsert);
             iterator=toInsert.entrySet().iterator();
-            while (iterator.hasNext()) {
-                Map.Entry<String, wordAttr> entry = iterator.next();
-                if(!parsedWords.contains(entry.getKey()))
-                {
-                    parsedWords.add(entry.getKey());
-                    MongoInterface.insertWord(entry.getKey(),Integer.toString(entry.getValue().priority),Double.toString(entry.getValue().TF),URl,entry.getValue().snippets,entry.getValue().title);
+            synchronized(this.parsedWords)
+            {
+                while (iterator.hasNext()) {
+                    Map.Entry<String, wordAttr> entry = iterator.next();
+                    if (!parsedWords.contains(entry.getKey())) {
+                        parsedWords.add(entry.getKey());
+                        MongoInterface.insertWord(entry.getKey(), Integer.toString(entry.getValue().priority), Double.toString(entry.getValue().TF), URl, entry.getValue().snippets, entry.getValue().title);
+                    } else {
+                        MongoInterface.addWebsiteToDoc(entry.getKey(), Integer.toString(entry.getValue().priority), Double.toString(entry.getValue().TF), URl, entry.getValue().snippets, entry.getValue().title);
+                    }
                 }
-                else
-                {
-                  MongoInterface.addWebsiteToDoc(entry.getKey(),Integer.toString(entry.getValue().priority),Double.toString(entry.getValue().TF),URl,entry.getValue().snippets,entry.getValue().title);
-                }
+                System.out.println("Finished"+ this.getId());
             }
+            toInsert.clear();
 
-         toInsert.clear();
+
+        }
+    }
+
+
+
+
+
+
+    public static void main(String[] args) {
+
+
+        String filePath = "Websites.ser";
+        File file = new File(filePath);
+
+        HashMap<String, String> webs = new HashMap<>();
+
+        if (file.exists()) {
+            try (FileInputStream fileIn = new FileInputStream(file);
+                 ObjectInputStream in = new ObjectInputStream(fileIn)) {
+                webs = (HashMap<String, String>) in.readObject();
+                System.out.println("All websites loaded from file: " + filePath);
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+                // Handle the exception appropriately
+            }
         }
 
 
-        MongoInterface.terminate();
+
+        Set<String> parsedWords = new HashSet<String>();
+
+        MongoInterface.Initialize();
+        DistinctIterable<String> distinctWords=MongoInterface.getWords();
+        for (String name : distinctWords) {
+
+            parsedWords.add(name);
+        }
+
+
+        // MongoInterface.terminate();
+        //int c=0;
+
+       // int c=0;
+        for (Map.Entry<String, String> Wentry : webs.entrySet()) {
+
+            //System.out.println(c++);
+
+            String URl =Wentry.getKey();
+            String document=Wentry.getValue();;
+            System.out.println(URl);
+            //System.out.println(document);
+
+            new Thread(() -> {
+                new IndexerT(URl, document , parsedWords).start();
+            }).start();
+
+        }
+
+        // MongoInterface.terminate();
     }
 }
