@@ -1,9 +1,11 @@
 package PhraseSearching.java;
 
 import MongoDB.MongoInterface;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCursor;
 import org.bson.Document;
 
+import javax.print.Doc;
 import java.util.ArrayList;
 
 
@@ -16,7 +18,16 @@ class PhraseSearching {
     public static void search(String phrase) {
 
         MongoInterface.Initialize();
-        MongoCursor<Document> cursor = MongoInterface.getCollectionByWord("pope", "ExcessDB", "Indexer");
+        String[] words = phrase.split("\\s+");
+        Document doc = null;
+
+        for(String word : words){
+            doc = MongoInterface.getCollectionByWord("pope", "ExcessDB", "Indexer");
+///            cursor
+//            Document doc = cursor.next();
+//
+//            System.out.println(doc);
+        }
 
         MongoInterface.terminate();
 

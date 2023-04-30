@@ -39,21 +39,22 @@ public class MongoInterface {
 
     }
 
-    public static MongoCursor<Document> getCollectionByWord(String word, String dbName, String collectionName){
+    public static Document getCollectionByWord(String word, String dbName, String collectionName){
         // Try to get the id the of the document that has the word in the phrase
-        MongoCursor<Document> cursor = null;
+        Document doc = null;
 
         try{
             MongoDatabase database = mongoClient.getDatabase(dbName);
             MongoCollection<Document> collection = database.getCollection(collectionName);
 
             Document query = new Document("Word", word);
-            cursor = collection.find(query).iterator();
+            doc = collection.find(query).first();
 
+//            doc = cursor.first();
             // Iterate over the documents and print them
-            while (cursor.hasNext()) {
-                System.out.println(cursor.next().toJson());
-            }
+
+            System.out.println(doc.toBsonDocument().getArray("Websites"));
+
 
 //            // Close the cursor and the MongoDB client
 //            cursor.close();
@@ -62,7 +63,7 @@ public class MongoInterface {
             System.err.println("err");
         }
 
-        return cursor;
+        return doc;
     }
     public static void insertDocument(String databaseName, String collectionName, Document document) {
 
