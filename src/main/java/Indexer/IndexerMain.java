@@ -3,6 +3,7 @@ package Indexer;
 import CrawlerState.CrawlerState;
 import MongoDB.MongoInterface;
 import QueryProcessor.queryP;
+import com.mongodb.client.DistinctIterable;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
@@ -42,20 +43,27 @@ public class IndexerMain {
             }
         }
 
+
         Set<String> parsedWords = new HashSet<String>();
         MongoInterface.Initialize();
-       // MongoInterface.terminate();
-        MongoCursor<Document> cursor= MongoInterface.getCursor("URlS_DOCS");
+        DistinctIterable<String> distinctWords=MongoInterface.getWords();
+        for (String name : distinctWords) {
+
+            parsedWords.add(name);
+        }
+
+        // MongoInterface.terminate();
         //int c=0;
         HashMap<String, wordAttr> toInsert = new HashMap<>();
        // int c=0;
-        while (cursor.hasNext()) {
+        for (Map.Entry<String, String> Wentry : webs.entrySet()) {
 
             //System.out.println(c++);
-            Document doc = cursor.next();
-            String URl = doc.getString("URL");
-            String document=doc.getString("DOC");;
 
+            String URl =Wentry.getKey();
+            String document=Wentry.getValue();;
+            System.out.println(URl);
+            System.out.println(document);
 
             org.jsoup.nodes.Document toParse = Jsoup.parse(document);
             String text = toParse.text();
@@ -68,21 +76,27 @@ public class IndexerMain {
 
             // Count the number of words
             double count = words.length;
+            String title=toParse.title().toString();
            // System.out.println(count);
-            Indexer.ParseH1(toParse,toInsert,URl);
-            Indexer.ParseH2(toParse,toInsert,URl);
-            Indexer.ParseH3(toParse,toInsert,URl);
-            Indexer.ParseH4(toParse,toInsert,URl);
-            Indexer.ParseH5(toParse,toInsert,URl);
-            Indexer.ParseH6(toParse,toInsert,URl);
-            Indexer.ParseP(toParse,toInsert,URl);
-            Indexer.ParseDiv(toParse,toInsert,URl);
-            Indexer.ParseTitle(toParse,toInsert,URl);
+            Indexer.ParseH1(toParse,toInsert,URl,title);
+            Indexer.ParseH2(toParse,toInsert,URl,title);
+            Indexer.ParseH3(toParse,toInsert,URl,title);
+            Indexer.ParseH4(toParse,toInsert,URl,title);
+            Indexer.ParseH5(toParse,toInsert,URl,title);
+            Indexer.ParseH6(toParse,toInsert,URl,title);
+            Indexer.ParseP(toParse,toInsert,URl,title);
+            Indexer.ParseDiv(toParse,toInsert,URl,title);
+            Indexer.ParseTitle(toParse,toInsert,URl,title);
             Iterator<Map.Entry<String, wordAttr>> iterator = toInsert.entrySet().iterator();
             while (iterator.hasNext()) {
                 Map.Entry<String, wordAttr> entry = iterator.next();
                 double x =entry.getValue().TF/=count;
                 if (x > 0.5||entry.getKey().length()==1) {
+                    ArrayList<String>todec=entry.getValue().snippets;
+                    for (int i = 0; i < todec.size(); i++) {
+                        String element = todec.get(i);
+                        MongoInterface.decCount(element);
+                    }
                     iterator.remove(); // remove the current element from the map
                 }
             }
@@ -93,11 +107,11 @@ public class IndexerMain {
                 if(!parsedWords.contains(entry.getKey()))
                 {
                     parsedWords.add(entry.getKey());
-                    MongoInterface.insertWord(entry.getKey(),Integer.toString(entry.getValue().priority),Double.toString(entry.getValue().TF),URl,entry.getValue().snippets);
+                    MongoInterface.insertWord(entry.getKey(),Integer.toString(entry.getValue().priority),Double.toString(entry.getValue().TF),URl,entry.getValue().snippets,entry.getValue().title);
                 }
                 else
                 {
-                  MongoInterface.addWebsiteToDoc(entry.getKey(),Integer.toString(entry.getValue().priority),Double.toString(entry.getValue().TF),URl,entry.getValue().snippets);
+                  MongoInterface.addWebsiteToDoc(entry.getKey(),Integer.toString(entry.getValue().priority),Double.toString(entry.getValue().TF),URl,entry.getValue().snippets,entry.getValue().title);
                 }
             }
 
