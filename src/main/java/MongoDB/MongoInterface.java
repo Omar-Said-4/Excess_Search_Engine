@@ -10,6 +10,7 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
+import javax.print.Doc;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +37,32 @@ public class MongoInterface {
         mongoClient.close();
         System.out.println("Connection to Excess database is terminated");
 
+    }
+
+    public static MongoCursor<Document> getCollectionByWord(String word, String dbName, String collectionName){
+        // Try to get the id the of the document that has the word in the phrase
+        MongoCursor<Document> cursor = null;
+
+        try{
+            MongoDatabase database = mongoClient.getDatabase(dbName);
+            MongoCollection<Document> collection = database.getCollection(collectionName);
+
+            Document query = new Document("Word", word);
+            cursor = collection.find(query).iterator();
+
+            // Iterate over the documents and print them
+            while (cursor.hasNext()) {
+                System.out.println(cursor.next().toJson());
+            }
+
+//            // Close the cursor and the MongoDB client
+//            cursor.close();
+        }
+        catch (MongoException e){
+            System.err.println("err");
+        }
+
+        return cursor;
     }
     public static void insertDocument(String databaseName, String collectionName, Document document) {
 
