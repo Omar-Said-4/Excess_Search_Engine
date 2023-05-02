@@ -15,7 +15,7 @@ public class Indexer {
         String snippetId = null;
         for (Element tag : tags) {
             ArrayList<String> currWords = queryP.QueryProcessor(tag.text());
-            snippetId = MongoInterface.insertSnippet(URl, tag.text(), Integer.toString(currWords.size()));
+            snippetId = MongoInterface.insertSnippet(URl, tag.text(), Integer.toString(currWords.size()), tagName);
             // System.out.println(currWords);
             for (String word : currWords) {
                 wordAttr tmp = new wordAttr();

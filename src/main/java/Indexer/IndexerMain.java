@@ -68,6 +68,7 @@ public class IndexerMain {
             tagName_Priority.put("title", 10);
 
 
+
             for (String tag : tagName_Priority.keySet()) {
                 Integer priority = tagName_Priority.get(tag);
                 Indexer.ParseTag(toParse, toInsert, URl, title, tag, priority);
@@ -109,6 +110,10 @@ public class IndexerMain {
 
     public static void main(String[] args) {
 
+        MongoInterface.Initialize();
+
+        MongoInterface.deleteAllDocuments("Snippets");
+
 
         String filePath = "Websites.ser";
         File file = new File(filePath);
@@ -129,7 +134,6 @@ public class IndexerMain {
 
         Set<String> parsedWords = new HashSet<String>();
 
-        MongoInterface.Initialize();
         DistinctIterable<String> distinctWords = MongoInterface.getWords();
         for (String name : distinctWords) {
 
@@ -157,6 +161,6 @@ public class IndexerMain {
 
         }
 
-        // MongoInterface.terminate();
+//         MongoInterface.terminate();
     }
 }

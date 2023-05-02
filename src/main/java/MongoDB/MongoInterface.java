@@ -90,14 +90,14 @@ public class MongoInterface {
         DeleteResult deleteResult = collection.deleteMany(new Document());
         System.out.println(deleteResult.getDeletedCount() + " documents deleted from collection " + collectionName);
     }
-    public static String insertSnippet(String URl, String snippet,String count)
+    public static String insertSnippet(String URl, String snippet,String count, String tag)
     {
         try {
             // Get the target database and collection
             MongoDatabase database = mongoClient.getDatabase("ExcessDB");
             MongoCollection<Document> collection = database.getCollection("Snippets");
             Document document = new Document("URL", URl)
-                    .append("Snippet", snippet).append("Count",count);
+                    .append("Snippet", snippet).append("Count",count).append("Tag", tag);
             // Insert the document into the collection
             collection.insertOne(document);
 
