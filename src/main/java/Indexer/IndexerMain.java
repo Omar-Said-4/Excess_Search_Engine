@@ -27,15 +27,14 @@ import javax.swing.event.DocumentEvent;
 
 public class IndexerMain {
 
-    private static class IndexerT extends Thread{
+    private static class IndexerT extends Thread {
         String URl;
         String document;
 
         Set<String> parsedWords;
 
 
-        public IndexerT(String url, String doc ,  Set<String> parsedWords)
-        {
+        public IndexerT(String url, String doc, Set<String> parsedWords) {
             this.URl = url;
             this.document = doc;
             this.parsedWords = parsedWords;
@@ -54,23 +53,32 @@ public class IndexerMain {
 
             // Count the number of words
             double count = words.length;
-            String title=toParse.title().toString();
-            // System.out.println(count);
-            Indexer.ParseH1(toParse,toInsert,URl,title);
-            Indexer.ParseH2(toParse,toInsert,URl,title);
-            Indexer.ParseH3(toParse,toInsert,URl,title);
-            Indexer.ParseH4(toParse,toInsert,URl,title);
-            Indexer.ParseH5(toParse,toInsert,URl,title);
-            Indexer.ParseH6(toParse,toInsert,URl,title);
-            Indexer.ParseP(toParse,toInsert,URl,title);
-            Indexer.ParseDiv(toParse,toInsert,URl,title);
-            Indexer.ParseTitle(toParse,toInsert,URl,title);
+            String title = toParse.title().toString();
+
+            HashMap<String, Integer> tagName_Priority = new HashMap<>();
+
+            tagName_Priority.put("h1", 10);
+            tagName_Priority.put("h2", 9);
+            tagName_Priority.put("h3", 8);
+            tagName_Priority.put("h4", 7);
+            tagName_Priority.put("h5", 6);
+            tagName_Priority.put("h6", 5);
+            tagName_Priority.put("p", 4);
+            tagName_Priority.put("div", 4);
+            tagName_Priority.put("title", 10);
+
+
+            for (String tag : tagName_Priority.keySet()) {
+                Integer priority = tagName_Priority.get(tag);
+                Indexer.ParseTag(toParse, toInsert, URl, title, tag, priority);
+            }
+
             Iterator<Map.Entry<String, wordAttr>> iterator = toInsert.entrySet().iterator();
             while (iterator.hasNext()) {
                 Map.Entry<String, wordAttr> entry = iterator.next();
-                double x =entry.getValue().TF/=count;
-                if (x > 0.5||entry.getKey().length()==1) {
-                    ArrayList<String>todec=entry.getValue().snippets;
+                double x = entry.getValue().TF /= count;
+                if (x > 0.5 || entry.getKey().length() == 1) {
+                    ArrayList<String> todec = entry.getValue().snippets;
                     for (int i = 0; i < todec.size(); i++) {
                         String element = todec.get(i);
                         MongoInterface.decCount(element);
@@ -79,9 +87,8 @@ public class IndexerMain {
                 }
             }
             //System.out.println(toInsert);
-            iterator=toInsert.entrySet().iterator();
-            synchronized(this.parsedWords)
-            {
+            iterator = toInsert.entrySet().iterator();
+            synchronized (this.parsedWords) {
                 while (iterator.hasNext()) {
                     Map.Entry<String, wordAttr> entry = iterator.next();
                     if (!parsedWords.contains(entry.getKey())) {
@@ -91,17 +98,13 @@ public class IndexerMain {
                         MongoInterface.addWebsiteToDoc(entry.getKey(), Integer.toString(entry.getValue().priority), Double.toString(entry.getValue().TF), URl, entry.getValue().snippets, entry.getValue().title);
                     }
                 }
-                System.out.println("Finished"+ this.getId());
+                System.out.println("Finished" + this.getId());
             }
             toInsert.clear();
 
 
         }
     }
-
-
-
-
 
 
     public static void main(String[] args) {
@@ -124,11 +127,10 @@ public class IndexerMain {
         }
 
 
-
         Set<String> parsedWords = new HashSet<String>();
 
         MongoInterface.Initialize();
-        DistinctIterable<String> distinctWords=MongoInterface.getWords();
+        DistinctIterable<String> distinctWords = MongoInterface.getWords();
         for (String name : distinctWords) {
 
             parsedWords.add(name);
@@ -138,18 +140,19 @@ public class IndexerMain {
         // MongoInterface.terminate();
         //int c=0;
 
-       // int c=0;
+        // int c=0;
         for (Map.Entry<String, String> Wentry : webs.entrySet()) {
 
             //System.out.println(c++);
 
-            String URl =Wentry.getKey();
-            String document=Wentry.getValue();;
+            String URl = Wentry.getKey();
+            String document = Wentry.getValue();
+            ;
             System.out.println(URl);
             //System.out.println(document);
 
             new Thread(() -> {
-                new IndexerT(URl, document , parsedWords).start();
+                new IndexerT(URl, document, parsedWords).start();
             }).start();
 
         }

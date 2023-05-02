@@ -3,6 +3,8 @@ plugins {
     id 'java'
 }
 
+buildDir = "bin"
+
 repositories {
     mavenCentral()
     maven {

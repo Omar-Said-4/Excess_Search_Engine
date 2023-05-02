@@ -48,7 +48,7 @@ public class Main {
                 BFS[i] = new ConcurrentLinkedQueue<>();
             }
             try {
-                File myObj = new File("Excess_Search_Engine/src/main/java/Crawler/seed.txt");
+                File myObj = new File("src/main/java/Crawler/seed.txt");
                 Scanner myReader = new Scanner(myObj);
                 while (myReader.hasNext()) {
                     String link = myReader.next();
