@@ -13,21 +13,24 @@ class PhraseSearching {
 
 
     public static void main(String[] args) throws InterruptedException {
-            PhraseSearching.search("pope");
+            PhraseSearching.search("test case");
     }
     public static void search(String phrase) {
 
         MongoInterface.Initialize();
-        String[] words = phrase.split("\\s+");
+
+//        String[] words = phrase.split("\\s+");
         Document doc = null;
 
-        for(String word : words){
-            doc = MongoInterface.getCollectionByWord("pope", "ExcessDB", "Indexer");
-///            cursor
-//            Document doc = cursor.next();
-//
-//            System.out.println(doc);
-        }
+        MongoInterface.searchSubstrInSnippet(phrase);
+
+//        for(String word : words){
+//            doc = MongoInterface.getCollectionByWord("pope", "ExcessDB", "Indexer");
+/////            cursor
+////            Document doc = cursor.next();
+////
+////            System.out.println(doc);
+//        }
 
         MongoInterface.terminate();
 
