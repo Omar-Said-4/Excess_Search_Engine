@@ -218,6 +218,8 @@ public static void ParseH4(org.jsoup.nodes.Document toParse, HashMap<String, wor
 
         }
     }
+
+
     public static void ParseP(org.jsoup.nodes.Document toParse, HashMap<String, wordAttr> toInsert,String URl,String title)
     {
         Elements pTags = toParse.getElementsByTag("p");
@@ -252,6 +254,242 @@ public static void ParseH4(org.jsoup.nodes.Document toParse, HashMap<String, wor
 
         }
     }
+
+
+    public static void ParseMeta(org.jsoup.nodes.Document toParse, HashMap<String, wordAttr> toInsert,String URl,String title)
+    {
+        Elements meta = toParse.getElementsByTag("meta");
+        String snippetId=null;
+        for (Element Meta : meta) {
+            ArrayList<String> currWords= queryP.QueryProcessor(Meta.text());
+            snippetId= MongoInterface.insertSnippet(URl,Meta.text(),Integer.toString(currWords.size()));
+            //System.out.println(currWords);
+
+            for (String word : currWords) {
+                wordAttr tmp=new wordAttr();
+                if(!toInsert.containsKey(word))
+                {
+                    tmp.link=URl;
+                    tmp.priority+=10;
+                    tmp.TF++;
+                    tmp.title=title;
+                    tmp.tags.add("meta");
+                    tmp.snippets.add(snippetId);
+                    toInsert.put(word,tmp);
+                }
+                else
+                {
+                    wordAttr tmp2=toInsert.get(word);
+                    tmp2.TF++;
+                    tmp2.snippets.add(snippetId);
+                    if(!tmp2.tags.contains("meta")) {
+                        tmp2.tags.add("meta");
+                        tmp2.priority += 10;
+                    }
+                }
+            }
+
+        }
+    }
+
+
+    public static void ParseStrong(org.jsoup.nodes.Document toParse, HashMap<String, wordAttr> toInsert,String URl,String title)
+    {
+        Elements strong = toParse.select("strong:not(p > strong):not(div > strong)");
+
+
+        String snippetId=null;
+        for (Element Strong : strong) {
+            ArrayList<String> currWords= queryP.QueryProcessor(Strong.text());
+            snippetId= MongoInterface.insertSnippet(URl,Strong.text(),Integer.toString(currWords.size()));
+            //System.out.println(currWords);
+
+            for (String word : currWords) {
+                wordAttr tmp=new wordAttr();
+                if(!toInsert.containsKey(word))
+                {
+                    tmp.link=URl;
+                    tmp.priority+=4;
+                    tmp.TF++;
+                    tmp.title=title;
+                    tmp.tags.add("strong");
+                    tmp.snippets.add(snippetId);
+                    toInsert.put(word,tmp);
+                }
+                else
+                {
+                    wordAttr tmp2=toInsert.get(word);
+                    tmp2.TF++;
+                    tmp2.snippets.add(snippetId);
+                    if(!tmp2.tags.contains("strong")) {
+                        tmp2.tags.add("strong");
+                        tmp2.priority += 4;
+                    }
+                }
+            }
+
+        }
+    }
+
+
+    public static void ParseUL(org.jsoup.nodes.Document toParse, HashMap<String, wordAttr> toInsert,String URl,String title)
+    {
+        Elements ul = toParse.select("u:not(p > u):not(div > u)");
+
+
+        String snippetId=null;
+        for (Element underline : ul) {
+            ArrayList<String> currWords= queryP.QueryProcessor(underline.text());
+            snippetId= MongoInterface.insertSnippet(URl,underline.text(),Integer.toString(currWords.size()));
+            //System.out.println(currWords);
+
+            for (String word : currWords) {
+                wordAttr tmp=new wordAttr();
+                if(!toInsert.containsKey(word))
+                {
+                    tmp.link=URl;
+                    tmp.priority+=4;
+                    tmp.TF++;
+                    tmp.title=title;
+                    tmp.tags.add("u");
+                    tmp.snippets.add(snippetId);
+                    toInsert.put(word,tmp);
+                }
+                else
+                {
+                    wordAttr tmp2=toInsert.get(word);
+                    tmp2.TF++;
+                    tmp2.snippets.add(snippetId);
+                    if(!tmp2.tags.contains("u")) {
+                        tmp2.tags.add("u");
+                        tmp2.priority += 4;
+                    }
+                }
+            }
+
+        }
+    }
+
+
+
+    public static void Parseblockquote(org.jsoup.nodes.Document toParse, HashMap<String, wordAttr> toInsert,String URl,String title)
+    {
+        Elements block = toParse.select("blockquote:not(p > blockquote):not(div > blockquote)");
+
+
+        String snippetId=null;
+        for (Element Blockq : block) {
+            ArrayList<String> currWords= queryP.QueryProcessor(Blockq.text());
+            snippetId= MongoInterface.insertSnippet(URl,Blockq.text(),Integer.toString(currWords.size()));
+            //System.out.println(currWords);
+
+            for (String word : currWords) {
+                wordAttr tmp=new wordAttr();
+                if(!toInsert.containsKey(word))
+                {
+                    tmp.link=URl;
+                    tmp.priority+=4;
+                    tmp.TF++;
+                    tmp.title=title;
+                    tmp.tags.add("blockquote");
+                    tmp.snippets.add(snippetId);
+                    toInsert.put(word,tmp);
+                }
+                else
+                {
+                    wordAttr tmp2=toInsert.get(word);
+                    tmp2.TF++;
+                    tmp2.snippets.add(snippetId);
+                    if(!tmp2.tags.contains("blockquote")) {
+                        tmp2.tags.add("blockquote");
+                        tmp2.priority += 4;
+                    }
+                }
+            }
+
+        }
+    }
+
+
+    public static void ParseCode(org.jsoup.nodes.Document toParse, HashMap<String, wordAttr> toInsert,String URl,String title)
+    {
+        Elements code = toParse.select("code:not(p > code):not(div > code)");
+
+
+        String snippetId=null;
+        for (Element C : code) {
+            ArrayList<String> currWords= queryP.QueryProcessor(C.text());
+            snippetId= MongoInterface.insertSnippet(URl,C.text(),Integer.toString(currWords.size()));
+            //System.out.println(currWords);
+
+            for (String word : currWords) {
+                wordAttr tmp=new wordAttr();
+                if(!toInsert.containsKey(word))
+                {
+                    tmp.link=URl;
+                    tmp.priority+=4;
+                    tmp.TF++;
+                    tmp.title=title;
+                    tmp.tags.add("code");
+                    tmp.snippets.add(snippetId);
+                    toInsert.put(word,tmp);
+                }
+                else
+                {
+                    wordAttr tmp2=toInsert.get(word);
+                    tmp2.TF++;
+                    tmp2.snippets.add(snippetId);
+                    if(!tmp2.tags.contains("code")) {
+                        tmp2.tags.add("code");
+                        tmp2.priority += 4;
+                    }
+                }
+            }
+
+        }
+    }
+
+
+
+    public static void ParseItalic(org.jsoup.nodes.Document toParse, HashMap<String, wordAttr> toInsert,String URl,String title)
+    {
+        Elements italic = toParse.select("em:not(p > em):not(div > em)");
+
+
+        String snippetId=null;
+        for (Element em : italic) {
+            ArrayList<String> currWords= queryP.QueryProcessor(em.text());
+            snippetId= MongoInterface.insertSnippet(URl,em.text(),Integer.toString(currWords.size()));
+            //System.out.println(currWords);
+
+            for (String word : currWords) {
+                wordAttr tmp=new wordAttr();
+                if(!toInsert.containsKey(word))
+                {
+                    tmp.link=URl;
+                    tmp.priority+=4;
+                    tmp.TF++;
+                    tmp.title=title;
+                    tmp.tags.add("em");
+                    tmp.snippets.add(snippetId);
+                    toInsert.put(word,tmp);
+                }
+                else
+                {
+                    wordAttr tmp2=toInsert.get(word);
+                    tmp2.TF++;
+                    tmp2.snippets.add(snippetId);
+                    if(!tmp2.tags.contains("em")) {
+                        tmp2.tags.add("em");
+                        tmp2.priority += 4;
+                    }
+                }
+            }
+
+        }
+    }
+
+
     public static void ParseDiv(org.jsoup.nodes.Document toParse, HashMap<String, wordAttr> toInsert,String URl,String title)
     {
         Elements dTags = toParse.getElementsByTag("div");
@@ -292,6 +530,15 @@ public static void ParseH4(org.jsoup.nodes.Document toParse, HashMap<String, wor
 
         }
     }
+
+
+
+
+
+
+
+
+
     public static void ParseTitle(org.jsoup.nodes.Document toParse, HashMap<String, wordAttr> toInsert,String URl,String title)
     {
         Elements tTags = toParse.getElementsByTag("title");
