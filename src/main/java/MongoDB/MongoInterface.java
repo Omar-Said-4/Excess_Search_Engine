@@ -250,9 +250,19 @@ public class MongoInterface {
                 Filters.eq("Word", word),
                 Filters.exists("Websites")
         )).first();
-        List<Object> arrayField = document.getList("Websites", Object.class);
+        if(document!=null) {
+            List<Object> arrayField = document.getList("Websites", Object.class);
 
-        return arrayField;
+            return arrayField;
+        }
+        return null;
+    }
+    public static String getSnippet(String id)
+    {
+        MongoDatabase database = mongoClient.getDatabase("ExcessDB");
+        MongoCollection<Document> collection = database.getCollection("Snippets");
+        Document document = collection.find(Filters.eq("_id", new ObjectId(id))).first();
+        return document.getString("Snippet");
     }
 
 }

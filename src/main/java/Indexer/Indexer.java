@@ -495,11 +495,8 @@ public static void ParseH4(org.jsoup.nodes.Document toParse, HashMap<String, wor
         Elements dTags = toParse.getElementsByTag("div");
         String snippetId=null;
         for (Element dTag : dTags) {
-           // dTag.unwrap();
 
             dTag.select("p").remove(); // remove all p elements
-        //    System.out.println(dTag);
-         //   System.out.println(dTag.text());
 
             ArrayList<String> currWords= queryP.QueryProcessor(dTag.text());
             snippetId= MongoInterface.insertSnippet(URl,dTag.text(),Integer.toString(currWords.size()),"div");
