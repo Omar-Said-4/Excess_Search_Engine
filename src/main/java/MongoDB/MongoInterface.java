@@ -13,6 +13,7 @@ import org.bson.types.ObjectId;
 
 import javax.print.Doc;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MongoInterface {
@@ -140,6 +141,50 @@ public class MongoInterface {
             return null;
         }
     }
+
+
+    public static void insertWebsitePopularity(HashMap<String , Double> webs)
+    {
+        try{
+            MongoDatabase database = mongoClient.getDatabase("ExcessDB");
+            MongoCollection<Document> collection = database.getCollection("Websites");
+
+            for (HashMap.Entry<String, Double> entry : webs.entrySet()) {
+                String URl = entry.getKey();
+                Double Popularity = entry.getValue();
+                Document document = new Document("URL", URl).append("Popularity", Popularity);
+                collection.insertOne(document);
+            }
+
+        }catch (MongoException e){
+            System.err.println("Error while inserting document: " + e.getMessage());
+        }
+    }
+
+
+
+    public static HashMap<String , Double> getWebsitePopularity(String[] weblist)
+    {
+
+        HashMap<String , Double> webs = new HashMap<>();
+        try{
+            MongoDatabase db = mongoClient.getDatabase("ExcessDB");
+            MongoCollection<Document> collection = db.getCollection("Websites");
+            List<Document> results = collection.find(Filters.in("URL", weblist)).into(new ArrayList<>());
+            for(Document website : results)
+            {
+                webs.put(website.getString("URL"),website.getDouble("Popularity"));
+            }
+
+        }catch(MongoException e)
+        {
+            System.err.println("Error while getting websites-popularity: " + e.getMessage());
+            return null;
+        }
+        return webs;
+    }
+
+
 
     public static void insertWord(String word, String pri, String tf, String link, List<String> snippets, String title) {
         ArrayList<Document> docs = new ArrayList<>();
