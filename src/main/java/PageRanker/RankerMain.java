@@ -12,17 +12,14 @@ public class RankerMain {
 
     public static void main(String[] args){
 
-        String prompt = "Hello let's play football";
+        String prompt = "play chess";
 
-        // placeholder for the query processor
 
-        Scanner s= new Scanner(System.in);
-
-        prompt = s.next();
 
         ArrayList<String> values = QueryProcessor(prompt);
 
-        String searchQuery[]= values.toArray(new String[values.size()]);
+        String searchQuery[]= new String[values.size()];
+        searchQuery=  values.toArray(searchQuery);
 
         Map<String, Integer> Snippets = new HashMap<>();
 
