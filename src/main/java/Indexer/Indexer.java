@@ -15,7 +15,7 @@ public static void ParseH1(org.jsoup.nodes.Document toParse, HashMap<String, wor
     String snippetId=null;
     for (Element h1Tag : h1Tags) {
         ArrayList<String> currWords= queryP.QueryProcessor(h1Tag.text());
-        snippetId= MongoInterface.insertSnippet(URl,h1Tag.text(),Integer.toString(currWords.size()));
+        snippetId= MongoInterface.insertSnippet(URl,h1Tag.text(),Integer.toString(currWords.size()),"h1");
         //System.out.println(currWords);
         for (String word : currWords) {
             wordAttr tmp=new wordAttr();
@@ -49,7 +49,7 @@ public static void ParseH2(org.jsoup.nodes.Document toParse, HashMap<String, wor
     String snippetId=null;
     for (Element h2Tag : h2Tags) {
         ArrayList<String> currWords= queryP.QueryProcessor(h2Tag.text());
-        snippetId= MongoInterface.insertSnippet(URl,h2Tag.text(),Integer.toString(currWords.size()));
+        snippetId= MongoInterface.insertSnippet(URl,h2Tag.text(),Integer.toString(currWords.size()),"h2");
         //System.out.println(currWords);
         for (String word : currWords) {
             wordAttr tmp=new wordAttr();
@@ -83,7 +83,7 @@ public static void ParseH3(org.jsoup.nodes.Document toParse, HashMap<String, wor
     String snippetId=null;
     for (Element h3Tag : h3Tags) {
             ArrayList<String> currWords= queryP.QueryProcessor(h3Tag.text());
-        snippetId= MongoInterface.insertSnippet(URl,h3Tag.text(),Integer.toString(currWords.size()));
+        snippetId= MongoInterface.insertSnippet(URl,h3Tag.text(),Integer.toString(currWords.size()),"h3");
         //System.out.println(currWords);
             for (String word : currWords) {
                 wordAttr tmp=new wordAttr();
@@ -119,7 +119,7 @@ public static void ParseH4(org.jsoup.nodes.Document toParse, HashMap<String, wor
         String snippetId=null;
         for (Element h4Tag : h4Tags) {
             ArrayList<String> currWords= queryP.QueryProcessor(h4Tag.text());
-            snippetId= MongoInterface.insertSnippet(URl,h4Tag.text(),Integer.toString(currWords.size()));
+            snippetId= MongoInterface.insertSnippet(URl,h4Tag.text(),Integer.toString(currWords.size()),"h4");
             //System.out.println(currWords);
             for (String word : currWords) {
                 wordAttr tmp=new wordAttr();
@@ -155,7 +155,7 @@ public static void ParseH4(org.jsoup.nodes.Document toParse, HashMap<String, wor
         String snippetId=null;
         for (Element h5Tag : h5Tags) {
             ArrayList<String> currWords= queryP.QueryProcessor(h5Tag.text());
-            snippetId= MongoInterface.insertSnippet(URl,h5Tag.text(),Integer.toString(currWords.size()));
+            snippetId= MongoInterface.insertSnippet(URl,h5Tag.text(),Integer.toString(currWords.size()),"h5");
             //System.out.println(currWords);
             for (String word : currWords) {
                 wordAttr tmp=new wordAttr();
@@ -190,7 +190,7 @@ public static void ParseH4(org.jsoup.nodes.Document toParse, HashMap<String, wor
         String snippetId=null;
         for (Element h6Tag : h6Tags) {
             ArrayList<String> currWords= queryP.QueryProcessor(h6Tag.text());
-            snippetId= MongoInterface.insertSnippet(URl,h6Tag.text(),Integer.toString(currWords.size()));
+            snippetId= MongoInterface.insertSnippet(URl,h6Tag.text(),Integer.toString(currWords.size()),"h6");
             //System.out.println(currWords);
             for (String word : currWords) {
                 wordAttr tmp=new wordAttr();
@@ -226,7 +226,7 @@ public static void ParseH4(org.jsoup.nodes.Document toParse, HashMap<String, wor
         String snippetId=null;
         for (Element pTag : pTags) {
             ArrayList<String> currWords= queryP.QueryProcessor(pTag.text());
-            snippetId= MongoInterface.insertSnippet(URl,pTag.text(),Integer.toString(currWords.size()));
+            snippetId= MongoInterface.insertSnippet(URl,pTag.text(),Integer.toString(currWords.size()),"p");
             //System.out.println(currWords);
             for (String word : currWords) {
                 wordAttr tmp=new wordAttr();
@@ -262,7 +262,7 @@ public static void ParseH4(org.jsoup.nodes.Document toParse, HashMap<String, wor
         String snippetId=null;
         for (Element Meta : meta) {
             ArrayList<String> currWords= queryP.QueryProcessor(Meta.text());
-            snippetId= MongoInterface.insertSnippet(URl,Meta.text(),Integer.toString(currWords.size()));
+            snippetId= MongoInterface.insertSnippet(URl,Meta.text(),Integer.toString(currWords.size()),"meta");
             //System.out.println(currWords);
 
             for (String word : currWords) {
@@ -301,7 +301,7 @@ public static void ParseH4(org.jsoup.nodes.Document toParse, HashMap<String, wor
         String snippetId=null;
         for (Element Strong : strong) {
             ArrayList<String> currWords= queryP.QueryProcessor(Strong.text());
-            snippetId= MongoInterface.insertSnippet(URl,Strong.text(),Integer.toString(currWords.size()));
+            snippetId= MongoInterface.insertSnippet(URl,Strong.text(),Integer.toString(currWords.size()),"strong");
             //System.out.println(currWords);
 
             for (String word : currWords) {
@@ -340,7 +340,7 @@ public static void ParseH4(org.jsoup.nodes.Document toParse, HashMap<String, wor
         String snippetId=null;
         for (Element underline : ul) {
             ArrayList<String> currWords= queryP.QueryProcessor(underline.text());
-            snippetId= MongoInterface.insertSnippet(URl,underline.text(),Integer.toString(currWords.size()));
+            snippetId= MongoInterface.insertSnippet(URl,underline.text(),Integer.toString(currWords.size()),"u");
             //System.out.println(currWords);
 
             for (String word : currWords) {
@@ -380,7 +380,7 @@ public static void ParseH4(org.jsoup.nodes.Document toParse, HashMap<String, wor
         String snippetId=null;
         for (Element Blockq : block) {
             ArrayList<String> currWords= queryP.QueryProcessor(Blockq.text());
-            snippetId= MongoInterface.insertSnippet(URl,Blockq.text(),Integer.toString(currWords.size()));
+            snippetId= MongoInterface.insertSnippet(URl,Blockq.text(),Integer.toString(currWords.size()),"blockquote");
             //System.out.println(currWords);
 
             for (String word : currWords) {
@@ -419,7 +419,7 @@ public static void ParseH4(org.jsoup.nodes.Document toParse, HashMap<String, wor
         String snippetId=null;
         for (Element C : code) {
             ArrayList<String> currWords= queryP.QueryProcessor(C.text());
-            snippetId= MongoInterface.insertSnippet(URl,C.text(),Integer.toString(currWords.size()));
+            snippetId= MongoInterface.insertSnippet(URl,C.text(),Integer.toString(currWords.size()),"code");
             //System.out.println(currWords);
 
             for (String word : currWords) {
@@ -459,7 +459,7 @@ public static void ParseH4(org.jsoup.nodes.Document toParse, HashMap<String, wor
         String snippetId=null;
         for (Element em : italic) {
             ArrayList<String> currWords= queryP.QueryProcessor(em.text());
-            snippetId= MongoInterface.insertSnippet(URl,em.text(),Integer.toString(currWords.size()));
+            snippetId= MongoInterface.insertSnippet(URl,em.text(),Integer.toString(currWords.size()),"em");
             //System.out.println(currWords);
 
             for (String word : currWords) {
@@ -502,7 +502,7 @@ public static void ParseH4(org.jsoup.nodes.Document toParse, HashMap<String, wor
          //   System.out.println(dTag.text());
 
             ArrayList<String> currWords= queryP.QueryProcessor(dTag.text());
-            snippetId= MongoInterface.insertSnippet(URl,dTag.text(),Integer.toString(currWords.size()));
+            snippetId= MongoInterface.insertSnippet(URl,dTag.text(),Integer.toString(currWords.size()),"div");
             // System.out.println(currWords);
             for (String word : currWords) {
                 wordAttr tmp=new wordAttr();
@@ -546,7 +546,7 @@ public static void ParseH4(org.jsoup.nodes.Document toParse, HashMap<String, wor
         for (Element tTag : tTags) {
 
             ArrayList<String> currWords= queryP.QueryProcessor(tTag.text());
-            snippetId= MongoInterface.insertSnippet(URl,tTag.text(),Integer.toString(currWords.size()));
+            snippetId= MongoInterface.insertSnippet(URl,tTag.text(),Integer.toString(currWords.size()),"title");
 
             //System.out.println(currWords);
             for (String word : currWords) {

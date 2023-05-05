@@ -13,7 +13,7 @@ class PhraseSearching {
 
 
     public static void main(String[] args) throws InterruptedException {
-            PhraseSearching.search("test case");
+            PhraseSearching.search("Tell us what titles or");
     }
     public static void search(String phrase) {
 
