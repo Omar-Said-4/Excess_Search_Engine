@@ -40,9 +40,9 @@ public class RankerMain {
                     Document websiteDoc = (Document) obj;
                     String url = websiteDoc.getString("URL");
                     String title = websiteDoc.getString("Title");
-                    Double tf = Double.parseDouble(websiteDoc.getString("TF"));
-                    Double pri = Math.log(Double.parseDouble(websiteDoc.getString("Pri")))* 0.1;
-                    Double idf = Math.log(numOfdocs / df);
+                    double tf = Double.parseDouble(websiteDoc.getString("TF"));
+                    double pri = 2*Math.log(Double.parseDouble(websiteDoc.getString("Pri")))* 0.1;
+                    double idf = Math.log(numOfdocs / df);
 
                     if (!toDisplayTmp.containsKey(url)) {
                         linkAttr tmp = new linkAttr();
@@ -65,8 +65,8 @@ public class RankerMain {
         Comparator<String> valueComparator = new Comparator<String>() {
             @Override
             public int compare(String s1, String s2) {
-                Double value1 = toDisplayTmp.get(s1).pri;
-                Double value2 = toDisplayTmp.get(s2).pri;
+                double value1 = toDisplayTmp.get(s1).pri;
+                double value2 = toDisplayTmp.get(s2).pri;
                 return Double.compare(value2, value1); // descending order
             }
         };
