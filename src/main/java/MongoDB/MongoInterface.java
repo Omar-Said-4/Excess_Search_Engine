@@ -242,5 +242,17 @@ public class MongoInterface {
         DistinctIterable<String> distinctWords = collection.distinct("Word", String.class);
         return distinctWords;
     }
+    public static  List<Object> getWordDocs(String word)
+    {
+        MongoDatabase database = mongoClient.getDatabase("ExcessDB");
+        MongoCollection<Document> collection = database.getCollection("Indexer");
+        Document document =  collection.find(Filters.and(
+                Filters.eq("Word", word),
+                Filters.exists("Websites")
+        )).first();
+        List<Object> arrayField = document.getList("Websites", Object.class);
+
+        return arrayField;
+    }
 
 }
