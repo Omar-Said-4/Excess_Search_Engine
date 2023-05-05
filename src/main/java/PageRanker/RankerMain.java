@@ -68,7 +68,7 @@ public class RankerMain {
                 }
             }
         }
-        MongoInterface.terminate();
+
         // use the popularity in the calculation
 
         Comparator<String> valueComparator = new Comparator<String>() {
@@ -91,8 +91,10 @@ public class RankerMain {
                     .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
                     .forEachOrdered(e -> descendingMap.put(e.getKey(), e.getValue()));
             Map.Entry<String, Integer> firstEntry = descendingMap.entrySet().iterator().next();
-
-            System.out.println("Website: " + key + ", Priority: " + value.pri +"best Snippet: "+ firstEntry);
+            String toShow=MongoInterface.getSnippet(firstEntry.getKey());
+            System.out.println("Website: " + key + ", Priority: " + value.pri +"best Snippet: "+ toShow.replaceAll("[^\\p{ASCII}]", "'"));
         });
+        MongoInterface.terminate();
+
     }
     }
