@@ -42,7 +42,9 @@ public class Main {
         Set<String>links= ConcurrentHashMap.newKeySet();
         ConcurrentLinkedQueue<String>[] BFS = new ConcurrentLinkedQueue[50];
 
-        
+        HashMap<String, ConcurrentLinkedQueue<String>> outGoingLinks = new HashMap<>();
+
+
         if (state==null || state.getFlag() == 1) {
             for (int i = 0; i < 50; i++) {
                 BFS[i] = new ConcurrentLinkedQueue<>();
@@ -83,7 +85,7 @@ public class Main {
             Globals.count = state.getCount();
             Globals.levelNum.set(BFS[Globals.turn.get()].size());
             Doc_Spec_txt = state.getDoc();
-
+            outGoingLinks = state.getOutGoingLinks();
         }
 
         Thread[] threads = new Thread[Globals.numThreads];
@@ -93,7 +95,7 @@ public class Main {
 
 
         for (int i = 0; i < Globals.numThreads; i++) {
-            threads[i] = new Thread(new Crawler(BFS,links,Doc_Spec_txt));
+            threads[i] = new Thread(new Crawler(BFS,links,Doc_Spec_txt, outGoingLinks));
             threads[i].setName(Integer.toString(i));
             threads[i].start();
         }
@@ -104,12 +106,14 @@ public class Main {
         Set<String> finalLinks = links;
         Set<String> finalDoc_Spec_txt = Doc_Spec_txt;
 
+        HashMap<String, ConcurrentLinkedQueue<String>> finalOutLinks = outGoingLinks;
+
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             int flag = 0;
             if (Globals.count.get() <= 0) {
                 flag = 1;
             }
-            CrawlerState Runstate = new CrawlerState(finalBFS, Globals.numThreads, Globals.turn, flag, Globals.count, Globals.levelNum, finalLinks, finalDoc_Spec_txt);
+            CrawlerState Runstate = new CrawlerState(finalBFS, Globals.numThreads, Globals.turn, flag, Globals.count, Globals.levelNum, finalLinks, finalDoc_Spec_txt, finalOutLinks);
             try (FileOutputStream fileOut = new FileOutputStream("crawler_state.ser");
                  ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
                 out.writeObject(Runstate);
