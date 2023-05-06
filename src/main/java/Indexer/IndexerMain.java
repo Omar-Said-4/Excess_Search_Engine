@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.ServerSocket;
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -57,6 +58,8 @@ public class IndexerMain {
             String title=toParse.title().toString();
             // System.out.println(count);
             // Indexer.ParseMeta(toParse,toInsert,URl,title);
+
+
             Indexer.Parseblockquote(toParse,toInsert,URl,title);
             Indexer.ParseStrong(toParse,toInsert,URl,title);
             Indexer.ParseCode(toParse,toInsert,URl,title);
@@ -71,7 +74,10 @@ public class IndexerMain {
             Indexer.ParseP(toParse,toInsert,URl,title);
             Indexer.ParseDiv(toParse,toInsert,URl,title);
             Indexer.ParseTitle(toParse,toInsert,URl,title);
+
+
             Iterator<Map.Entry<String, wordAttr>> iterator = toInsert.entrySet().iterator();
+
             while (iterator.hasNext()) {
                 Map.Entry<String, wordAttr> entry = iterator.next();
                 double x =entry.getValue().TF/=count;
@@ -84,8 +90,10 @@ public class IndexerMain {
                     iterator.remove(); // remove the current element from the map
                 }
             }
+
             //System.out.println(toInsert);
             iterator=toInsert.entrySet().iterator();
+
             synchronized(this.parsedWords)
             {
                 while (iterator.hasNext()) {
@@ -99,6 +107,7 @@ public class IndexerMain {
                 }
                 System.out.println("Finished"+ this.getId());
             }
+
             toInsert.clear();
 
 
@@ -136,7 +145,6 @@ public class IndexerMain {
         MongoInterface.Initialize();
         DistinctIterable<String> distinctWords=MongoInterface.getWords();
         for (String name : distinctWords) {
-
             parsedWords.add(name);
         }
 
@@ -146,18 +154,15 @@ public class IndexerMain {
 
        // int c=0;
         for (Map.Entry<String, String> Wentry : webs.entrySet()) {
-
             //System.out.println(c++);
-
             String URl =Wentry.getKey();
+
             String document=Wentry.getValue();;
             System.out.println(URl);
-            //System.out.println(document);
-
             new Thread(() -> {
                 new IndexerT(URl, document , parsedWords).start();
             }).start();
-
+//            webs.remove(URl);
         }
 
         // MongoInterface.terminate();
