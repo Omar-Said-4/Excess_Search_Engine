@@ -158,7 +158,7 @@ public class PageRanker {
 
 
         assert state != null;
-        HashMap<String, ConcurrentLinkedQueue<String>> outGoingLinks = state.getOutGoingLinks();
+       // HashMap<String, ConcurrentLinkedQueue<String>> outGoingLinks = state.getOutGoingLinks();
         System.out.println(outGoingLinks.size());
         Thread.sleep(5000);
 

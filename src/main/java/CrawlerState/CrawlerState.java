@@ -1,6 +1,5 @@
 package CrawlerState;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,15 +17,11 @@ public class CrawlerState implements Serializable {
     private final AtomicInteger level ;
     private final Set<String> links;
     private final Set<String> Doc;
-
-    private final HashMap<String, ConcurrentLinkedQueue<String>> outGoingLinks;
-
-    public CrawlerState(ConcurrentLinkedQueue<String>[] BFS , int numThreads, AtomicInteger current_Turn , int flag,AtomicInteger c , AtomicInteger l  , Set<String> li , Set<String> doc, HashMap<String, ConcurrentLinkedQueue<String>> outGoingLinks) {
+    public CrawlerState(ConcurrentLinkedQueue<String>[] BFS , int numThreads, AtomicInteger current_Turn , int flag,AtomicInteger c , AtomicInteger l  , Set<String> li , Set<String> doc) {
         this.BFS = BFS;
         this.numThreads = numThreads;
         this.current_Turn = current_Turn;
         this.flag =flag ;
-        this.outGoingLinks = outGoingLinks;
         count = c;
         level = l;
         links = li;
@@ -38,10 +33,6 @@ public class CrawlerState implements Serializable {
         return BFS;
     }
 
-    public HashMap<String, ConcurrentLinkedQueue<String>> getOutGoingLinks()
-    {
-        return outGoingLinks;
-    }
     public int getNumThreads() {
         return numThreads;
     }

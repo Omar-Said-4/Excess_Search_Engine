@@ -1,29 +1,30 @@
 package Crawler;
 
-import org.apache.lucene.util.fst.PairOutputs;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 public class Crawler implements  Runnable{
 
     Set<String>links;
     ConcurrentLinkedQueue<String>[] BFS ;
 
-    HashMap<String, ConcurrentLinkedQueue<String>> outGoingLinks;
     Set<String> Doc_Spec_txt;
-    public Crawler(ConcurrentLinkedQueue<String>[] BFS ,  Set<String>links, Set<String> DST, HashMap<String, ConcurrentLinkedQueue<String>>  outGoingLinks)
+    public Crawler(   ConcurrentLinkedQueue<String>[] BFS ,  Set<String>links, Set<String> DST)
     {
         this.links=links;
         this.BFS=BFS;
         Doc_Spec_txt=DST;
-        this.outGoingLinks = outGoingLinks;
     }
     private boolean isValidURL(String url) {
         try {
@@ -344,8 +345,12 @@ public class Crawler implements  Runnable{
                 continue;
             }
             if (doc != null) {
-
+                // synchronized (this.URL_Docs) {
+                //   URL_Docs.clear();
+                // URL_Docs.put(currURL, doc);
+                //   Globals.count--;
                 Globals.count.decrementAndGet();
+                //}
                 Elements links = doc.select("a[href]");
                 int maxcount=100;
                 for (Element link : links) {
@@ -357,28 +362,22 @@ public class Crawler implements  Runnable{
                         BFS[currturn+1].add(next_link);
                     }
                 }
-
-                outGoingLinks.put(currURL, BFS[currturn+1]);
-
-                for (Map.Entry<String, ConcurrentLinkedQueue<String>> entry : outGoingLinks.entrySet()) {
-                    System.out.println(entry.getKey() + " : " + entry.getValue());
-                    System.out.println();
-                }
-
                 Globals.levelNum.decrementAndGet();
-            }
-            else
-            {
-                Globals.levelNum.decrementAndGet();
-            }
-            System.out.println(Globals.count.get() +" " + BFS[currturn].size()+" "+BFS[currturn+1].size()+" "+currturn+" "+Globals.levelNum.get());
-        }
-
-    }
-
-}
                 // System.out.println( Thread.currentThread().getName()+" "+localseed.size());
 //                    if(localseed.size()<=10) {
 //                        System.out.println(localseed);
 //                        System.out.println(doc);
 //                    }
+            }
+            else
+            {
+                Globals.levelNum.decrementAndGet();
+            }
+            //System.out.println("Thread : " + Thread.currentThread().getName()+" remaining: "+c+" curr local seed size: "+localseed.size());
+            System.out.println(Globals.count.get() +" " + BFS[currturn].size()+" "+BFS[currturn+1].size()+" "+currturn+" "+Globals.levelNum.get());
+        }
+        // System.out.println("thread " + Thread.currentThread().getName()+" finished with "+(Globals.portion-c) +" websites");
+
+    }
+
+}
