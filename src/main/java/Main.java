@@ -6,18 +6,17 @@ import org.bson.Document;
 import org.jsoup.Jsoup;
 
 
+import javax.print.Doc;
 import java.io.*;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 
 public class Main {
 
     public static void main(String[] args) throws InterruptedException {
+
+
 
         CrawlerState state = null;
         String filePath = "crawler_state.ser";
@@ -29,14 +28,13 @@ public class Main {
                 state = (CrawlerState) in.readObject();
                 System.out.println("Crawler state loaded from file: " + filePath);
             } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
                 // Handle the exception appropriately
             }
         }
 
-        MongoInterface.Initialize();
-        MongoInterface.deleteAllDocuments("URlS_DOCS");
-        MongoInterface.terminate();
+//        MongoInterface.Initialize();
+//        MongoInterface.deleteAllDocuments("URlS_DOCS");
+//        MongoInterface.terminate();
         // Thread.sleep(3000000);
         //reading seed from file
         Queue<String> seed = new LinkedList<>();
@@ -76,7 +74,6 @@ public class Main {
             Globals.levelNum.set(BFS[0].size());
 
         }
-
         else
         {
             BFS = state.getBFS();
@@ -128,31 +125,36 @@ public class Main {
         }
 
         System.out.println("Crawler Finished got : "+ links.size()+" websites inserting them to ExcessDB");
+        HashMap<String , String> webs = new HashMap<>() ;
 
         if (Globals.count.get() <= 0 ) {
-            MongoInterface.Initialize();
+//            MongoInterface.Initialize();
 
             links.forEach(link -> {
                 try {
 
                     org.jsoup.nodes.Document doc = Jsoup.connect(link).get();
-                    Document document = new Document("URL", link)
-                            .append("DOC", doc.toString());
-
+                    webs.put(link, doc.toString());
                     // Insert the text into the MongoDB collection
-                    MongoInterface.insertDocument("ExcessDB", "URlS_DOCS", document);
+//                    MongoInterface.insertDocument("ExcessDB", "URlS_DOCS", document);
 
                 } catch (IOException e) {
                     System.out.println("Error fetching URL: " + e.getMessage());
                 }
             });
-            MongoInterface.terminate();
+//            MongoInterface.terminate();
+        }
 
+        try (FileOutputStream fileOut = new FileOutputStream("Websites.ser");
+             ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
+            out.writeObject(webs);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         //User Query Processing
-//        query.QueryProcessor("This is a new play field");
-//        query.QueryProcessor("Hello world from the computer department with a new computing power");
+//        QueryProcessor.query.QueryProcessor("This is a new play field");
+//        QueryProcessor.query.QueryProcessor("Hello world from the computer department with a new computing power");
     }
 
 }
