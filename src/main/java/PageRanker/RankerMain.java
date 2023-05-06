@@ -14,8 +14,6 @@ public class RankerMain {
 
         String prompt = "game Patricia";
 
-
-
         ArrayList<String> values = QueryProcessor(prompt);
 
         String searchQuery[]= new String[values.size()];
