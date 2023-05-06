@@ -56,7 +56,7 @@ public class IndexerMain {
             double count = words.length;
             String title=toParse.title().toString();
             // System.out.println(count);
-            Indexer.ParseMeta(toParse,toInsert,URl,title);
+            // Indexer.ParseMeta(toParse,toInsert,URl,title);
             Indexer.Parseblockquote(toParse,toInsert,URl,title);
             Indexer.ParseStrong(toParse,toInsert,URl,title);
             Indexer.ParseCode(toParse,toInsert,URl,title);

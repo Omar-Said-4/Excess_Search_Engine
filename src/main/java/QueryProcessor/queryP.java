@@ -58,6 +58,7 @@ public class queryP {
         }
 
         while (true) {
+            flag = 0;
             try {
                 if (!porterFilter.incrementToken()) break;
             } catch (IOException e) {
@@ -70,6 +71,7 @@ public class queryP {
                 if(term.equals(t))
                 {
                     flag = 1;
+                    break;
                 }
             }
 

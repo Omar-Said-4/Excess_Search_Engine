@@ -12,12 +12,20 @@ public class RankerMain {
 
     public static void main(String[] args){
 
-        String prompt = "game Patricia";
+        String prompt = "Playing Chess";
+
+        System.out.println("Please Enter your prompt");
+
+        Scanner s =new Scanner(System.in);
+
+        prompt = s.nextLine();
 
         ArrayList<String> values = QueryProcessor(prompt);
 
         String searchQuery[]= new String[values.size()];
+
         searchQuery=  values.toArray(searchQuery);
+
         Map<String, linkAttr> toDisplayTmp = new HashMap<>();
         MongoInterface.Initialize();
         for (int i = 0; i < searchQuery.length; i++) {
@@ -42,7 +50,7 @@ public class RankerMain {
                     if (!toDisplayTmp.containsKey(url)) {
                         linkAttr tmp = new linkAttr();
                         tmp.title = title;
-                        tmp.pri += (tf * idf);
+                        tmp.pri += (tf * idf *0.3) ;
                         tmp.pri+=pri;
                         for (String snippet : snips) {
                             tmp.Snippets.put(snippet,0);
