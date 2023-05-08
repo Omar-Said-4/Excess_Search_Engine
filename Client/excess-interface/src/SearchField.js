@@ -18,24 +18,36 @@ const SearchField = ({ query, place }) => {
       "&page=1";
   };
 
-  return (
-    <div className="search-field">
-      <input
-        type="text"
-        placeholder="Search"
-        id="input-field"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        style={style}
-      />
+  const data = ["test", "Kiro", "test1"];
 
-      <img
+  return (
+    <>
+      <div className="search-field">
+        <input
+          type="text"
+          placeholder="Search"
+          id="input-field"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          style={style}
+        />
+
+        {/* <img
         src={search}
         className="search-field-icon"
         alt="search-icon"
         onClick={makeSearch}
-      ></img>
-    </div>
+      ></img> */}
+      </div>
+
+      {text !== "" ? (
+        <div className="dropdown">
+          {data.map((item) => (
+            <div className="suggestion-item">{item}</div>
+          ))}
+        </div>
+      ) : null}
+    </>
   );
 };
 
