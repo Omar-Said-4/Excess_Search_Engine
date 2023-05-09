@@ -70,6 +70,10 @@ public class MongoInterface {
 
     public static void searchSubstrInSnippet(String subStr) {
 
+        subStr = subStr.replaceAll("[^A-Za-z0-9']+", "'");
+
+        System.out.println(subStr);
+
         try {
             MongoDatabase db = mongoClient.getDatabase("ExcessDB");
             MongoCollection<Document> collection = db.getCollection("Snippets");
