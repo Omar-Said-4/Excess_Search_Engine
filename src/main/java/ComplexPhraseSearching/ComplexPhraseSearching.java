@@ -1,8 +1,11 @@
 package ComplexPhraseSearching;
 
+import MongoDB.MongoInterface;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,11 +13,11 @@ import java.util.regex.Pattern;
 public class ComplexPhraseSearching {
     public static void main(String[] args) {
 //        System.out.println("test");
-        complexPhraseSearch("NOT \"kiri baghdad\"");
+        complexPhraseSearch("\"facebook\" AND \"google\"");
     }
 
     static void complexPhraseSearch(String phrase) {
-        Set<String> phrases = null;
+        List<String> phrases = new ArrayList<>();
         String op = null;
 
         Pattern pattern = Pattern.compile("\"([^\"]*)\"");
@@ -37,9 +40,11 @@ public class ComplexPhraseSearching {
             }
         }
 
-        // AND Operation
-        if(Objects.equals(op, "AND")){
+        MongoInterface.complexSearch(phrases.get(0), phrases.get(1), op);
 
-        }
+//        // AND Operation
+//        if(Objects.equals(op, "AND")){
+//
+//        }
     }
 }

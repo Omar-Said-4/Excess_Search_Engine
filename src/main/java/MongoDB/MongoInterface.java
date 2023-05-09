@@ -1,5 +1,6 @@
 package MongoDB;
 
+import CrawlerState.CrawlerState;
 import com.mongodb.*;
 import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
@@ -10,8 +11,17 @@ import org.bson.Document;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.jsoup.Jsoup;
 
+//import javax.lang.model.element.Element;
+//import javax.lang.model.util.Elements;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import javax.print.Doc;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -67,6 +77,82 @@ public class MongoInterface {
         return doc;
     }
 
+    public static void complexSearch(String firstString, String secondString , String op){
+        System.out.println(firstString + " " + secondString);
+        String filePath = "Websites.ser";
+        File file = new File(filePath);
+
+        HashMap<String, String> webPages = new HashMap<>();
+
+        if (file.exists()) {
+            try (FileInputStream fileIn = new FileInputStream(file);
+                 ObjectInputStream in = new ObjectInputStream(fileIn)) {
+                webPages = (HashMap<String, String>) in.readObject();
+
+                for (String url : webPages.keySet()) {
+                    System.out.println(url);
+                }
+                System.out.println("All websites loaded from file: " + filePath);
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+                // Handle the exception appropriately
+            }
+        }
+
+        String doc_string = null;
+        int count = 0;
+        for(String link : webPages.keySet()){
+
+            if(count > 3)
+                break;
+
+            doc_string = webPages.get(link);
+            org.jsoup.nodes.Document doc = Jsoup.parse(doc_string);
+            List<String> list = new ArrayList<String>();
+
+            Elements div = (Elements) doc.select("div");
+            Elements p = (Elements) doc.select("p");
+            Elements h1 = (Elements) doc.select("h1");
+            Elements h2 = (Elements) doc.select("h2");
+            Elements h3 = (Elements) doc.select("h3");
+            Elements h4 = (Elements) doc.select("h4");
+            Elements h5 = (Elements) doc.select("h5");
+            Elements h6 = (Elements) doc.select("h6");
+
+            list.add(String.valueOf(div));
+            list.add(String.valueOf(p));
+            list.add(String.valueOf(h1));
+            list.add(String.valueOf(h2));
+            list.add(String.valueOf(h3));
+            list.add(String.valueOf(h4));
+            list.add(String.valueOf(h5));
+            list.add(String.valueOf(h6));
+
+            System.out.println(link);
+            for (String element : list) {
+                System.out.println(element);
+
+                if (list.contains(secondString)) {
+                    System.out.println("Found " + firstString + " " + link + " " + element);
+                    count++;
+                    break;
+                }
+            }
+
+
+
+//            if (doc.contains(secondString)) {
+//                System.out.println(doc);
+//                System.out.println(link);
+////                System.out.println("The original string contains both strings.");
+//            }
+
+
+        }
+
+
+
+    }
 
     public static void searchSubstrInSnippet(String subStr) {
 
