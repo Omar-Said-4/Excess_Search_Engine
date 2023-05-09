@@ -70,7 +70,7 @@ public class MongoInterface {
 
     public static void searchSubstrInSnippet(String subStr) {
 
-        subStr = subStr.replaceAll("[^A-Za-z0-9']+", "'");
+        subStr = subStr.replaceAll("[^\\x00-\\x7F]", "'");
 
         System.out.println(subStr);
 
