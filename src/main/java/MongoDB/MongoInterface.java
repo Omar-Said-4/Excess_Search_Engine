@@ -17,12 +17,14 @@ import org.jsoup.Jsoup;
 //import javax.lang.model.util.Elements;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
 import javax.print.Doc;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -77,113 +79,40 @@ public class MongoInterface {
         return doc;
     }
 
-    public static void complexSearch(String firstString, String secondString , String op){
-        System.out.println(firstString + " " + secondString);
-        String filePath = "Websites.ser";
-        File file = new File(filePath);
+    public static List<String> getDistinctWebsites() {
+        MongoDatabase db = mongoClient.getDatabase("ExcessDB");
+        MongoCollection<Document> collection = db.getCollection("Snippets");
 
-        HashMap<String, String> webPages = new HashMap<>();
+        MongoCursor<String> cursor = collection.distinct("URL", String.class).iterator();
+        List<String> results = new ArrayList<>();
 
-        if (file.exists()) {
-            try (FileInputStream fileIn = new FileInputStream(file);
-                 ObjectInputStream in = new ObjectInputStream(fileIn)) {
-                webPages = (HashMap<String, String>) in.readObject();
-
-                for (String url : webPages.keySet()) {
-                    System.out.println(url);
-                }
-                System.out.println("All websites loaded from file: " + filePath);
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
-                // Handle the exception appropriately
-            }
+        while (cursor.hasNext()) {
+            results.add(cursor.next());
         }
 
-        String doc_string = null;
-        int count = 0;
-        for(String link : webPages.keySet()){
-
-            if(count > 3)
-                break;
-
-            doc_string = webPages.get(link);
-            org.jsoup.nodes.Document doc = Jsoup.parse(doc_string);
-            List<String> list = new ArrayList<String>();
-
-            Elements div = (Elements) doc.select("div");
-            Elements p = (Elements) doc.select("p");
-            Elements h1 = (Elements) doc.select("h1");
-            Elements h2 = (Elements) doc.select("h2");
-            Elements h3 = (Elements) doc.select("h3");
-            Elements h4 = (Elements) doc.select("h4");
-            Elements h5 = (Elements) doc.select("h5");
-            Elements h6 = (Elements) doc.select("h6");
-
-            list.add(String.valueOf(div));
-            list.add(String.valueOf(p));
-            list.add(String.valueOf(h1));
-            list.add(String.valueOf(h2));
-            list.add(String.valueOf(h3));
-            list.add(String.valueOf(h4));
-            list.add(String.valueOf(h5));
-            list.add(String.valueOf(h6));
-
-            System.out.println(link);
-            for (String element : list) {
-                System.out.println(element);
-
-                if (list.contains(secondString)) {
-                    System.out.println("Found " + firstString + " " + link + " " + element);
-                    count++;
-                    break;
-                }
-            }
-
-
-
-//            if (doc.contains(secondString)) {
-//                System.out.println(doc);
-//                System.out.println(link);
-////                System.out.println("The original string contains both strings.");
-//            }
-
-
-        }
-
-
-
+        return results;
     }
 
-    public static void searchSubstrInSnippet(String subStr) {
+    public static List<String> getSnippetsByURL(String url) {
+        MongoDatabase db = mongoClient.getDatabase("ExcessDB");
+        MongoCollection<Document> collection = db.getCollection("Snippets");
 
-        subStr = subStr.replaceAll("[^\\x00-\\x7F]", "'");
+        var filter = Filters.eq("URL", url);
 
-        System.out.println(subStr);
+        MongoCursor<Document> cursor = collection.find(filter).iterator();
 
-        try {
-            MongoDatabase db = mongoClient.getDatabase("ExcessDB");
-            MongoCollection<Document> collection = db.getCollection("Snippets");
+        List<String> results = new ArrayList<>();
 
-            Document query = new Document("Snippet", new Document("$regex", subStr).append("$options", "i"));
-
-            MongoCursor<Document> cursor = collection.find(query).iterator();
-
-            // Print the results
-            List<Document> results = new ArrayList<>();
-            while (cursor.hasNext()) {
-                Document document = cursor.next();
-                results.add(document);
-                System.out.println(document.toJson());
-            }
-
-            System.out.println("Found " + results.size() + " documents.");
-
-        }
-        catch (MongoException e){
-            System.out.println("Error");
+        while (cursor.hasNext()) {
+            Document document = cursor.next();
+            Object fieldValue = document.get("Snippet");
+//            System.out.println(fieldValue);
+            results.add(fieldValue.toString());
         }
 
+        return results;
     }
+
 
     public static void insertDocument(String databaseName, String collectionName, Document document) {
 
@@ -212,13 +141,13 @@ public class MongoInterface {
         System.out.println(deleteResult.getDeletedCount() + " documents deleted from collection " + collectionName);
     }
 
-    public static String insertSnippet(String URl, String snippet,String count , String tag) {
+    public static String insertSnippet(String URl, String snippet, String count, String tag) {
         try {
             // Get the target database and collection
             MongoDatabase database = mongoClient.getDatabase("ExcessDB");
             MongoCollection<Document> collection = database.getCollection("Snippets");
             Document document = new Document("URL", URl)
-                    .append("Snippet", snippet).append("Count",count).append("Tag", tag);
+                    .append("Snippet", snippet).append("Count", count).append("Tag", tag);
             // Insert the document into the collection
             collection.insertOne(document);
 
@@ -233,9 +162,8 @@ public class MongoInterface {
     }
 
 
-    public static void insertWebsitePopularity(HashMap<String , Double> webs)
-    {
-        try{
+    public static void insertWebsitePopularity(HashMap<String, Double> webs) {
+        try {
             MongoDatabase database = mongoClient.getDatabase("ExcessDB");
             MongoCollection<Document> collection = database.getCollection("Websites");
 
@@ -246,28 +174,24 @@ public class MongoInterface {
                 collection.insertOne(document);
             }
 
-        }catch (MongoException e){
+        } catch (MongoException e) {
             System.err.println("Error while inserting document: " + e.getMessage());
         }
     }
 
 
+    public static HashMap<String, Double> getWebsitePopularity(String[] weblist) {
 
-    public static HashMap<String , Double> getWebsitePopularity(String[] weblist)
-    {
-
-        HashMap<String , Double> webs = new HashMap<>();
-        try{
+        HashMap<String, Double> webs = new HashMap<>();
+        try {
             MongoDatabase db = mongoClient.getDatabase("ExcessDB");
             MongoCollection<Document> collection = db.getCollection("Websites");
             List<Document> results = collection.find(Filters.in("URL", weblist)).into(new ArrayList<>());
-            for(Document website : results)
-            {
-                webs.put(website.getString("URL"),website.getDouble("Popularity"));
+            for (Document website : results) {
+                webs.put(website.getString("URL"), website.getDouble("Popularity"));
             }
 
-        }catch(MongoException e)
-        {
+        } catch (MongoException e) {
             System.err.println("Error while getting websites-popularity: " + e.getMessage());
             return null;
         }
@@ -275,8 +199,8 @@ public class MongoInterface {
     }
 
 
-
-    public static void insertWord(String word, String pri, String tf, String link, List<String> snippets, String title) {
+    public static void insertWord(String word, String pri, String tf, String link, List<String> snippets, String
+            title) {
         ArrayList<Document> docs = new ArrayList<>();
         Document doc = new Document("URL", link).append("Pri", pri).append("TF", tf).append("Snippets", snippets).append("Title", title);
         docs.add(doc);
@@ -288,7 +212,8 @@ public class MongoInterface {
         System.out.println("Inserted  word " + word);
     }
 
-    public static void addWebsiteToDoc(String word, String pri, String tf, String link, List<String> snippets, String title) {
+    public static void addWebsiteToDoc(String word, String pri, String tf, String
+            link, List<String> snippets, String title) {
         Document doc = new Document("URL", link).append("Pri", pri).append("TF", tf).append("Snippets", snippets).append("Title", title);
         MongoDatabase database = mongoClient.getDatabase("ExcessDB");
         MongoCollection<Document> collection = database.getCollection("Indexer");
@@ -332,23 +257,23 @@ public class MongoInterface {
         DistinctIterable<String> distinctWords = collection.distinct("Word", String.class);
         return distinctWords;
     }
-    public static  List<Object> getWordDocs(String word)
-    {
+
+    public static List<Object> getWordDocs(String word) {
         MongoDatabase database = mongoClient.getDatabase("ExcessDB");
         MongoCollection<Document> collection = database.getCollection("Indexer");
-        Document document =  collection.find(Filters.and(
+        Document document = collection.find(Filters.and(
                 Filters.eq("Word", word),
                 Filters.exists("Websites")
         )).first();
-        if(document!=null) {
+        if (document != null) {
             List<Object> arrayField = document.getList("Websites", Object.class);
 
             return arrayField;
         }
         return null;
     }
-    public static String getSnippet(String id)
-    {
+
+    public static String getSnippet(String id) {
         MongoDatabase database = mongoClient.getDatabase("ExcessDB");
         MongoCollection<Document> collection = database.getCollection("Snippets");
         Document document = collection.find(Filters.eq("_id", new ObjectId(id))).first();
