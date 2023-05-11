@@ -8,13 +8,30 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import PhraseSearching.PhraseSearching;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 public class ComplexPhraseSearching {
     public static void main(String[] args) {
-        List<String> result = complexPhraseSearch("\"It was Popular\" OR \"Thank you\"");
-//
+        List<String> result = complexPhraseSearch("\"It was popular\" OR \"this is google\"");
+
+
 //        for (String r: result)
 //            System.out.println(r);
+//
+//        String html = "<div>jhkgkj<p>Some text</p><span></span></div>";
+//        Document doc = Jsoup.parse(html);
+//        Element div = doc.selectFirst("div");
+//
+//
+//        System.out.println(div.ownText());
+//        assert div != null;
+//        if (div.hasText()) {
+//            System.out.println("The div has non-empty text.");
+//        } else {
+//            System.out.println("The div does not have non-empty text.");
+//        }
     }
 
     static List<String> complexPhraseSearch(String phrase) {
@@ -42,10 +59,15 @@ public class ComplexPhraseSearching {
             }
         }
 
-        List<String> results = Collections.emptyList();
+        List<String> results = null;
+
+        // Normal phrase searching
+        if (operators.size() == 0) {
+            results = PhraseSearching.phraseSearching(phrases.get(0), null, null, null, null, 0);
+        }
 
         // Check for errors in the query
-        if (operators.size() > 2 || operators.size() == 0) {
+        if (operators.size() > 2) {
             System.out.println("Error in Query!");
             return null;
         }
@@ -78,17 +100,16 @@ public class ComplexPhraseSearching {
 
 
         if (operators.size() == 1) {
-            results = PhraseSearching.phraseSearching(phrases.get(0), phrases.get(1), null, operators.get(0), null, 1);
+            if (Objects.equals(operators.get(0), "NOT"))
+                results = PhraseSearching.phraseSearching(phrases.get(0), null, null, operators.get(0), null, 1);
+            else
+                results = PhraseSearching.phraseSearching(phrases.get(0), phrases.get(1), null, operators.get(0), null, 1);
         } else if (operators.size() == 2) {
             System.out.println(2);
             if (Objects.equals(operators.get(0), "NOT") || Objects.equals(operators.get(1), "NOT"))
                 results = PhraseSearching.phraseSearching(phrases.get(0), phrases.get(1), null, operators.get(0), operators.get(1), 2);
             else
                 results = PhraseSearching.phraseSearching(phrases.get(0), phrases.get(1), phrases.get(2), operators.get(0), operators.get(1), 2);
-        } else {
-            System.out.println("Error in Query!");
-            MongoInterface.terminate();
-            return null;
         }
 
 
