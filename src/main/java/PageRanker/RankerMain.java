@@ -1,6 +1,7 @@
 package PageRanker;
 
 import MongoDB.MongoInterface;
+import SpringBoot.SpringBootInterface;
 import org.bson.Document;
 
 import java.util.*;
@@ -61,11 +62,11 @@ public class RankerMain {
                         tmp.pri += (tf * idf + pri);
                         for (String snippet : snips) {
                             if(!tmp.Snippets.containsKey(snippet)) {
-                                tmp.Snippets.put(snippet, 0);
+                                tmp.Snippets.put(snippet, snippet.length());
                             }
                             else
                             {
-                                tmp.Snippets.put(snippet,tmp.Snippets.get(snippet)+1);
+                                tmp.Snippets.put(snippet,tmp.Snippets.get(snippet)+1000);
                             }
                         }
                         toDisplayTmp.put(url, tmp);
@@ -100,7 +101,9 @@ public class RankerMain {
             String toShow=MongoInterface.getSnippet(firstEntry.getKey());
             System.out.println("Website: " + key + ", Priority: " + value.pri +"best Snippet: "+ toShow.replaceAll("[^\\p{ASCII}]", "'"));
         });
-        MongoInterface.terminate();
+        SpringBootInterface.toDisplay=toDisplay;
+        SpringBootInterface.runSpring();
+
 
     }
     }

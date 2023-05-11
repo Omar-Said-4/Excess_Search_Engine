@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class linkAttr {
-    String title;
+    public String title;
     double pri;
 
-    Map<String, Integer> Snippets = new HashMap<>();
+    public Map<String, Integer> Snippets = new HashMap<>();
 }
 
