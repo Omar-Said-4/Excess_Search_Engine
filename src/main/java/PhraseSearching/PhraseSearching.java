@@ -8,18 +8,61 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class PhraseSearching {
 
     public static void main(String[] args) {
-        MongoInterface.Initialize();
-        List<String> results = PhraseSearching.search("Picture of the day");
-        MongoInterface.terminate();
+//        List<String> results = PhraseSearching.search("Picture of the day");
+
+        List<String> words = new ArrayList<>();
+        words.add("Kiro");
+        words.add("Baghdad");
+
+        System.out.println(findPhraseInSnippet(words, "what is kiro vdfg my Baghdad"));
+    }
+
+    static final String[] StopWords = new String[]{"a", "about", "actually", "almost", "also",
+            "although", "always", "am", "an", "and", "any", "are",
+            "as", "at", "be", "became", "become", "but", "by", "can", "could", "did", "do", "does",
+            "each", "either", "else", "for", "from", "had", "has", "have", "hence", "how", "i", "if", "in",
+            "is", "it", "its", "just", "may", "maybe", "me", "might", "mine", "must", "my", "neither", "nor",
+            "not", "of", "oh", "ok", "when", "whenever", "where", "whereas", "wherever", "whether", "which", "while",
+            "who", "whoever", "whom", "whose", "why", "will", "with", "within", "without", "would", "yes", "yet", "you", "your", "all"};
+
+    private static boolean findPhraseInSnippet(List<String> words, String snippet) {
+
+        String[] snippetWords = snippet.split(" ");
+        int index = 0;
+        Pattern pattern;
+        Matcher matcher;
+
+        Iterator<String> iterator = words.iterator();
+
+        for (String word : words) {
+            iterator.next();
+            pattern = Pattern.compile("\\b" + word + "\\b|\\b" + word + "$", Pattern.CASE_INSENSITIVE);
+            matcher = pattern.matcher(snippet.substring(index, snippet.length() - 1));
+            System.out.println(index + " " + (snippet.length() - 1));
+
+            if (matcher.find()) {
+                index = matcher.end();
+                System.out.println(index);
+                System.out.println("Found the word " + word + " in the sentence!");
+            } else if (snippet.endsWith(" " + word) || snippet.endsWith(" " + word + "\n") || snippet.endsWith(" " + word + "\r\n")) {
+                System.out.println("test");
+
+                if (iterator.hasNext())
+                    return false;
+                else break;
+
+            }
+        }
+
+        return true;
     }
 
     public static List<String> phraseSearching(String firstString, String secondString, String thirdString, String op0, String op1, int complexity) {
