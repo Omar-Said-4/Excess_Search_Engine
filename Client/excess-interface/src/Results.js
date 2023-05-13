@@ -18,6 +18,9 @@ const Results = () => {
   const [loading, setLoading] = useState(true);
 
   const [data, setData] = useState([]);
+  const [resultsSize, setSize] = useState(0);
+  const [responseTime, setResponseTime] = useState(0);
+
   const navigate = useNavigate();
   console.log(query + page);
 
@@ -43,30 +46,60 @@ const Results = () => {
 
   useEffect(() => {
     setLoading(true);
-    Axios.get(
-      "https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/Search/WebSearchAPI",
-      {
-        params: {
-          q: query,
-          pageNumber: page,
-          pageSize: "10",
-          autoCorrect: "true",
-        },
-        headers: {
-          "content-type": "application/octet-stream",
-          "X-RapidAPI-Key":
-            "9bed59de6dmsh99ed317ac6f065bp108d18jsnaa3975d2a67f",
-          "X-RapidAPI-Host": "contextualwebsearch-websearch-v1.p.rapidapi.com",
-        },
-      }
-    )
+
+    const startTime = performance.now();
+    Axios.get("http://localhost:8080/", {
+      params: {
+        query: query,
+        pageNumber: page,
+      },
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+    })
       .then((response) => {
-        setData(response.data.value);
+        const endTime = performance.now();
+        const time = endTime - startTime;
+        
+        setResponseTime(time);
+
+        console.log(response.data);
+        setData(response.data.results);
+        setSize(response.data.size);
+
+        response.data.results.map((item) => {
+          console.log(item.Snippet);
+        });
+
         setLoading(false);
       })
-      .catch((err) => {
-        console.error(err);
+      .catch((error) => {
+        console.error(error);
       });
+    // Axios.get(
+    //   "https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/Search/WebSearchAPI",
+    //   {
+    //     params: {
+    //       q: query,
+    //       pageNumber: page,
+    //       pageSize: "10",
+    //       autoCorrect: "true",
+    //     },
+    //     headers: {
+    //       "content-type": "application/octet-stream",
+    //       "X-RapidAPI-Key":
+    //         "9bed59de6dmsh99ed317ac6f065bp108d18jsnaa3975d2a67f",
+    //       "X-RapidAPI-Host": "contextualwebsearch-websearch-v1.p.rapidapi.com",
+    //     },
+    //   }
+    // )
+    //   .then((response) => {
+    //     setData(response.data.value);
+    //     setLoading(false);
+    //   })
+    //   .catch((err) => {
+    //     console.error(err);
+    //   });
   }, [query, page]);
 
   return (
@@ -77,15 +110,15 @@ const Results = () => {
       ) : (
         <>
           <div className="results">
-            <ResponseTime responseTime={20} resultsCount={2000} />
+            <ResponseTime responseTime={responseTime} resultsCount={resultsSize} />
 
             {data.map((item, index) => {
               return (
                 <PageResult
                   key={index}
-                  description={item.snippet}
+                  description={item.Snippet}
                   title={item.title}
-                  url={item.url}
+                  url={item.URL}
                 />
               );
             })}

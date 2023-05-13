@@ -1,6 +1,5 @@
 package MongoDB;
 
-import CrawlerState.CrawlerState;
 import com.mongodb.*;
 import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
@@ -8,23 +7,11 @@ import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
-import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import org.jsoup.Jsoup;
-
-//import javax.lang.model.element.Element;
-//import javax.lang.model.util.Elements;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import javax.print.Doc;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -261,15 +248,26 @@ public class MongoInterface {
     public static List<Object> getWordDocs(String word) {
         MongoDatabase database = mongoClient.getDatabase("ExcessDB");
         MongoCollection<Document> collection = database.getCollection("Indexer");
-        Document document = collection.find(Filters.and(
-                Filters.eq("Word", word),
-                Filters.exists("Websites")
-        )).first();
-        if (document != null) {
-            List<Object> arrayField = document.getList("Websites", Object.class);
 
-            return arrayField;
-        }
+        if (collection.getNamespace().getCollectionName().equals("Indexer") && collection.getNamespace().getDatabaseName().equals("ExcessDB")) {
+            FindIterable<Document> cursor = collection.find(Filters.and(
+                    Filters.eq("Word", word),
+                    Filters.exists("Websites")
+            ));
+
+
+            Document document = cursor.first();
+//
+//            if (cursor.hasNext())
+//                document = cursor.next();
+
+            if (document != null) {
+                List<Object> arrayField = document.getList("Websites", Object.class);
+
+                return arrayField;
+            }
+        } else System.out.println("ERROR");
+
         return null;
     }
 
@@ -280,4 +278,28 @@ public class MongoInterface {
         return document.getString("Snippet");
     }
 
+    public static void addSuggestion(String suggestion) {
+        MongoDatabase database = mongoClient.getDatabase("ExcessDB");
+        MongoCollection<Document> collection = database.getCollection("Suggestions");
+
+        Document doc = new Document("Query", suggestion);
+        collection.insertOne(doc);
+    }
+
+
+    public static List<String> getSuggestions(String q) {
+        MongoDatabase database = mongoClient.getDatabase("ExcessDB");
+        MongoCollection<Document> collection = database.getCollection("Suggestions");
+
+        Document query = new Document("attribute", new Document("$regex", q));
+
+        MongoCursor<Document> cursor = collection.find(query).iterator();
+
+        List<String> result = new ArrayList<>();
+
+        while (cursor.hasNext())
+            result.add((String) cursor.next().get("Query"));
+
+        return result;
+    }
 }
