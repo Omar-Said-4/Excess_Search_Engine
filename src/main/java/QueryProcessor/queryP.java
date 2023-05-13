@@ -26,12 +26,9 @@ public class queryP {
             "not", "of", "oh", "ok", "when", "whenever", "where", "whereas", "wherever", "whether", "which", "while",
             "who", "whoever", "whom", "whose", "why", "will", "with", "within", "without", "would", "yes", "yet", "you", "your","all"};
     public static ArrayList<String> QueryProcessor(String prompt) {
-
-        Pattern pattern = Pattern.compile("\\d"); // Match any digit
+        Pattern nonAlphaNumericPattern = Pattern.compile("[^a-zA-Z0-9\\s]");
         Reader reader = new StringReader(prompt);
-        Reader filteredReader = new PatternReplaceCharFilter(pattern, "", reader);
-        Pattern pattern2=Pattern.compile("[^a-zA-Z0-9\\s]");
-        filteredReader=new PatternReplaceCharFilter(pattern2, " ", filteredReader);
+        Reader filteredReader = new PatternReplaceCharFilter(nonAlphaNumericPattern, " ", reader);
         StringBuilder outputBuilder = new StringBuilder();
         int ch;
         while (true) {
@@ -57,6 +54,7 @@ public class queryP {
             throw new RuntimeException(e);
         }
 
+        String previousTerm = null;
         while (true) {
             flag = 0;
             try {
@@ -66,23 +64,35 @@ public class queryP {
             }
             String term = termAtt.toString();
 
-            for(String t : StopWords)
-            {
-                if(term.equals(t))
-                {
+            for (String t : StopWords) {
+                if (term.equals(t)) {
                     flag = 1;
                     break;
                 }
             }
 
-            if(flag ==0)
-                words.add(term);
+            if (flag == 0) {
+                if (previousTerm != null && term.matches("\\d+")) {
+                    String combinedTerm = previousTerm + " " + term;
+                    if (!words.contains(combinedTerm)) {
+                        words.add(combinedTerm);
+                    }
+                }
+
+                if (!term.matches("\\d+")) {
+                    if (!words.contains(term)) {
+                        words.add(term);
+                    }
+                    previousTerm = term;
+                }
+            }
         }
-
-
 
         return words;
     }
+
+
+
 
 
 }

@@ -27,14 +27,27 @@ public class PhraseSearching {
 //
 //        System.out.println(findPhraseInSnippet(words, "Dolkart, Andrew S. June 2, 2011, at the , . Accessed May 15, 2007. \"It is at a triangular site where Broadway and Fifth Avenue—the two most important streets of New York—meet at Madison Square, and because of the juxtaposition of the streets and the park across the street, there was a wind-tunnel effect here. In the early twentieth century, men would hang out on the corner here on Twenty-third Street and watch the wind blowing women's dresses up so that they could catch a little bit of ankle. This entered into popular culture and there are hundreds of postcards and illustrations of women with their dresses blowing up in front of the Flatiron Building. And it supposedly is where the slang expression \"23 skidoo\" comes from because the police would come and give the voyeurs the 23 skidoo to tell them to get out of the area.\"\n"));
 
-        String s = "Dolkart, Andrew S. June 2, 2011, at the , . Accessed May 15, 2007. \"It is at a triangular site where Broadway and Fifth Avenue—the two most important streets of New York—meet at Madison Square, and because of the juxtaposition of the streets and the park across the street, there was a wind-tunnel effect here. In the early twentieth century, men would hang out on the corner here on Twenty-third Street and watch the wind blowing women's dresses up so that they could catch a little bit of ankle. This entered into popular culture and there are hundreds of postcards and illustrations of women with their dresses blowing up in front of the Flatiron Building. And it supposedly is where the slang expression \"23 skidoo\" comes from because the police would come and give the voyeurs the 23 skidoo to tell them to get out of the area.\"\n";
+//        String s = "Dolkart, Andrew S. June 2, 2011, at the , . Accessed May 15, 2007. \"It is at a triangular site where Broadway and Fifth Avenue—the two most important streets of New York—meet at Madison Square, and because of the juxtaposition of the streets and the park across the street, there was a wind-tunnel effect here. In the early twentieth century, men would hang out on the corner here on Twenty-third Street and watch the wind blowing women's dresses up so that they could catch a little bit of ankle. This entered into popular culture and there are hundreds of postcards and illustrations of women with their dresses blowing up in front of the Flatiron Building. And it supposedly is where the slang expression \"23 skidoo\" comes from because the police would come and give the voyeurs the 23 skidoo to tell them to get out of the area.\"\n";
+//
+//        List<String> l = removeStoppingWords(s);
 
-        List<String> l = removeStoppingWords(s);
+
+//        for (String i : l)
+//            System.out.println(i);
+
+
+        String prompt ;
+        Scanner s = new Scanner(System.in);
+        prompt = s.nextLine();
+
+        List<String> l = search(prompt);
 
 
         for (String i : l)
-            System.out.println(i);
+           System.out.println(i);
+
     }
+
 
     static final List<String> StopWords = List.of("a", "about", "actually", "almost", "also",
             "although", "always", "am", "an", "and", "any", "are",
