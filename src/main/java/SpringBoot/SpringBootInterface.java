@@ -60,12 +60,12 @@ public class SpringBootInterface {
         return ResponseEntity.ok(r.toString());
     }
 
-
+    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/suggest")
     public ResponseEntity<String> suggestionResult(@RequestParam("query") String query) {
         System.out.println(query);
 
-        return ResponseEntity.ok(MongoInterface.getSuggestions(query).toString());
+        return ResponseEntity.ok(MongoInterface.getSuggestions(query));
     }
 
 

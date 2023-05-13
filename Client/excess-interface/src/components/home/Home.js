@@ -1,8 +1,7 @@
-import SearchField from "./SearchField";
-import logo from "./logo.png";
+import SearchField from "../../SearchField";
+import logo from "../../icons/logo.png";
 
 const Home = () => {
-  // document.body.style.backgroundImage = "url('./background.jpg')";
 
   return (
     <div id="home">

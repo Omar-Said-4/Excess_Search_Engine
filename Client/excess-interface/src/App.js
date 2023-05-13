@@ -2,12 +2,11 @@ import { useCallback, useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 
-import "./App.css";
-import Results from "./Results";
-import Home from "./Home";
+import "./styles/App.css";
+import Results from "./components/results/Results";
+import Home from "./components/home/Home";
 
 function App() {
-  // const navigate = useNavigate();
   const handleKeyDown = useCallback((event) => {
     if (event.key === "/") {
       let element = document.getElementById("input-field");
@@ -18,7 +17,6 @@ function App() {
       document.getElementById("input-field") === document.activeElement && 
       (document.getElementById("input-field").value).replace(/\s/g, "") !== ""
     ) {
-      // navigate("/search/?query="+documen)
       window.location.href = "/search/?query="+ document.getElementById("input-field").value +"&page=1";
     } 
   }, []);

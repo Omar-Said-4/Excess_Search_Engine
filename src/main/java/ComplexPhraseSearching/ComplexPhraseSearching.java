@@ -14,7 +14,7 @@ import org.jsoup.nodes.Element;
 
 public class ComplexPhraseSearching {
     public static void main(String[] args) {
-        List<String> result = complexPhraseSearch("\"It was popular\" OR \"this is google\"");
+        List<String> result = complexPhraseSearch("\"Football\" AND \"major city in the United States\" AND \"CNN\"");
 
 
 //        for (String r: result)

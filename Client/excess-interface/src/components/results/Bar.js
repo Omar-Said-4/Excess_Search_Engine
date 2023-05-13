@@ -1,5 +1,5 @@
-import SearchField from "./SearchField";
-import logo from "./logo.png";
+import SearchField from "../../SearchField";
+import logo from "../../icons/logo.png";
 
 const Bar = ({query}) => {
 

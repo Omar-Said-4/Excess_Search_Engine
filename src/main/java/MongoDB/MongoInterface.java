@@ -3,12 +3,15 @@ package MongoDB;
 import com.mongodb.*;
 import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.json.JSONArray;
 
 import javax.print.Doc;
 import java.util.ArrayList;
@@ -282,24 +285,29 @@ public class MongoInterface {
         MongoDatabase database = mongoClient.getDatabase("ExcessDB");
         MongoCollection<Document> collection = database.getCollection("Suggestions");
 
-        Document doc = new Document("Query", suggestion);
-        collection.insertOne(doc);
+        Document document = new Document("Query", suggestion);
+
+        Document filter = new Document("Query", suggestion);
+        collection.updateOne(filter, new Document("$set", document), new UpdateOptions().upsert(true));
+//
+//        Document doc = new Document("Query", suggestion);
+//        collection.insertOne(doc);
     }
 
 
-    public static List<String> getSuggestions(String q) {
+    public static String getSuggestions(String q) {
         MongoDatabase database = mongoClient.getDatabase("ExcessDB");
         MongoCollection<Document> collection = database.getCollection("Suggestions");
 
-        Document query = new Document("attribute", new Document("$regex", q));
+        Document query = new Document("Query", new Document("$regex", q));
 
         MongoCursor<Document> cursor = collection.find(query).iterator();
 
-        List<String> result = new ArrayList<>();
+        JSONArray result = new JSONArray();
 
         while (cursor.hasNext())
-            result.add((String) cursor.next().get("Query"));
+            result.put((String) cursor.next().get("Query"));
 
-        return result;
+        return result.toString();
     }
 }

@@ -1,4 +1,4 @@
-import logo from "./insta.png";
+import logo from "../../icons/insta.png";
 import parse from "html-react-parser";
 
 const PageResult = ({ title, url, description }) => {
