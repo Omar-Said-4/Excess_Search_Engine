@@ -33,5 +33,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.json:json:20210307'
+    runtimeOnly 'org.springframework.boot:spring-boot-devtools'
 
 }

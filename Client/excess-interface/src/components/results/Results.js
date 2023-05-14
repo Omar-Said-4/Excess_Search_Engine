@@ -48,6 +48,15 @@ const Results = () => {
     setLoading(true);
 
     const startTime = performance.now();
+    
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, "0");
+    const minutes = now.getMinutes().toString().padStart(2, "0");
+    const seconds = now.getSeconds().toString().padStart(2, "0");
+    const millis = now.getMilliseconds().toString().padStart(3, "0")
+    const formattedTime = `${hours}:${minutes}:${seconds}:${millis}`;
+    console.log(formattedTime);
+
     Axios.get("http://localhost:8080/", {
       params: {
         query: query,
@@ -59,17 +68,26 @@ const Results = () => {
     })
       .then((response) => {
         const endTime = performance.now();
+
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, "0");
+        const minutes = now.getMinutes().toString().padStart(2, "0");
+        const seconds = now.getSeconds().toString().padStart(2, "0");
+        const millis = now.getMilliseconds().toString().padStart(3, "0")
+        const formattedTime = `${hours}:${minutes}:${seconds}:${millis}`;
+        console.log(formattedTime);
+
         const time = endTime - startTime;
-        
+
         setResponseTime(time);
 
-        console.log(response.data);
+        // console.log(response.data);
         setData(response.data.results);
         setSize(response.data.size);
 
-        response.data.results.map((item) => {
-          console.log(item.Snippet);
-        });
+        // response.data.results.map((item) => {
+        //   console.log(item.Snippet);
+        // });
 
         setLoading(false);
       })
@@ -110,7 +128,10 @@ const Results = () => {
       ) : (
         <>
           <div className="results">
-            <ResponseTime responseTime={responseTime} resultsCount={resultsSize} />
+            <ResponseTime
+              responseTime={responseTime}
+              resultsCount={resultsSize}
+            />
 
             {data.map((item, index) => {
               return (
