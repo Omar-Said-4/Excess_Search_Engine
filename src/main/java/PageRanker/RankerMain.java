@@ -8,53 +8,68 @@ import org.bson.Document;
 import javax.swing.plaf.metal.MetalBorders;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static QueryProcessor.queryP.QueryProcessor;
 
 public class RankerMain {
 
     public static Map<String, linkAttr> handleQuery(String prompt, int pageNumber) {
+
+
         ArrayList<String> values = QueryProcessor(prompt);
         String[] searchQuery = values.toArray(new String[0]);
 
         Map<String, linkAttr> toDisplayTmp = new ConcurrentHashMap<>();
         final double numOfdocs = 6000;
 
-        Arrays.stream(searchQuery).parallel().forEach(s -> {
-            List<Object> websites = MongoInterface.getWordDocs(s);
-            if (websites == null)
-                return;
-            int df = websites.size();
 
-            for (Object obj : websites) {
-                if (obj instanceof Document websiteDoc) {
-                    String url = websiteDoc.getString("URL");
-                    String title = websiteDoc.getString("Title");
-                    double tf = Double.parseDouble(websiteDoc.getString("TF"));
-                    double pri = 2 * Math.log(Double.parseDouble(websiteDoc.getString("Pri"))) * 0.1;
-                    double idf = Math.log(numOfdocs / df);
-                    ArrayList<String> snips = (ArrayList<String>) websiteDoc.get("Snippets");
 
-                    linkAttr tmp = toDisplayTmp.computeIfAbsent(url, k -> new linkAttr());
-                    tmp.title = title;
+        List<linkAttr> results = Arrays.stream(searchQuery)
+                .parallel()
+                .flatMap(s -> {
+                    List<Object> websites = MongoInterface.getWordDocs(s);
+                    if (websites == null)
+                        return Stream.empty();
+                    int df = websites.size();
 
-                    double snippetScore = tf * idf * 0.3 + pri;
-                    tmp.pri += snippetScore;
+                    return websites.stream()
+                            .filter(obj -> obj instanceof Document websiteDoc)
+                            .map(obj -> (Document) obj)
+                            .map(websiteDoc -> {
+                                String url = websiteDoc.getString("URL");
+                                String title = websiteDoc.getString("Title");
+                                double tf = Double.parseDouble(websiteDoc.getString("TF"));
+                                double pri = 2 * Math.log(Double.parseDouble(websiteDoc.getString("Pri"))) * 0.1;
+                                double idf = Math.log(numOfdocs / df);
+                                ArrayList<String> snips = (ArrayList<String>) websiteDoc.get("Snippets");
 
-                    for (String snippet : snips) {
-                        tmp.Snippets.merge(snippet, 1000, Integer::sum);
-                    }
-                }
-            }
-        });
+                                linkAttr tmp = toDisplayTmp.computeIfAbsent(url, k -> new linkAttr());
+                                tmp.title = title;
 
-        Map<String, linkAttr> toDisplay = new TreeMap<>(Comparator.comparingDouble(s -> toDisplayTmp.get(s).pri).reversed());
-        toDisplay.putAll(toDisplayTmp);
+                                double snippetScore = tf * idf * 0.3 + pri;
+                                tmp.pri += snippetScore;
 
-        toDisplay.forEach((key, value) -> {
-            Map<String, Integer> descendingMap = value.Snippets.entrySet()
-                    .parallelStream()
+                                for (String snippet : snips) {
+                                    tmp.Snippets.merge(snippet, 1000, Integer::sum);
+                                }
+
+                                return tmp;
+                            });
+                })
+                .collect(Collectors.toList());
+
+
+
+        long startTime = System.currentTimeMillis();
+        Map<String, linkAttr> toDisplay = new ConcurrentSkipListMap<>(Comparator.comparingDouble(s -> toDisplayTmp.get(s).pri).reversed());
+        toDisplayTmp.keySet().parallelStream().forEach(key -> {
+            linkAttr attr = toDisplayTmp.get(key);
+            toDisplay.put(key, attr);
+
+            Map<String, Integer> descendingMap = attr.Snippets.entrySet().parallelStream()
                     .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (oldValue, newValue) -> oldValue, LinkedHashMap::new));
 
@@ -62,17 +77,19 @@ public class RankerMain {
 
             StringBuilder output = new StringBuilder();
             output.append("Website: ").append(key)
-                    .append(", Priority: ").append(value.pri)
+                    .append(", Priority: ").append(attr.pri)
                     .append(", Best Snippet: ").append(toShow.replaceAll("[^\\p{ASCII}]", "'"));
             System.out.println(output.toString());
         });
+        long endTime = System.currentTimeMillis();
+        long elapsedTime = endTime - startTime;
+        System.out.println("Elapsed time: " + elapsedTime + " milliseconds");
 
         return toDisplay;
     }
 
 
     public static void main(String[] args) throws InterruptedException {
-
         try {
             MongoInterface.Initialize();
             SpringBootInterface.runSpring();
