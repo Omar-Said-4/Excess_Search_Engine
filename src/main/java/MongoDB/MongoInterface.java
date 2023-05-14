@@ -258,21 +258,45 @@ public class MongoInterface {
                     Filters.exists("Websites")
             ));
 
-
             Document document = cursor.first();
-//
-//            if (cursor.hasNext())
-//                document = cursor.next();
 
             if (document != null) {
                 List<Object> arrayField = document.getList("Websites", Object.class);
-
                 return arrayField;
             }
         } else System.out.println("ERROR");
 
         return null;
     }
+
+
+    public static List<Object> getWordDocsAll(String[] words) {
+        MongoDatabase database = mongoClient.getDatabase("ExcessDB");
+        MongoCollection<Document> collection = database.getCollection("Indexer");
+
+        if (collection.getNamespace().getCollectionName().equals("Indexer") && collection.getNamespace().getDatabaseName().equals("ExcessDB")) {
+            FindIterable<Document> cursor = collection.find(Filters.and(
+                    Filters.in("Word", words),
+                    Filters.exists("Websites")
+            ));
+
+            List<Object> result = new ArrayList<>();
+
+            for (Document document : cursor) {
+                List<Object> arrayField = document.getList("Websites", Object.class);
+                result.addAll(arrayField);
+            }
+
+            return result;
+        } else {
+            System.out.println("ERROR");
+            return null;
+        }
+    }
+
+
+
+
 
     public static String getSnippet(String id) {
         MongoDatabase database = mongoClient.getDatabase("ExcessDB");

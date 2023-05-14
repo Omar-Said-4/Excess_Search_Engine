@@ -24,38 +24,31 @@ public class RankerMain {
         final double numOfdocs = 6000;
 
 
-        List<linkAttr> results = Arrays.stream(searchQuery)
-                .parallel()
-                .flatMap(s -> {
-                    List<Object> websites = MongoInterface.getWordDocs(s);
-                    if (websites == null)
-                        return Stream.empty();
-                    int df = websites.size();
+        List<Object> websites = MongoInterface.getWordDocsAll(searchQuery); // Retrieve websites related to search query
 
-                    return websites.stream()
-                            .filter(obj -> obj instanceof Document websiteDoc)
-                            .map(obj -> (Document) obj)
-                            .map(websiteDoc -> {
-                                String url = websiteDoc.getString("URL");
-                                String title = websiteDoc.getString("Title");
-                                double tf = Double.parseDouble(websiteDoc.getString("TF"));
-                                double pri = 2 * Math.log(Double.parseDouble(websiteDoc.getString("Pri"))) * 0.1;
-                                double idf = Math.log(numOfdocs / df);
-                                ArrayList<String> snips = (ArrayList<String>) websiteDoc.get("Snippets");
-                                linkAttr tmp = toDisplayTmp.computeIfAbsent(url, k -> new linkAttr());
-                                tmp.title = title;
-                                double snippetScore = tf * idf * 0.3 + pri;
-                                tmp.pri += snippetScore;
-                                for (String snippet : snips) {
-                                    tmp.Snippets.merge(snippet, 1000, Integer::sum);
-                                }
+        List<linkAttr> results = websites.parallelStream() // Make the stream parallel
+                .filter(obj -> obj instanceof Document)
+                .map(obj -> (Document) obj)
+                .map(websiteDoc -> {
+                    String url = websiteDoc.getString("URL");
+                    String title = websiteDoc.getString("Title");
+                    double tf = Double.parseDouble(websiteDoc.getString("TF"));
+                    double pri = 2 * Math.log(Double.parseDouble(websiteDoc.getString("Pri"))) * 0.1;
+                    int df = websites.size(); // Calculate document frequency based on the retrieved websites
+                    double idf = Math.log(numOfdocs / df);
 
-                                return tmp;
-                            });
+                    // Rest of the mapping and processing
+                    ArrayList<String> snips = (ArrayList<String>) websiteDoc.get("Snippets");
+                    linkAttr tmp = toDisplayTmp.computeIfAbsent(url, k -> new linkAttr());
+                    tmp.title = title;
+                    double snippetScore = tf * idf * 0.3 + pri;
+                    tmp.pri += snippetScore;
+                    for (String snippet : snips) {
+                        tmp.Snippets.merge(snippet, 1000, Integer::sum);
+                    }
+                    return tmp;
                 })
                 .collect(Collectors.toList());
-
-
 
 
         Map<String, linkAttr> toDisplay = new ConcurrentSkipListMap<>(Comparator.comparingDouble(s -> toDisplayTmp.get(s).pri).reversed());
@@ -64,8 +57,6 @@ public class RankerMain {
             Map<String, Integer> descendingMap = attr.Snippets.entrySet().parallelStream()
                     .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (oldValue, newValue) -> oldValue, LinkedHashMap::new));
-
-
             String toShow = MongoInterface.getSnippet(descendingMap.keySet().iterator().next());
             attr.BestSnip = toShow.replaceAll("[^\\p{ASCII}]", "'");
             StringBuilder output = new StringBuilder();

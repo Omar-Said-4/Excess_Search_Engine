@@ -82,7 +82,7 @@ public class SpringBootInterface {
         resultList.forEach(toDisp::put);
 
 
-
+//
         if (toDisp.length() != 0)
             MongoInterface.addSuggestion(query);
 
@@ -105,7 +105,6 @@ public class SpringBootInterface {
         return ResponseEntity.ok(r.toString());
 
     }
-
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/suggest")
     public ResponseEntity<String> suggestionResult(@RequestParam("query") String query) {
