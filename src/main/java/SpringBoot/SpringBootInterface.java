@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -28,6 +29,12 @@ import sun.misc.SignalHandler;
 @RestController
 public class SpringBootInterface {
 //    public static Map<String, linkAttr> toDisplay;
+
+    public static boolean isStringEnclosed(String input) {
+        Pattern pattern = Pattern.compile("^\".*\"$");
+        Matcher matcher = pattern.matcher(input);
+        return matcher.matches();
+    }
 
     public static void runSpring() throws InterruptedException {
         SpringApplication app = new SpringApplication(SpringBootInterface.class);
@@ -59,28 +66,36 @@ public class SpringBootInterface {
         JSONObject r = new JSONObject();
 
 //        JSONArray response = new JSONArray();
-        long startTime = System.currentTimeMillis();
-        Map<String, linkAttr> toDisplay = RankerMain.handleQuery(query, pageNumber);
-        long endTime = System.currentTimeMillis();
-        long elapsedTime = endTime - startTime;
-        System.out.println("Elapsed time: " + elapsedTime + " milliseconds");
 
-        JSONArray toDisp = new JSONArray();
+        Map<String, linkAttr> toDisplay = new HashMap<>();
+
+        // Checking if this is a phrase searching
+        boolean isEnclosed = isStringEnclosed(query);
+        if(isEnclosed){
+
+        }
 
 
-        List<JSONObject> resultList = toDisplay.entrySet().parallelStream()
-                .map(entry -> {
-                    String key = entry.getKey();
-                    linkAttr value = entry.getValue();
-                    JSONObject temp = new JSONObject();
-                    temp.put("URL", key);
-                    temp.put("title", value.title);
-                    temp.put("Snippet", value.BestSnip);
-                    return temp;
-                })
-                .toList();
-        resultList.forEach(toDisp::put);
 
+        else {
+            toDisplay = RankerMain.handleQuery(query, pageNumber);
+
+            JSONArray toDisp = new JSONArray();
+
+
+            List<JSONObject> resultList = toDisplay.entrySet().parallelStream()
+                    .map(entry -> {
+                        String key = entry.getKey();
+                        linkAttr value = entry.getValue();
+                        JSONObject temp = new JSONObject();
+                        temp.put("URL", key);
+                        temp.put("title", value.title);
+                        temp.put("Snippet", value.BestSnip);
+                        return temp;
+                    })
+                    .toList();
+            resultList.forEach(toDisp::put);
+        }
 
 //
         if (toDisp.length() != 0)
