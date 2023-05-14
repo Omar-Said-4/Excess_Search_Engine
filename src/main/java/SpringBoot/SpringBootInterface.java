@@ -55,7 +55,7 @@ public class SpringBootInterface {
 
         System.out.println("Current time: " + formattedDateTime);
 
-        long startTime = System.currentTimeMillis();
+        //long startTime = System.currentTimeMillis();
 
         JSONObject r = new JSONObject();
 
@@ -66,27 +66,31 @@ public class SpringBootInterface {
 
         JSONArray toDisp = new JSONArray();
 
+        long startTime = System.currentTimeMillis();
         List<JSONObject> resultList = toDisplay.entrySet().parallelStream()
                 .map(entry -> {
                     String key = entry.getKey();
                     linkAttr value = entry.getValue();
-                    String firstSnippetKey = value.Snippets.keySet().iterator().next();
                     JSONObject temp = new JSONObject();
                     temp.put("URL", key);
                     temp.put("title", value.title);
-                    temp.put("Snippet", MongoInterface.getSnippet(firstSnippetKey));
+                    temp.put("Snippet", value.BestSnip);
                     return temp;
                 })
                 .toList();
-
         resultList.forEach(toDisp::put);
+
+
+        long endTime = System.currentTimeMillis();
+        long elapsedTime = endTime - startTime;
+        System.out.println("Elapsed time: " + elapsedTime + " milliseconds");
 
         if (toDisp.length() != 0)
             MongoInterface.addSuggestion(query);
 
         r.put("results", toDisp);
         r.put("size", toDisp.length());
-        long endTime = System.currentTimeMillis();
+
 
         now = LocalDateTime.now();
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
@@ -96,8 +100,8 @@ public class SpringBootInterface {
         System.out.println("Current time: " + formattedDateTime);
 
 
-        long elapsedTime = endTime - startTime;
-        System.out.println("Elapsed time: " + elapsedTime + " milliseconds");
+//        long elapsedTime = endTime - startTime;
+//        System.out.println("Elapsed time: " + elapsedTime + " milliseconds");
 
 
         return ResponseEntity.ok(r.toString());

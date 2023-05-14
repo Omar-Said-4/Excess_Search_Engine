@@ -9,5 +9,7 @@ public class linkAttr {
     double pri;
 
     public Map<String, Integer> Snippets = new HashMap<>();
+
+    public String BestSnip;
 }
 

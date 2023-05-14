@@ -63,12 +63,10 @@ public class RankerMain {
 
 
 
-        long startTime = System.currentTimeMillis();
+
         Map<String, linkAttr> toDisplay = new ConcurrentSkipListMap<>(Comparator.comparingDouble(s -> toDisplayTmp.get(s).pri).reversed());
         toDisplayTmp.keySet().parallelStream().forEach(key -> {
             linkAttr attr = toDisplayTmp.get(key);
-            toDisplay.put(key, attr);
-
             Map<String, Integer> descendingMap = attr.Snippets.entrySet().parallelStream()
                     .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (oldValue, newValue) -> oldValue, LinkedHashMap::new));
@@ -78,12 +76,11 @@ public class RankerMain {
             StringBuilder output = new StringBuilder();
             output.append("Website: ").append(key)
                     .append(", Priority: ").append(attr.pri)
-                    .append(", Best Snippet: ").append(toShow.replaceAll("[^\\p{ASCII}]", "'"));
+                    .append(", Best Snippet: ").append(attr.BestSnip = toShow.replaceAll("[^\\p{ASCII}]", "'"));
+            toDisplay.put(key, attr);
             System.out.println(output.toString());
         });
-        long endTime = System.currentTimeMillis();
-        long elapsedTime = endTime - startTime;
-        System.out.println("Elapsed time: " + elapsedTime + " milliseconds");
+
 
         return toDisplay;
     }
