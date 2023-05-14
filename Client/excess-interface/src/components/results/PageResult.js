@@ -2,7 +2,7 @@ import logo from "../../icons/insta.png";
 import parse from "html-react-parser";
 
 const PageResult = ({ title, url, description }) => {
-  const maxLength = 300;
+  const maxLength = 500;
   console.log(description.length);
 
   if (description.length > maxLength) {

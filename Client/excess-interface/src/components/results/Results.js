@@ -48,7 +48,7 @@ const Results = () => {
     setLoading(true);
 
     const startTime = performance.now();
-    
+
     const now = new Date();
     const hours = now.getHours().toString().padStart(2, "0");
     const minutes = now.getMinutes().toString().padStart(2, "0");
@@ -87,7 +87,7 @@ const Results = () => {
 
         // response.data.results.map((item) => {
         //   console.log(item.Snippet);
-        // });
+        // });`
 
         setLoading(false);
       })

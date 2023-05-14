@@ -1,5 +1,5 @@
 import SearchField from "../../SearchField";
-import logo from "../../icons/logo.png";
+import logo from "../../icons/image.png";
 
 const Home = () => {
 

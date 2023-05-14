@@ -76,31 +76,89 @@
 
 // export default SearchField;
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Axios from "axios";
 import {
   MDBInputGroup,
-  MDBInput,
   MDBIcon,
-  MDBAlert,
   MDBBtn,
+  MDBListGroup,
+  MDBListGroupItem,
 } from "mdb-react-ui-kit";
 import "mdb-react-ui-kit/dist/css/mdb.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import LoadingCircle from "./components/results/LoadingCircle";
 
-const SearchField = ({ query }) => {
-  const [showSearchAlert, setShowSearchAlert] = useState(false);
+const SearchField = ({ query, place }) => {
   const [text, setText] = useState(query);
-
+  const [loaded, setLoaded] = useState(false);
+  const [index, setIndex] = useState(-1);
   const [suggestions, setSuggestions] = useState([]);
+
+  // const handleImageLoad = () => {
+  //   setIsLoaded(true);
+  // }
+
+  const handleKeyDown = useCallback(
+    (event) => {
+      if (event.keyCode === 38) {
+        // handle up arrow key
+        // There is no list -> Do no thing
+        // Else
+        if (suggestions.length !== 0) {
+          // If no item is highlighted
+          if (index === -1) setIndex(suggestions.length - 1);
+          else if (index === 0) setIndex(-1);
+          else if (index !== 0) setIndex(index - 1);
+        }
+        console.log(index);
+      } else if (event.keyCode === 40) {
+        // handle down arrow key
+        // There is no list -> Do no thing
+        // Else
+        if (suggestions.length !== 0) {
+          // If no item is highlighted
+          if (index === suggestions.length - 1) setIndex(-1);
+          else setIndex(index + 1);
+        }
+
+        console.log(index);
+      } else if (
+        event.keyCode === 13 &&
+        document.getElementById("input-field") === document.activeElement &&
+        document.getElementById("input-field").value.replace(/\s/g, "") !== ""
+      ) {
+        if (index !== -1) {
+          setText(suggestions.at(index));
+
+          document.getElementById("input-field").value = suggestions.at(index);
+        }
+
+        makeSearch();
+      }
+    },
+    [index, suggestions]
+  );
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleKeyDown]);
+
+  window.onload = function () {
+    setLoaded(true);
+  };
 
   const queryChanged = async (e) => {
     setText(e.target.value);
 
-    console.log("test");
-
-    if (e.target.value == "") setSuggestions([]);
-    else
+    setIndex(-1);
+    if (e.target.value === "") {
+      setSuggestions([]);
+    } else
       Axios.get("http://localhost:8080/suggest", {
         params: { query: e.target.value },
         headers: {
@@ -112,40 +170,104 @@ const SearchField = ({ query }) => {
       });
   };
 
+  const makeSearch = () => {
+    window.location.href =
+      "/search/?query=" +
+      document.getElementById("input-field").value +
+      "&page=1";
+  };
+
+  const search = () => {
+    if (index !== -1) {
+      setText(suggestions.at(index));
+
+      document.getElementById("input-field").value = suggestions.at(index);
+    }
+
+    makeSearch();
+  };
+
+
+
   return (
     <>
-      <MDBInputGroup
-        className="search-field"
-        style={{ width: "40%", height: "40px", marginBottom: "15px" }}
-      >
-        <input
-          className="form-control"
-          label="Search"
-          id="input-field"
-          style={{
-            width: "5vh",
-            height: "7vh",
-            fontSize: "26px",
-            borderRadius: "15px",
-          }}
-          spellCheck={false}
-          autoComplete="off"
-          placeholder="Search!"
-          onChange={(e)=>queryChanged(e)}
-        />
-        <MDBBtn
-          onClick={() => setShowSearchAlert(true)}
-          rippleColor="dark"
-          style={{ borderRadius: "15px" }}
-          disabled={text === ""}
-        >
-          <MDBIcon icon="search" />
-        </MDBBtn>
-      </MDBInputGroup>
+      {loaded || place === "result" ? (
+        <div style={{ width: "40%", display: place === "result"? "inline-block" : "block", left: place === "result" ? "25%" : "30%" }} className="search-field">
+          <MDBInputGroup style={{ height: "100%" }}>
+            <input
+              className="form-control"
+              label="Search"
+              id="input-field"
+              style={{
+                // height: "7vh",
+                fontSize: "26px",
+                borderRadius: "15px",
+              }}
+              value={text}
+              spellCheck={false}
+              autoComplete="off"
+              placeholder="Search!"
+              onChange={(e) => queryChanged(e)}
+            />
+            <MDBBtn
+              rippleColor="dark"
+              style={{ borderRadius: "15px" }}
+              disabled={text === ""}
+              onClick={search}
+            >
+              <MDBIcon icon="search" />
+            </MDBBtn>
+          </MDBInputGroup>
 
-      {/* <MDBAlert delay={1000} position='top-right' autohide appendToBody show={showSearchAlert}>
-        Search!
-      </MDBAlert> */}
+          {suggestions.length !== 0 ? (
+            <MDBListGroup
+              style={{ marginTop: "5px", paddingLeft: "5px" , position: "absolute"}}
+              light
+              className="my-list"
+
+            >
+              {suggestions.map((suggestion, i) => (
+                <MDBListGroupItem
+                  active
+                  aria-current="true"
+                  className="px-3"
+                  style={{
+                    backgroundColor: index === i ? "#5ea8e9" : "#e2e0e0",
+                    color: "black",
+                    // marginBottom: "4px",
+                    height: "35px",
+                    padding: "0",
+                    paddingTop: "4px",
+                    borderRadius: "0px",
+                    userSelect: "none",
+                  }}
+                  onMouseEnter={(event) => {
+                    event.target.style.backgroundColor = "#5ea8e9";
+                    setIndex(i);
+                  }}
+                  onMouseLeave={(event) => {
+                    event.target.style.backgroundColor = "#e0e1e2";
+                    setIndex(-1);
+                  }}
+                  onClick={(event) => {
+                    console.log(event);
+
+                    setText(event.target.innerHTML);
+
+                    document.getElementById("input-field").value =
+                      event.target.innerHTML;
+                    makeSearch();
+                  }}
+                >
+                  {suggestion}
+                </MDBListGroupItem>
+              ))}
+            </MDBListGroup>
+          ) : null}
+        </div>
+      ) : (
+        <LoadingCircle />
+      )}
     </>
   );
 };
