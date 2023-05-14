@@ -56,17 +56,18 @@ public class SpringBootInterface {
         System.out.println("Current time: " + formattedDateTime);
 
         //long startTime = System.currentTimeMillis();
-
         JSONObject r = new JSONObject();
 
 //        JSONArray response = new JSONArray();
+        long startTime = System.currentTimeMillis();
         Map<String, linkAttr> toDisplay = RankerMain.handleQuery(query, pageNumber);
-
-
+        long endTime = System.currentTimeMillis();
+        long elapsedTime = endTime - startTime;
+        System.out.println("Elapsed time: " + elapsedTime + " milliseconds");
 
         JSONArray toDisp = new JSONArray();
 
-        long startTime = System.currentTimeMillis();
+
         List<JSONObject> resultList = toDisplay.entrySet().parallelStream()
                 .map(entry -> {
                     String key = entry.getKey();
@@ -81,9 +82,6 @@ public class SpringBootInterface {
         resultList.forEach(toDisp::put);
 
 
-        long endTime = System.currentTimeMillis();
-        long elapsedTime = endTime - startTime;
-        System.out.println("Elapsed time: " + elapsedTime + " milliseconds");
 
         if (toDisp.length() != 0)
             MongoInterface.addSuggestion(query);

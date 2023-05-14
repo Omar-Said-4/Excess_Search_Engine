@@ -277,8 +277,15 @@ public class MongoInterface {
     public static String getSnippet(String id) {
         MongoDatabase database = mongoClient.getDatabase("ExcessDB");
         MongoCollection<Document> collection = database.getCollection("Snippets");
-        Document document = collection.find(Filters.eq("_id", new ObjectId(id))).first();
+
+        Document projection = new Document("Snippet", 1); // Include only the "Snippet" field
+
+        Document document = collection.find(Filters.eq("_id", new ObjectId(id)))
+                .projection(projection)
+                .first();
+
         return document.getString("Snippet");
+
     }
 
     public static void addSuggestion(String suggestion) {
