@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -95,27 +97,27 @@ public class SpringBootInterface {
                     })
                     .toList();
             resultList.forEach(toDisp::put);
-        }
+            if (toDisp.length() != 0)
+                MongoInterface.addSuggestion(query);
 
-//
-        if (toDisp.length() != 0)
-            MongoInterface.addSuggestion(query);
-
-        r.put("results", toDisp);
-        r.put("size", toDisp.length());
+            r.put("results", toDisp);
+            r.put("size", toDisp.length());
 
 
-        now = LocalDateTime.now();
-        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+            now = LocalDateTime.now();
+            formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
-        formattedDateTime = now.format(formatter);
+            formattedDateTime = now.format(formatter);
 
-        System.out.println("Current time: " + formattedDateTime);
+            System.out.println("Current time: " + formattedDateTime);
 
 
 //        long elapsedTime = endTime - startTime;
 //        System.out.println("Elapsed time: " + elapsedTime + " milliseconds");
 
+
+            return ResponseEntity.ok(r.toString());
+        }
 
         return ResponseEntity.ok(r.toString());
 
