@@ -17,6 +17,7 @@ import javax.print.Doc;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class MongoInterface {
     static MongoClient mongoClient;
@@ -296,8 +297,6 @@ public class MongoInterface {
 
 
 
-
-
     public static String getSnippet(String id) {
         MongoDatabase database = mongoClient.getDatabase("ExcessDB");
         MongoCollection<Document> collection = database.getCollection("Snippets");
@@ -318,11 +317,14 @@ public class MongoInterface {
 
         Document document = new Document("Query", suggestion);
 
-        Document filter = new Document("Query", suggestion);
-        collection.updateOne(filter, new Document("$set", document), new UpdateOptions().upsert(true));
-//
-//        Document doc = new Document("Query", suggestion);
-//        collection.insertOne(doc);
+
+        Document query = new Document("Query", new Document("$regex", suggestion).append("$options", "i"));
+
+        FindIterable<Document> result = collection.find(query);
+
+        if (!result.iterator().hasNext())
+            collection.insertOne(document);
+        
     }
 
 
@@ -330,14 +332,14 @@ public class MongoInterface {
         MongoDatabase database = mongoClient.getDatabase("ExcessDB");
         MongoCollection<Document> collection = database.getCollection("Suggestions");
 
-        Document query = new Document("Query", new Document("$regex", q));
+        Document query = new Document("Query", new Document("$regex", q).append("$options", "i"));
 
         MongoCursor<Document> cursor = collection.find(query).iterator();
 
         JSONArray result = new JSONArray();
 
         while (cursor.hasNext())
-            result.put((String) cursor.next().get("Query"));
+            result.put(cursor.next().get("Query"));
 
         return result.toString();
     }

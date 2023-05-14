@@ -135,10 +135,10 @@ const SearchField = ({ query, place }) => {
 
           document.getElementById("input-field").value = suggestions.at(index);
         }
+        console.log(document.getElementById("input-field").value.trim());
+        setText(document.getElementById("input-field").value.trim());
         makeSearch();
-      }
-      else if(event.keyCode == 27)
-        setFocused(false);
+      } else if (event.keyCode === 27) setFocused(false);
     },
     [index, suggestions]
   );
@@ -177,7 +177,7 @@ const SearchField = ({ query, place }) => {
   const makeSearch = () => {
     window.location.href =
       "/search/?query=" +
-      document.getElementById("input-field").value +
+      document.getElementById("input-field").value.trim() +
       "&page=1";
   };
 
@@ -202,7 +202,7 @@ const SearchField = ({ query, place }) => {
           }}
           className="search-field"
         >
-          <MDBInputGroup style={{ height: "100%"}}>
+          <MDBInputGroup style={{ height: "100%" }}>
             <input
               className="form-control"
               label="Search"
@@ -213,7 +213,7 @@ const SearchField = ({ query, place }) => {
                 borderRadius: "15px",
                 boxShadow: focused ? "0 0 10px rgba(0, 0, 0, 1)" : "",
                 backgroundColor: place !== "result" ? "#f2f2f2" : "#c6ddf6",
-                marginRight: "7px"
+                marginRight: "7px",
               }}
               value={text}
               spellCheck={false}
