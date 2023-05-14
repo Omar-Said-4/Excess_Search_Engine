@@ -7,24 +7,24 @@ import org.bson.Document;
 
 import javax.swing.plaf.metal.MetalBorders;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static QueryProcessor.queryP.QueryProcessor;
 
 public class RankerMain {
 
-
     public static Map<String, linkAttr> handleQuery(String prompt, int pageNumber) {
         ArrayList<String> values = QueryProcessor(prompt);
         String[] searchQuery = values.toArray(new String[0]);
 
-        Map<String, linkAttr> toDisplayTmp = new HashMap<>();
-
+        Map<String, linkAttr> toDisplayTmp = new ConcurrentHashMap<>();
         final double numOfdocs = 6000;
 
-        for (String s : searchQuery) {
+        Arrays.stream(searchQuery).parallel().forEach(s -> {
             List<Object> websites = MongoInterface.getWordDocs(s);
             if (websites == null)
-                continue;
+                return;
             int df = websites.size();
 
             for (Object obj : websites) {
@@ -36,37 +36,27 @@ public class RankerMain {
                     double idf = Math.log(numOfdocs / df);
                     ArrayList<String> snips = (ArrayList<String>) websiteDoc.get("Snippets");
 
-                    linkAttr tmp = toDisplayTmp.get(url);
-                    if (tmp == null) {
-                        tmp = new linkAttr();
-                        tmp.title = title;
-                        toDisplayTmp.put(url, tmp);
-                    }
+                    linkAttr tmp = toDisplayTmp.computeIfAbsent(url, k -> new linkAttr());
+                    tmp.title = title;
 
-                    tmp.pri += (tf * idf * 0.3 + pri);
+                    double snippetScore = tf * idf * 0.3 + pri;
+                    tmp.pri += snippetScore;
 
                     for (String snippet : snips) {
-                        tmp.Snippets.put(snippet, tmp.Snippets.getOrDefault(snippet, 0) + 1000);
+                        tmp.Snippets.merge(snippet, 1000, Integer::sum);
                     }
                 }
             }
-        }
+        });
 
-        // Use the popularity in the calculation
-        Comparator<String> valueComparator = (s1, s2) -> {
-            double value1 = toDisplayTmp.get(s1).pri;
-            double value2 = toDisplayTmp.get(s2).pri;
-            return Double.compare(value2, value1); // descending order
-        };
-
-        Map<String, linkAttr> toDisplay = new TreeMap<>(valueComparator);
+        Map<String, linkAttr> toDisplay = new TreeMap<>(Comparator.comparingDouble(s -> toDisplayTmp.get(s).pri).reversed());
         toDisplay.putAll(toDisplayTmp);
 
         toDisplay.forEach((key, value) -> {
-            Map<String, Integer> descendingMap = new LinkedHashMap<>(value.Snippets.size());
-            value.Snippets.entrySet().stream()
+            Map<String, Integer> descendingMap = value.Snippets.entrySet()
+                    .parallelStream()
                     .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                    .forEach(entry -> descendingMap.put(entry.getKey(), entry.getValue()));
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (oldValue, newValue) -> oldValue, LinkedHashMap::new));
 
             String toShow = MongoInterface.getSnippet(descendingMap.keySet().iterator().next());
 
@@ -79,7 +69,6 @@ public class RankerMain {
 
         return toDisplay;
     }
-
 
 
     public static void main(String[] args) throws InterruptedException {
