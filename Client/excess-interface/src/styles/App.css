@@ -39,8 +39,14 @@
 
 .title-div{
   display: flex;
-  align-items: center;
-  justify-content: center;
+  /* align-items: center;
+  justify-content: center; */
+}
+
+.url-span{
+  transform: translateY(-50%);
+  margin-left: 40px;
+
 }
 
 .title{ 
@@ -54,7 +60,8 @@
   -webkit-transform: translateY(-10%);
   -ms-transform: translateY(-10%);
   transform: translateY(-10%);
-  width: 90%;
+  width: 100%;
+  
   text-decoration: none;
 } 
 
@@ -106,6 +113,7 @@
   background-color: white;
   border-radius: 50%;
 
+  position: absolute;
   border: 1px solid black;
 
 
@@ -145,7 +153,8 @@
 .response-time{
   text-align: left;
   margin-bottom: 15px;
-  color: black;
+  color: grey;
+  font-size: 15px;
 }
 
 .results{
@@ -212,8 +221,9 @@
   /* border-radius: 20px; */
   border: none;
   outline: none;
-  background-color: #f2f2f2;
+  background-color: #c6ddf6;
   height: 100%;
+  color: black;
 }
 
 #input-field::placeholder{
@@ -241,10 +251,11 @@
   font-size: 4vh;
 
   position: relative; 
-  top: 40%; left: 0%;
+  top: 30%; left: 0%;
   transform: translate(0%,-100%);
 
   margin-top: 20px;
+  user-select: none;
 }
 
 
@@ -362,10 +373,9 @@
 }
 
 .my-list {
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  /* padding-left: 10px;
-  padding-right: 10px; */
+  border: 2px solid #b5a8a8;
+  border-radius: 7px;
+
   padding: 5px;
 
   width: 100%;
