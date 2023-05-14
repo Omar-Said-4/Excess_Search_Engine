@@ -88,12 +88,14 @@ import {
 import "mdb-react-ui-kit/dist/css/mdb.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import LoadingCircle from "./components/results/LoadingCircle";
+import { motion } from "framer-motion";
 
 const SearchField = ({ query, place }) => {
   const [text, setText] = useState(query);
   const [loaded, setLoaded] = useState(false);
   const [index, setIndex] = useState(-1);
   const [suggestions, setSuggestions] = useState([]);
+  const [focused, setFocused] = useState(false);
 
   // const handleImageLoad = () => {
   //   setIsLoaded(true);
@@ -133,9 +135,10 @@ const SearchField = ({ query, place }) => {
 
           document.getElementById("input-field").value = suggestions.at(index);
         }
-
         makeSearch();
       }
+      else if(event.keyCode == 27)
+        setFocused(false);
     },
     [index, suggestions]
   );
@@ -154,6 +157,7 @@ const SearchField = ({ query, place }) => {
 
   const queryChanged = async (e) => {
     setText(e.target.value);
+    setFocused(true);
 
     setIndex(-1);
     if (e.target.value === "") {
@@ -187,27 +191,37 @@ const SearchField = ({ query, place }) => {
     makeSearch();
   };
 
-
-
   return (
     <>
       {loaded || place === "result" ? (
-        <div style={{ width: "40%", display: place === "result"? "inline-block" : "block", left: place === "result" ? "25%" : "30%" }} className="search-field">
-          <MDBInputGroup style={{ height: "100%" }}>
+        <div
+          style={{
+            width: "40%",
+            display: place === "result" ? "inline-block" : "block",
+            left: place === "result" ? "5%" : "30%",
+          }}
+          className="search-field"
+        >
+          <MDBInputGroup style={{ height: "100%"}}>
             <input
               className="form-control"
               label="Search"
               id="input-field"
               style={{
                 // height: "7vh",
-                fontSize: "26px",
+                fontSize: "20px",
                 borderRadius: "15px",
+                boxShadow: focused ? "0 0 10px rgba(0, 0, 0, 1)" : "",
+                backgroundColor: place !== "result" ? "#f2f2f2" : "#c6ddf6",
+                marginRight: "7px"
               }}
               value={text}
               spellCheck={false}
               autoComplete="off"
               placeholder="Search!"
               onChange={(e) => queryChanged(e)}
+              onFocus={(e) => setFocused(true)}
+              onBlur={(e) => setFocused(true)}
             />
             <MDBBtn
               rippleColor="dark"
@@ -219,48 +233,62 @@ const SearchField = ({ query, place }) => {
             </MDBBtn>
           </MDBInputGroup>
 
-          {suggestions.length !== 0 ? (
+          {suggestions.length !== 0 && focused ? (
             <MDBListGroup
-              style={{ marginTop: "5px", paddingLeft: "5px" , position: "absolute"}}
+              style={{
+                marginTop: "5px",
+                // paddingLeft: "5px",
+                position: "absolute",
+              }}
               light
               className="my-list"
-
             >
               {suggestions.map((suggestion, i) => (
-                <MDBListGroupItem
-                  active
-                  aria-current="true"
-                  className="px-3"
-                  style={{
-                    backgroundColor: index === i ? "#5ea8e9" : "#e2e0e0",
-                    color: "black",
-                    // marginBottom: "4px",
-                    height: "35px",
-                    padding: "0",
-                    paddingTop: "4px",
-                    borderRadius: "0px",
-                    userSelect: "none",
-                  }}
-                  onMouseEnter={(event) => {
-                    event.target.style.backgroundColor = "#5ea8e9";
-                    setIndex(i);
-                  }}
-                  onMouseLeave={(event) => {
-                    event.target.style.backgroundColor = "#e0e1e2";
-                    setIndex(-1);
-                  }}
-                  onClick={(event) => {
-                    console.log(event);
-
-                    setText(event.target.innerHTML);
-
-                    document.getElementById("input-field").value =
-                      event.target.innerHTML;
-                    makeSearch();
-                  }}
+                <motion.div
+                  initial={{ opacity: "0%" }}
+                  animate={{ opacity: "100%" }}
+                  // transition={{
+                  //   type: "tween",
+                  //   duration: 0.9,
+                  // }}
                 >
-                  {suggestion}
-                </MDBListGroupItem>
+                  <MDBListGroupItem
+                    active
+                    aria-current="true"
+                    className="px-3"
+                    style={{
+                      backgroundColor: index === i ? "#5ea8e9" : "#e2e0e0",
+                      color: "black",
+                      // marginBottom: "4px",
+                      height: "35px",
+                      padding: "0",
+                      paddingTop: "4px",
+                      borderRadius: "0px",
+                      userSelect: "none",
+                      borderRadius: "5px",
+                      // marginBottom: "3px",
+                    }}
+                    onMouseEnter={(event) => {
+                      event.target.style.backgroundColor = "#5ea8e9";
+                      setIndex(i);
+                    }}
+                    onMouseLeave={(event) => {
+                      event.target.style.backgroundColor = "#e0e1e2";
+                      setIndex(-1);
+                    }}
+                    onClick={(event) => {
+                      console.log(event);
+
+                      setText(event.target.innerHTML);
+
+                      document.getElementById("input-field").value =
+                        event.target.innerHTML;
+                      makeSearch();
+                    }}
+                  >
+                    {suggestion}
+                  </MDBListGroupItem>
+                </motion.div>
               ))}
             </MDBListGroup>
           ) : null}

@@ -81,7 +81,7 @@ const Results = () => {
 
         setResponseTime(time);
 
-        // console.log(response.data);
+        console.log(response.data);
         setData(response.data.results);
         setSize(response.data.size);
 
