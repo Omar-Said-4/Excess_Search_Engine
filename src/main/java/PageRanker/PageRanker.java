@@ -2,10 +2,7 @@ package PageRanker;
 
 import CrawlerState.CrawlerState;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
@@ -96,6 +93,18 @@ public class PageRanker {
 //        return numLinks;
 //    }
 
+    public static void serializeHashMap(HashMap<String, Double> hashMap, String filename) {
+        try {
+            FileOutputStream fileOut = new FileOutputStream(filename);
+            ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+            objectOut.writeObject(hashMap);
+            objectOut.close();
+            fileOut.close();
+            System.out.println("HashMap serialized and saved to " + filename);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     private static HashMap<String, ConcurrentLinkedQueue<String>> getGraph() throws IOException {
         HashMap<String, ConcurrentLinkedQueue<String>> outGoingLinks = new HashMap<>();
@@ -259,7 +268,10 @@ public class PageRanker {
 
         PageRanker pageRanker = new PageRanker();
 
-        pageRanker.computePageRank();
+        HashMap<String, Double> stringDoubleHashMap = pageRanker.computePageRank();
+
+        serializeHashMap(stringDoubleHashMap, "map.ser");
+
 
     }
 
