@@ -15,21 +15,19 @@ public class RankerMain {
 
     public static Map<String, linkAttr> handleQuery(String prompt, int pageNumber) {
         ArrayList<String> values = QueryProcessor(prompt);
-
-        String[] searchQuery = new String[values.size()];
-
-        searchQuery = values.toArray(searchQuery);
+        String[] searchQuery = values.toArray(new String[0]);
 
         Map<String, linkAttr> toDisplayTmp = new HashMap<>();
+
+        final double numOfdocs = 6000;
+
         for (String s : searchQuery) {
-
-            final double numOfdocs = 6000;
-
-            List<Object> Websites = MongoInterface.getWordDocs(s);
-            if (Websites == null)
+            List<Object> websites = MongoInterface.getWordDocs(s);
+            if (websites == null)
                 continue;
-            int df = Websites.size();
-            for (Object obj : Websites) {
+            int df = websites.size();
+
+            for (Object obj : websites) {
                 if (obj instanceof Document websiteDoc) {
                     String url = websiteDoc.getString("URL");
                     String title = websiteDoc.getString("Title");
@@ -38,35 +36,23 @@ public class RankerMain {
                     double idf = Math.log(numOfdocs / df);
                     ArrayList<String> snips = (ArrayList<String>) websiteDoc.get("Snippets");
 
-
-                    if (!toDisplayTmp.containsKey(url)) {
-                        linkAttr tmp = new linkAttr();
+                    linkAttr tmp = toDisplayTmp.get(url);
+                    if (tmp == null) {
+                        tmp = new linkAttr();
                         tmp.title = title;
-                        tmp.pri += (tf * idf * 0.3);
-                        tmp.pri += pri;
-                        for (String snippet : snips) {
-                            tmp.Snippets.put(snippet, 0);
-                        }
-                        toDisplayTmp.put(url, tmp);
-                    } else {
-                        linkAttr tmp = toDisplayTmp.get(url);
-                        tmp.pri += (tf * idf + pri);
-                        for (String snippet : snips) {
-                            if (!tmp.Snippets.containsKey(snippet)) {
-                                tmp.Snippets.put(snippet, snippet.length());
-                            } else {
-                                tmp.Snippets.put(snippet, tmp.Snippets.get(snippet) + 1000);
-                            }
-                        }
                         toDisplayTmp.put(url, tmp);
                     }
-                    // System.out.println("Website URL: " + url);
+
+                    tmp.pri += (tf * idf * 0.3 + pri);
+
+                    for (String snippet : snips) {
+                        tmp.Snippets.put(snippet, tmp.Snippets.getOrDefault(snippet, 0) + 1000);
+                    }
                 }
             }
         }
 
-        // use the popularity in the calculation
-
+        // Use the popularity in the calculation
         Comparator<String> valueComparator = (s1, s2) -> {
             double value1 = toDisplayTmp.get(s1).pri;
             double value2 = toDisplayTmp.get(s2).pri;
@@ -77,25 +63,29 @@ public class RankerMain {
         toDisplay.putAll(toDisplayTmp);
 
         toDisplay.forEach((key, value) -> {
-
-
-            Map<String, Integer> descendingMap = new LinkedHashMap<>();
+            Map<String, Integer> descendingMap = new LinkedHashMap<>(value.Snippets.size());
             value.Snippets.entrySet().stream()
-                    .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                    .forEachOrdered(e -> descendingMap.put(e.getKey(), e.getValue()));
-            Map.Entry<String, Integer> firstEntry = descendingMap.entrySet().iterator().next();
-            String toShow = MongoInterface.getSnippet(firstEntry.getKey());
-            System.out.println("Website: " + key + ", Priority: " + value.pri + "best Snippet: " + toShow.replaceAll("[^\\p{ASCII}]", "'"));
+                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                    .forEach(entry -> descendingMap.put(entry.getKey(), entry.getValue()));
+
+            String toShow = MongoInterface.getSnippet(descendingMap.keySet().iterator().next());
+
+            StringBuilder output = new StringBuilder();
+            output.append("Website: ").append(key)
+                    .append(", Priority: ").append(value.pri)
+                    .append(", Best Snippet: ").append(toShow.replaceAll("[^\\p{ASCII}]", "'"));
+            System.out.println(output.toString());
         });
 
         return toDisplay;
     }
 
 
+
     public static void main(String[] args) throws InterruptedException {
+
         try {
             MongoInterface.Initialize();
-
             SpringBootInterface.runSpring();
         } catch (MongoException e) {
             System.out.println("Error");

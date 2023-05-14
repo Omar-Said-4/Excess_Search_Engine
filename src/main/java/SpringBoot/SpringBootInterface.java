@@ -32,32 +32,45 @@ public class SpringBootInterface {
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/")
     public ResponseEntity<String> rchResult(@RequestParam("query") String query, @RequestParam("pageNumber") int pageNumber) {
+
         System.out.println(query);
 
         JSONObject r = new JSONObject();
 
-        JSONArray toDisp = new JSONArray();
-//        JSONArray response = new JSONArray();
 
+
+
+
+
+//        JSONArray response = new JSONArray();
         Map<String, linkAttr> toDisplay = RankerMain.handleQuery(query, pageNumber);
 
-        toDisplay.forEach((key, value) -> {
+        long startTime = System.currentTimeMillis();
+        JSONArray toDisp = new JSONArray();
+
+        toDisplay.entrySet().parallelStream().forEach(entry -> {
+            String key = entry.getKey();
+            linkAttr value = entry.getValue();
+            String firstSnippetKey = value.Snippets.keySet().iterator().next();
             JSONObject temp = new JSONObject();
             temp.put("URL", key);
             temp.put("title", value.title);
-            Map.Entry<String, Integer> firstEntry = value.Snippets.entrySet().iterator().next();
-            temp.put("Snippet", MongoInterface.getSnippet(firstEntry.getKey()));
-            toDisp.put(temp);
+            temp.put("Snippet", MongoInterface.getSnippet(firstSnippetKey));
+            synchronized (toDisp) {
+                toDisp.put(temp);
+            }
         });
+        long endTime = System.currentTimeMillis();
+        long elapsedTime = endTime - startTime;
+        System.out.println("Elapsed time: " + elapsedTime + " milliseconds");
 
         if (toDisp.length() != 0)
             MongoInterface.addSuggestion(query);
 
         r.put("results", toDisp);
         r.put("size", toDisp.length());
-
-
         return ResponseEntity.ok(r.toString());
+
     }
 
     @CrossOrigin(origins = "http://localhost:3000")
