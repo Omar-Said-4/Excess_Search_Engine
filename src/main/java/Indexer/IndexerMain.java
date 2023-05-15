@@ -28,11 +28,11 @@ import javax.swing.event.DocumentEvent;
 
 public class IndexerMain {
 
-    static Map<String,String> webIcon;
+    static Map<String,String> webIcon = new HashMap<>();
     private static class IndexerT extends Thread{
         String URl;
         String document;
-        Set<String> parsedWords;
+        final Set<String> parsedWords;
 
         String ICON;
 
@@ -62,6 +62,7 @@ public class IndexerMain {
             // Indexer.ParseMeta(toParse,toInsert,URl,title);
 
             String Icon = Indexer.fetchIconUrl(toParse,URl);
+            System.out.println("test");
 
             webIcon.put(URl,Icon);
 
@@ -121,10 +122,7 @@ public class IndexerMain {
 
 
 
-
-
-
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
 
         String filePath = "Websites.ser";
@@ -157,6 +155,8 @@ public class IndexerMain {
         // MongoInterface.terminate();
         int c=0;
 
+        List<Thread> threads = new ArrayList<>();
+
        // int c=0;
         for (Map.Entry<String, String> Wentry : webs.entrySet()) {
             //System.out.println(c++);
@@ -164,16 +164,28 @@ public class IndexerMain {
             c++;
             String document=Wentry.getValue();;
             System.out.println(URl);
-            new Thread(() -> {
+
+            org.jsoup.nodes.Document toParse =  Jsoup.parse(document);
+
+            String Icon = Indexer.fetchIconUrl(toParse,URl);
+
+            System.out.println(Icon);
+
+            Thread t = new Thread(() -> {
                 new IndexerT(URl, document , parsedWords).start();
-            }).start();
+            });
+
+            threads.add(t);
 //            webs.remove(URl);
-        }
-
-        while (c != webs.size())
-        {
 
         }
+
+        for (Thread thread : threads) {
+            thread.join();
+        }
+
+        System.out.println(webIcon.toString());
+
 
         try (FileOutputStream fileOut = new FileOutputStream("icon.ser");
              ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
