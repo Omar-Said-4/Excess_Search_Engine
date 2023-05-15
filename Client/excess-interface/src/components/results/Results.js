@@ -98,7 +98,10 @@ const Results = () => {
       {loading ? (
         <LoadingCircle />
       ) : (
-        <>
+        <div
+          className="results-section"
+
+        >
           <div className="results">
             <ResponseTime
               responseTime={responseTime}
@@ -126,8 +129,9 @@ const Results = () => {
             prevPage={prevPage}
             firstPage={firstPage}
             changePage={changePage}
+            size={resultsSize}
           />
-        </>
+        </div>
       )}
     </div>
   );

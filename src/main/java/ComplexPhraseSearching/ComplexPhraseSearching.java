@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import PageRanker.RankerMain;
 import PageRanker.linkAttr;
 import PhraseSearching.PhraseSearching;
 import org.jsoup.Jsoup;
@@ -15,7 +16,7 @@ import org.jsoup.nodes.Element;
 
 public class ComplexPhraseSearching {
     public static void main(String[] args) {
-        Map<String, linkAttr> result = complexPhraseSearch("\"Football\" AND \"major city in the United States\" AND \"CNN\"");
+        Map<String, Object> result = complexPhraseSearch("\"Football\" AND \"major city in the United States\" AND \"CNN\"", 1);
 
 
 //        for (String r: result)
@@ -35,7 +36,7 @@ public class ComplexPhraseSearching {
 //        }
     }
 
-    public static Map<String, linkAttr> complexPhraseSearch(String phrase) {
+    public static Map<String, Object> complexPhraseSearch(String phrase, int pageNumber) {
         List<String> phrases = new ArrayList<>();
         List<String> operators = new ArrayList<>();
 
@@ -109,11 +110,50 @@ public class ComplexPhraseSearching {
             System.out.println(2);
             if (Objects.equals(operators.get(0), "NOT") || Objects.equals(operators.get(1), "NOT"))
                 results = PhraseSearching.phraseSearching(phrases.get(0), phrases.get(1), null, operators.get(0), operators.get(1), 2);
-            else
+            else {
+                System.out.println("test");
                 results = PhraseSearching.phraseSearching(phrases.get(0), phrases.get(1), phrases.get(2), operators.get(0), operators.get(1), 2);
+            }
         }
 
 
-        return results;
+        Integer size = results.size();
+
+        System.out.println("Size: " +  size);
+
+        // Calculate start and end index
+        int start = 0, end = 0;
+
+        // Check if there are enough data
+        if (!(RankerMain.PAGE_COUNT * (pageNumber - 1) >= results.size())) {
+            start = RankerMain.PAGE_COUNT * (pageNumber - 1);
+
+            // Calculate end index
+            if (results.size() < RankerMain.PAGE_COUNT * pageNumber)
+                end = results.size();
+            else
+                end = RankerMain.PAGE_COUNT * pageNumber;
+        }
+
+
+        List<String> requiredURLs = new ArrayList<>(results.keySet()).subList(start, end);
+        List<linkAttr> requiredAttrs = new ArrayList<>(results.values()).subList(start, end);
+
+        Map<String, linkAttr> snippets = new HashMap<String, linkAttr>();
+
+        System.out.println("Phrase Searching -> Start: " + start);
+        System.out.println("End: " + end);
+
+        for (int i = 0; i < requiredURLs.size(); i++) {
+            snippets.put(requiredURLs.get(i), requiredAttrs.get(i));
+        }
+
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("snippets", snippets);
+        result.put("size", size);
+
+
+        return result;
     }
 }

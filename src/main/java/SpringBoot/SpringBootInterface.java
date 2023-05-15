@@ -18,6 +18,7 @@ import java.io.ObjectInputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -50,7 +51,7 @@ public class SpringBootInterface {
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/")
     public ResponseEntity<String> rchResult(@RequestParam("query") String query, @RequestParam("pageNumber") int pageNumber) {
-        System.out.println(query);
+        System.out.println(query + " " + pageNumber);
 
         Map<String, String> icons = new HashMap<>();
 
@@ -73,11 +74,16 @@ public class SpringBootInterface {
 
         Map<String, linkAttr> toDisplay;
 
+        Integer size = 0;
+
         // Check if this is a phrase searching
         boolean isEnclosed = isStringEnclosed(query);
         if (isEnclosed) {
             long startTime = System.currentTimeMillis();
-            Map<String, linkAttr> list = ComplexPhraseSearching.complexPhraseSearch(query);
+            Map<String, Object> result = ComplexPhraseSearching.complexPhraseSearch(query, pageNumber);
+
+            Map<String, linkAttr> list = (Map<String, linkAttr>) result.get("snippets");
+            size = (Integer) result.get("size");
 
             JSONArray phraseSearchResult = new JSONArray();
 
@@ -101,8 +107,12 @@ public class SpringBootInterface {
 
                 resultList.forEach(phraseSearchResult::put);
 
+                if (size != 0)
+                    MongoInterface.addSuggestion(query);
+
+
                 r.put("results", phraseSearchResult);
-                r.put("size", phraseSearchResult.length());
+                r.put("size", size);
 
                 long elapsedTime = System.currentTimeMillis() - startTime;
                 System.out.println("Elapsed time: " + elapsedTime + " milliseconds");
@@ -110,7 +120,11 @@ public class SpringBootInterface {
 
         } else {
 
-            toDisplay = RankerMain.handleQuery(query, pageNumber);
+            Map<String, Object> result = RankerMain.handleQuery(query, pageNumber);
+            toDisplay = (Map<String, linkAttr>) result.get("snippets");
+            size = (Integer) result.get("size");
+
+            System.out.println(size);
 
             JSONArray toDisp = new JSONArray();
 
@@ -136,8 +150,7 @@ public class SpringBootInterface {
                 MongoInterface.addSuggestion(query);
 
             r.put("results", toDisp);
-            r.put("size", toDisp.length());
-
+            r.put("size", size);
 
         }
 

@@ -206,8 +206,7 @@ public class PhraseSearching {
                     results.putAll(firstElements);
                 }
 
-            }
-            else if (complexity == 1) {
+            } else if (complexity == 1) {
 //                if (firstElements.size() > 0 && Objects.equals(op0, "OR")) {
 //                    results.putAll(link);
 //
@@ -260,8 +259,7 @@ public class PhraseSearching {
                     }
                 }
 
-            }
-            else if (complexity == 2) {
+            } else if (complexity == 2) {
 
                 secondElements = searchPhraseInSnippets(doc.body(), secondString, link, title);
 
@@ -273,29 +271,27 @@ public class PhraseSearching {
 
 
                 if (Objects.equals(op0, "AND") && Objects.equals(op1, "AND")) {
+                    System.out.println(firstElements.size() + " " + secondElements.size() + " " + thirdElements.size());
                     if (firstElements.size() > 0 && secondElements.size() > 0 && thirdElements.size() > 0) {
                         results.putAll(firstElements);
                         results.putAll(secondElements);
                         results.putAll(thirdElements);
                         System.out.println(firstElements.size() + " " + secondElements.size() + " " + thirdElements.size() + " " + link);
                     }
-                }
-                else if (Objects.equals(op0, "AND") && Objects.equals(op1, "OR")) {
+                } else if (Objects.equals(op0, "AND") && Objects.equals(op1, "OR")) {
                     if ((firstElements.size() > 0 && secondElements.size() > 0) || thirdElements.size() > 0) {
                         results.putAll(firstElements);
                         results.putAll(secondElements);
                         results.putAll(thirdElements);
                         System.out.println(firstElements.size() + " " + secondElements.size() + " " + thirdElements.size() + " " + link);
                     }
-                }
-                else if (Objects.equals(op0, "AND") && Objects.equals(op1, "NOT")) {
+                } else if (Objects.equals(op0, "AND") && Objects.equals(op1, "NOT")) {
                     if (firstElements.size() > 0 && secondElements.size() == 0) {
                         results.putAll(firstElements);
                         results.putAll(secondElements);
                         System.out.println(firstElements.size() + " " + secondElements.size() + " " + link);
                     }
-                }
-                else if (Objects.equals(op0, "OR") && Objects.equals(op1, "AND")) {
+                } else if (Objects.equals(op0, "OR") && Objects.equals(op1, "AND")) {
                     if (firstElements.size() > 0 || (secondElements.size() > 0 && thirdElements.size() > 0)) {
                         results.putAll(firstElements);
                         results.putAll(secondElements);
@@ -303,8 +299,7 @@ public class PhraseSearching {
                         System.out.println(firstElements.size() + " " + secondElements.size() + " " + thirdElements.size() + " " + link);
 
                     }
-                }
-                else if (Objects.equals(op0, "OR") && Objects.equals(op1, "OR")) {
+                } else if (Objects.equals(op0, "OR") && Objects.equals(op1, "OR")) {
                     if (firstElements.size() > 0 || secondElements.size() > 0 || thirdElements.size() > 0) {
                         results.putAll(firstElements);
                         results.putAll(secondElements);
@@ -312,22 +307,19 @@ public class PhraseSearching {
                         System.out.println(firstElements.size() + " " + secondElements.size() + " " + thirdElements.size() + " " + link);
 
                     }
-                }
-                else if (Objects.equals(op0, "OR") && Objects.equals(op1, "NOT")) {
+                } else if (Objects.equals(op0, "OR") && Objects.equals(op1, "NOT")) {
                     if (firstElements.size() > 0 || secondElements.size() == 0) {
                         results.putAll(firstElements);
                         results.putAll(secondElements);
                         System.out.println(firstElements.size() + " " + secondElements.size() + " " + link);
                     }
-                }
-                else if (Objects.equals(op0, "NOT") && Objects.equals(op1, "AND")) {
+                } else if (Objects.equals(op0, "NOT") && Objects.equals(op1, "AND")) {
                     if (firstElements.size() == 0 && secondElements.size() > 0) {
                         results.putAll(firstElements);
                         results.putAll(secondElements);
                         System.out.println(firstElements.size() + " " + secondElements.size() + " " + link);
                     }
-                }
-                else if (Objects.equals(op0, "NOT") && Objects.equals(op1, "OR")) {
+                } else if (Objects.equals(op0, "NOT") && Objects.equals(op1, "OR")) {
                     if (firstElements.size() == 0 || secondElements.size() > 0) {
                         results.putAll(firstElements);
                         results.putAll(secondElements);

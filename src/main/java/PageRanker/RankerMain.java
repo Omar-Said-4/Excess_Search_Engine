@@ -21,7 +21,11 @@ import static QueryProcessor.queryP.QueryProcessor;
 
 public class RankerMain {
 
-    public static Map<String, linkAttr> handleQuery(String prompt, int pageNumber) {
+
+    static public int PAGE_COUNT = 10;
+
+    public static Map<String, Object> handleQuery(String prompt, int pageNumber) {
+        Integer size = 0;
 
         String filePath = "map.ser";
         File file = new File(filePath);
@@ -88,17 +92,50 @@ public class RankerMain {
             if (descendingMap.keySet().iterator().hasNext()) {
                 toShow = MongoInterface.getSnippet(descendingMap.keySet().iterator().next());
                 attr.BestSnip = toShow.replaceAll("[^\\p{ASCII}]", "'");
+                toDisplay.put(key, attr);
                 StringBuilder output = new StringBuilder();
                 output.append("Website: ").append(key)
                         .append(", Priority: ").append(attr.pri)
                         .append(", Best Snippet: ").append(attr.BestSnip);
-                toDisplay.put(key, attr);
+
                 System.out.println(output.toString());
             }
         });
 
+        // Calculate start and end index
 
-        return toDisplay;
+        int start = 0, end = 0;
+
+        // Check if there are enough data
+        if (!(PAGE_COUNT * (pageNumber - 1) >= toDisplay.size())) {
+            start = PAGE_COUNT * (pageNumber - 1);
+
+            // Calculate end index
+            if(toDisplay.size() < PAGE_COUNT * pageNumber)
+                end = toDisplay.size();
+            else end = PAGE_COUNT * pageNumber;
+        }
+
+        size = toDisplay.size();
+
+        List<String> requiredURLs = new ArrayList<>(toDisplay.keySet()).subList(start, end);
+        List<linkAttr> requiredAttrs = new ArrayList<>(toDisplay.values()).subList(start, end);
+
+        Map<String, linkAttr> snippets = new HashMap<String, linkAttr>();
+
+        System.out.println("Start: " + start);
+        System.out.println("End: " + end);
+
+        for (int i = 0; i < requiredURLs.size(); i++) {
+            snippets.put(requiredURLs.get(i), requiredAttrs.get(i));
+        }
+
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("snippets", snippets);
+        result.put("size", size);
+
+        return result;
     }
 
 

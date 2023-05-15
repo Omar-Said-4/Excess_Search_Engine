@@ -24,6 +24,8 @@ const SearchField = ({ query, place }) => {
 
   const [isListening, setIsListening] = useState(false);
 
+  const [tempQuery, setTempQuery] = useState("");
+
   const handleKeyDown = useCallback(
     (event) => {
       if (event.keyCode === 38) {
@@ -120,6 +122,7 @@ const SearchField = ({ query, place }) => {
       document.getElementById("input-field").value = suggestions.at(index);
     }
 
+    // if (document.getElementById("input-field").value.trim().length > 0)
     makeSearch();
   };
 
@@ -143,7 +146,7 @@ const SearchField = ({ query, place }) => {
               style={{
                 // height: "7vh",
                 overflow: "",
-                fontSize: "14px",
+                fontSize: "16px",
                 borderRadius: "15px",
                 boxShadow: focused ? "0 0 10px rgba(0, 0, 0, 1)" : "",
                 backgroundColor: place !== "result" ? "#f2f2f2" : "#c6ddf6",
@@ -176,6 +179,9 @@ const SearchField = ({ query, place }) => {
               onClick={(e) => {
                 if (isListening === false) {
                   resetTranscript();
+                  setTempQuery(text);
+                  console.log(tempQuery);
+                  setText("");
 
                   SpeechRecognition.startListening({
                     language: "en-US",
@@ -183,13 +189,16 @@ const SearchField = ({ query, place }) => {
                   });
                   setIsListening(true);
                 } else {
+                  console.log(transcript);
                   if (transcript !== "") {
                     setText(transcript);
-
+                    search();
+                  } else {
+                    console.log(tempQuery);
+                    setText(tempQuery);
                   }
 
                   SpeechRecognition.abortListening();
-                  search();
                   setIsListening(false);
                 }
               }}
