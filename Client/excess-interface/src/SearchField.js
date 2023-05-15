@@ -97,7 +97,7 @@ const SearchField = ({ query, place }) => {
   const [index, setIndex] = useState(-1);
   const [suggestions, setSuggestions] = useState([]);
   const [focused, setFocused] = useState(false);
-  
+
   const [transcript, setTranscript] = useState("");
   const [isListening, setIsListening] = useState(false);
 
@@ -235,11 +235,13 @@ const SearchField = ({ query, place }) => {
               id="input-field"
               style={{
                 // height: "7vh",
-                fontSize: "20px",
+                overflow: "",
+                fontSize: "14px",
                 borderRadius: "15px",
                 boxShadow: focused ? "0 0 10px rgba(0, 0, 0, 1)" : "",
                 backgroundColor: place !== "result" ? "#f2f2f2" : "#c6ddf6",
                 marginRight: "7px",
+                whiteSpace: "normal"
               }}
               value={text}
               spellCheck={false}
@@ -314,9 +316,9 @@ const SearchField = ({ query, place }) => {
                       height: "35px",
                       padding: "0",
                       paddingTop: "4px",
-                      borderRadius: "0px",
                       userSelect: "none",
                       borderRadius: "5px",
+                      fontSize: "14px"
                       // marginBottom: "3px",
                     }}
                     onMouseEnter={(event) => {

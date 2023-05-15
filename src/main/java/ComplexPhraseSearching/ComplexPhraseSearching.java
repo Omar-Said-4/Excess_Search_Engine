@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import PageRanker.linkAttr;
 import PhraseSearching.PhraseSearching;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -14,7 +15,7 @@ import org.jsoup.nodes.Element;
 
 public class ComplexPhraseSearching {
     public static void main(String[] args) {
-        List<String> result = complexPhraseSearch("\"Football\" AND \"major city in the United States\" AND \"CNN\"");
+        Map<String, linkAttr> result = complexPhraseSearch("\"Football\" AND \"major city in the United States\" AND \"CNN\"");
 
 
 //        for (String r: result)
@@ -34,7 +35,7 @@ public class ComplexPhraseSearching {
 //        }
     }
 
-    static List<String> complexPhraseSearch(String phrase) {
+    public static Map<String, linkAttr> complexPhraseSearch(String phrase) {
         List<String> phrases = new ArrayList<>();
         List<String> operators = new ArrayList<>();
 
@@ -59,7 +60,7 @@ public class ComplexPhraseSearching {
             }
         }
 
-        List<String> results = null;
+        Map<String, linkAttr> results = null;
 
         // Normal phrase searching
         if (operators.size() == 0) {

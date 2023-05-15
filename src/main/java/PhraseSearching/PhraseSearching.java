@@ -1,6 +1,7 @@
 package PhraseSearching;
 
 import MongoDB.MongoInterface;
+import PageRanker.linkAttr;
 import com.mongodb.internal.connection.SslHelper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
@@ -36,15 +37,15 @@ public class PhraseSearching {
 //            System.out.println(i);
 
 
-        String prompt ;
+        String prompt;
         Scanner s = new Scanner(System.in);
         prompt = s.nextLine();
-
-        List<String> l = search(prompt);
-
-
-        for (String i : l)
-           System.out.println(i);
+//
+//        List<String> l = search(prompt);
+//
+//
+//        for (String i : l)
+//            System.out.println(i);
 
     }
 
@@ -126,44 +127,45 @@ public class PhraseSearching {
         return result;
     }
 
-    private static List<String> searchPhraseInSnippets(Element element, String s) {
-        List<String> result = new ArrayList<>();
+    private static Map<String, linkAttr> searchPhraseInSnippets(Element element, String s, String link, String title) {
+        Map<String, linkAttr> result = new HashMap<>();
         if (element.children().size() == 0) {
             // This is a leaf node
             if ((element.tagName().equals("h1") || element.tagName().equals("h2") || element.tagName().equals("h3") || element.tagName().equals("h4") || element.tagName().equals("h5") || element.tagName().equals("h6") || element.tagName().equals("p") || element.tagName().equals("div") || element.tagName().equals("b") || element.tagName().equals("i") || element.tagName().equals("strong") || element.tagName().equals("scan") || element.tagName().equals("q") || element.tagName().equals("a") || element.tagName().equals("code") || element.tagName().equals("cite") || element.tagName().equals("li") || element.tagName().equals("caption") || element.tagName().equals("dd")) && !hasNoneDisplayParent(element)) {
 
                 if (findPhraseInSnippet(removeStoppingWords(s), element.ownText())) {
-//                    if(element.text().contains("Thank you"))
-//                        System.out.println(hasNoneDisplayParent(element));
-
-                    result.add(element.text());
+                    linkAttr attributes = new linkAttr();
+                    attributes.BestSnip = element.text();
+                    attributes.title = title;
+                    result.put(link, attributes);
                 }
             }
         } else {
             // Recursively find leaf nodes in each child element
             if (!element.ownText().equals("")) {
-//                System.out.println(element.ownText());
-//                result.add(element.ownText());
-
-                if (!hasNoneDisplayParent(element) && findPhraseInSnippet(removeStoppingWords(s), element.ownText()))
-                    result.add(element.ownText());
+                if (!hasNoneDisplayParent(element) && findPhraseInSnippet(removeStoppingWords(s), element.ownText())) {
+                    linkAttr attributes = new linkAttr();
+                    attributes.BestSnip = element.text();
+                    attributes.title = title;
+                    result.put(link, attributes);
+                }
             }
             for (Element child : element.children()) {
-                result.addAll(searchPhraseInSnippets(child, s));
+                result.putAll((searchPhraseInSnippets(child, s, link, title)));
             }
         }
 
         return result;
     }
 
-    public static List<String> phraseSearching(String firstString, String secondString, String thirdString, String op0, String op1, int complexity) {
+    public static Map<String, linkAttr> phraseSearching(String firstString, String secondString, String thirdString, String op0, String op1, int complexity) {
         System.out.println(firstString + " " + secondString + " " + thirdString);
         System.out.println(op0 + " " + op1);
 
         String filePath = "Websites.ser";
         File file = new File(filePath);
 
-        List<String> results = new ArrayList<>();
+        Map<String, linkAttr> results = new HashMap<>();
 
         HashMap<String, String> webPages = new HashMap<>();
 
@@ -183,70 +185,59 @@ public class PhraseSearching {
         System.out.println(webPages.size());
 
         String doc_string;
-        int count = 0;
 
         for (String link : webPages.keySet()) {
             doc_string = webPages.get(link);
 
-            if (link.contains("Art_Nouveau"))
-                System.out.println();
-
-
             org.jsoup.nodes.Document doc = Jsoup.parse(doc_string);
+
+            String title = doc.title();
 
 
             // Get All the Rendered Text
-            List<String> firstElements = searchPhraseInSnippets(doc.body(), firstString);
+            Map<String, linkAttr> firstElements = searchPhraseInSnippets(doc.body(), firstString, link, title);
 
-//            if (count == 0) {
-//                System.out.println(leafNodes.size());
-//                count++;
-//
-//                System.out.println(link);
-//
-//                for (String l : leafNodes)
-//                    System.out.println(l);
-//            }
 
-            List<String> secondElements = Collections.emptyList();
-            List<String> thirdElements = Collections.emptyList();
+            Map<String, linkAttr> secondElements = new HashMap<>();
+            Map<String, linkAttr> thirdElements = new HashMap<>();
 
             if (complexity == 0) {
                 if (firstElements.size() > 0) {
-                    results.add(link);
-//                    System.out.println(link);
+                    results.putAll(firstElements);
                 }
 
-            } else if (complexity == 1) {
-
-                if (firstElements.size() > 0 && Objects.equals(op0, "OR")) {
-                    results.add(link);
-                    for (String l : firstElements)
-                        System.out.println(l + "\n");
-
-                    System.out.println(firstElements.size() + " " + secondElements.size() + " " + link);
-                    System.out.println();
-                    continue;
-                }
+            }
+            else if (complexity == 1) {
+//                if (firstElements.size() > 0 && Objects.equals(op0, "OR")) {
+//                    results.putAll(link);
+//
+//                    for (String l : firstElements.keySet())
+//                        System.out.println(l + "\n");
+//
+//                    System.out.println(firstElements.size() + " " + secondElements.size() + " " + link);
+//                    System.out.println();
+//                    continue;
+//                }
 
                 if (Objects.equals(op0, "NOT")) {
                     if (firstElements.size() == 0) {
-                        results.add(link);
+                        results.putAll(firstElements);
                     }
                     continue;
                 }
 
 //                secondElements = doc.getElementsContainingOwnText(secondString);
 
-                secondElements = searchPhraseInSnippets(doc.body(), secondString);
+                secondElements = searchPhraseInSnippets(doc.body(), secondString, link, title);
 
                 if (Objects.equals(op0, "AND")) {
                     if (firstElements.size() > 0 && secondElements.size() > 0) {
-                        results.add(link);
-                        for (String l : firstElements)
+                        results.putAll(firstElements);
+                        results.putAll(secondElements);
+                        for (String l : firstElements.keySet())
                             System.out.println(l + "\n");
 
-                        for (String l : secondElements)
+                        for (String l : secondElements.keySet())
                             System.out.println(l + "\n");
 
                         System.out.println(firstElements.size() + " " + secondElements.size() + " " + link);
@@ -254,84 +245,105 @@ public class PhraseSearching {
                     }
                 } else if (Objects.equals(op0, "OR")) {
                     if (firstElements.size() > 0 || secondElements.size() > 0) {
-//                        for (String l : firstElements)
-//                            System.out.println(l + "\n");
+                        results.putAll(firstElements);
+                        results.putAll(secondElements);
 
-                        for (String l : secondElements)
+                        for (String l : firstElements.keySet())
+                            System.out.println(l + "\n");
+
+                        for (String l : secondElements.keySet())
                             System.out.println(l + "\n");
 
                         System.out.println(firstElements.size() + " " + secondElements.size() + " " + link);
                         System.out.println();
-
-                        results.add(link);
 //                        System.out.println(firstElements.size() + " " + secondElements.size());
                     }
                 }
 
-            } else if (complexity == 2) {
+            }
+            else if (complexity == 2) {
 
-                secondElements = searchPhraseInSnippets(doc.body(), secondString);
+                secondElements = searchPhraseInSnippets(doc.body(), secondString, link, title);
 
                 if (!Objects.equals(op0, "NOT") && !Objects.equals(op1, "NOT")) {
 
-                    thirdElements = searchPhraseInSnippets(doc.body(), thirdString);
+                    thirdElements = searchPhraseInSnippets(doc.body(), thirdString, link, title);
 
                 }
 
 
                 if (Objects.equals(op0, "AND") && Objects.equals(op1, "AND")) {
                     if (firstElements.size() > 0 && secondElements.size() > 0 && thirdElements.size() > 0) {
-                        results.add(link);
+                        results.putAll(firstElements);
+                        results.putAll(secondElements);
+                        results.putAll(thirdElements);
                         System.out.println(firstElements.size() + " " + secondElements.size() + " " + thirdElements.size() + " " + link);
                     }
-                } else if (Objects.equals(op0, "AND") && Objects.equals(op1, "OR")) {
+                }
+                else if (Objects.equals(op0, "AND") && Objects.equals(op1, "OR")) {
                     if ((firstElements.size() > 0 && secondElements.size() > 0) || thirdElements.size() > 0) {
+                        results.putAll(firstElements);
+                        results.putAll(secondElements);
+                        results.putAll(thirdElements);
                         System.out.println(firstElements.size() + " " + secondElements.size() + " " + thirdElements.size() + " " + link);
-                        results.add(link);
                     }
-                } else if (Objects.equals(op0, "AND") && Objects.equals(op1, "NOT")) {
+                }
+                else if (Objects.equals(op0, "AND") && Objects.equals(op1, "NOT")) {
                     if (firstElements.size() > 0 && secondElements.size() == 0) {
-                        results.add(link);
+                        results.putAll(firstElements);
+                        results.putAll(secondElements);
                         System.out.println(firstElements.size() + " " + secondElements.size() + " " + link);
                     }
-                } else if (Objects.equals(op0, "OR") && Objects.equals(op1, "AND")) {
+                }
+                else if (Objects.equals(op0, "OR") && Objects.equals(op1, "AND")) {
                     if (firstElements.size() > 0 || (secondElements.size() > 0 && thirdElements.size() > 0)) {
-                        results.add(link);
+                        results.putAll(firstElements);
+                        results.putAll(secondElements);
+                        results.putAll(thirdElements);
                         System.out.println(firstElements.size() + " " + secondElements.size() + " " + thirdElements.size() + " " + link);
 
                     }
-                } else if (Objects.equals(op0, "OR") && Objects.equals(op1, "OR")) {
+                }
+                else if (Objects.equals(op0, "OR") && Objects.equals(op1, "OR")) {
                     if (firstElements.size() > 0 || secondElements.size() > 0 || thirdElements.size() > 0) {
-                        results.add(link);
+                        results.putAll(firstElements);
+                        results.putAll(secondElements);
+                        results.putAll(thirdElements);
                         System.out.println(firstElements.size() + " " + secondElements.size() + " " + thirdElements.size() + " " + link);
 
                     }
-                } else if (Objects.equals(op0, "OR") && Objects.equals(op1, "NOT")) {
+                }
+                else if (Objects.equals(op0, "OR") && Objects.equals(op1, "NOT")) {
                     if (firstElements.size() > 0 || secondElements.size() == 0) {
-                        results.add(link);
+                        results.putAll(firstElements);
+                        results.putAll(secondElements);
                         System.out.println(firstElements.size() + " " + secondElements.size() + " " + link);
                     }
-                } else if (Objects.equals(op0, "NOT") && Objects.equals(op1, "AND")) {
+                }
+                else if (Objects.equals(op0, "NOT") && Objects.equals(op1, "AND")) {
                     if (firstElements.size() == 0 && secondElements.size() > 0) {
-                        results.add(link);
+                        results.putAll(firstElements);
+                        results.putAll(secondElements);
                         System.out.println(firstElements.size() + " " + secondElements.size() + " " + link);
                     }
-                } else if (Objects.equals(op0, "NOT") && Objects.equals(op1, "OR")) {
+                }
+                else if (Objects.equals(op0, "NOT") && Objects.equals(op1, "OR")) {
                     if (firstElements.size() == 0 || secondElements.size() > 0) {
-                        results.add(link);
+                        results.putAll(firstElements);
+                        results.putAll(secondElements);
                         System.out.println(firstElements.size() + " " + secondElements.size() + " " + link);
                     }
                 }
             }
         }
 
-        for (String l : results)
+        for (String l : results.keySet())
             System.out.println(l);
 
         return results;
     }
 
-    public static List<String> search(String phrase) {
+    public static Map<String, linkAttr> search(String phrase) {
         return PhraseSearching.phraseSearching(phrase, null, null, null, null, 0);
     }
 }

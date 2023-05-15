@@ -1,5 +1,6 @@
 package SpringBoot;
 
+import ComplexPhraseSearching.ComplexPhraseSearching;
 import MongoDB.MongoInterface;
 import PageRanker.RankerMain;
 import PageRanker.linkAttr;
@@ -57,33 +58,47 @@ public class SpringBootInterface {
     @GetMapping("/")
     public ResponseEntity<String> rchResult(@RequestParam("query") String query, @RequestParam("pageNumber") int pageNumber) {
         System.out.println(query);
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
-        String formattedDateTime = now.format(formatter);
 
-        System.out.println("Current time: " + formattedDateTime);
-
-        //long startTime = System.currentTimeMillis();
         JSONObject r = new JSONObject();
-
-//        JSONArray response = new JSONArray();
 
         Map<String, linkAttr> toDisplay = new HashMap<>();
 
-        // Checking if this is a phrase searching
+        // Check if this is a phrase searching
         boolean isEnclosed = isStringEnclosed(query);
-        if(isEnclosed){
+        if (isEnclosed) {
+            long startTime = System.currentTimeMillis();
+            Map<String, linkAttr> list = ComplexPhraseSearching.complexPhraseSearch(query);
 
-        }
+            JSONArray phraseSearchResult = new JSONArray();
 
+            if (list != null) {
+                List<JSONObject> resultList = list.entrySet().parallelStream()
+                        .map(entry -> {
+                            String key = entry.getKey();
+                            linkAttr value = entry.getValue();
+                            JSONObject temp = new JSONObject();
+                            temp.put("URL", key);
+                            temp.put("title", value.title);
+                            temp.put("Snippet", value.BestSnip);
+                            return temp;
+                        })
+                        .toList();
 
+                resultList.forEach(phraseSearchResult::put);
 
-        else {
+                r.put("results", phraseSearchResult);
+                r.put("size", phraseSearchResult.length());
+
+                long elapsedTime = System.currentTimeMillis() - startTime;
+                System.out.println("Elapsed time: " + elapsedTime + " milliseconds");
+            }
+
+        } else {
+
             toDisplay = RankerMain.handleQuery(query, pageNumber);
 
             JSONArray toDisp = new JSONArray();
-
 
             List<JSONObject> resultList = toDisplay.entrySet().parallelStream()
                     .map(entry -> {
@@ -104,24 +119,11 @@ public class SpringBootInterface {
             r.put("size", toDisp.length());
 
 
-            now = LocalDateTime.now();
-            formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-
-            formattedDateTime = now.format(formatter);
-
-            System.out.println("Current time: " + formattedDateTime);
-
-
-//        long elapsedTime = endTime - startTime;
-//        System.out.println("Elapsed time: " + elapsedTime + " milliseconds");
-
-
-            return ResponseEntity.ok(r.toString());
         }
 
         return ResponseEntity.ok(r.toString());
-
     }
+
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/suggest")
     public ResponseEntity<String> suggestionResult(@RequestParam("query") String query) {
