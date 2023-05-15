@@ -110,7 +110,7 @@
 
 
 .img-span{
-  background-color: white;
+  background-color: rgb(243, 243, 243);
   border-radius: 50%;
 
   position: absolute;
@@ -125,8 +125,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 3px;
-  margin-right: 8px;
+  padding: 5px;
+  /* margin-right: 0px; */
 }
 
 

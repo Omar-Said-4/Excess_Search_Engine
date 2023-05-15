@@ -11,23 +11,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import sun.misc.Signal;
-import sun.misc.SignalHandler;
-
 @SpringBootApplication
 @RestController
 public class SpringBootInterface {
@@ -59,10 +52,26 @@ public class SpringBootInterface {
     public ResponseEntity<String> rchResult(@RequestParam("query") String query, @RequestParam("pageNumber") int pageNumber) {
         System.out.println(query);
 
+        Map<String, String> icons = new HashMap<>();
+
+        String filePath = "icon.ser";
+        File file = new File(filePath);
+
+        if (file.exists()) {
+            try (FileInputStream fileIn = new FileInputStream(file);
+                 ObjectInputStream in = new ObjectInputStream(fileIn)) {
+                icons = (Map<String, String>) in.readObject();
+                System.out.println("Crawler state loaded from file: " + filePath);
+            } catch (IOException |
+                     ClassNotFoundException e) {
+                // Handle the exception appropriately
+            }
+        }
+
 
         JSONObject r = new JSONObject();
 
-        Map<String, linkAttr> toDisplay = new HashMap<>();
+        Map<String, linkAttr> toDisplay;
 
         // Check if this is a phrase searching
         boolean isEnclosed = isStringEnclosed(query);
@@ -73,6 +82,7 @@ public class SpringBootInterface {
             JSONArray phraseSearchResult = new JSONArray();
 
             if (list != null) {
+                Map<String, String> finalIcons = icons;
                 List<JSONObject> resultList = list.entrySet().parallelStream()
                         .map(entry -> {
                             String key = entry.getKey();
@@ -81,6 +91,10 @@ public class SpringBootInterface {
                             temp.put("URL", key);
                             temp.put("title", value.title);
                             temp.put("Snippet", value.BestSnip);
+                            String icon = finalIcons.get(key);
+                            temp.put("Icon", icon);
+                            System.out.println(icon);
+
                             return temp;
                         })
                         .toList();
@@ -100,6 +114,7 @@ public class SpringBootInterface {
 
             JSONArray toDisp = new JSONArray();
 
+            Map<String, String> finalIcons = icons;
             List<JSONObject> resultList = toDisplay.entrySet().parallelStream()
                     .map(entry -> {
                         String key = entry.getKey();
@@ -108,10 +123,15 @@ public class SpringBootInterface {
                         temp.put("URL", key);
                         temp.put("title", value.title);
                         temp.put("Snippet", value.BestSnip);
+                        String icon = finalIcons.get(key);
+                        temp.put("Icon", icon);
+                        System.out.println(icon);
+
                         return temp;
                     })
                     .toList();
             resultList.forEach(toDisp::put);
+
             if (toDisp.length() != 0)
                 MongoInterface.addSuggestion(query);
 

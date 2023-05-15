@@ -53,7 +53,7 @@ const Results = () => {
     const hours = now.getHours().toString().padStart(2, "0");
     const minutes = now.getMinutes().toString().padStart(2, "0");
     const seconds = now.getSeconds().toString().padStart(2, "0");
-    const millis = now.getMilliseconds().toString().padStart(3, "0")
+    const millis = now.getMilliseconds().toString().padStart(3, "0");
     const formattedTime = `${hours}:${minutes}:${seconds}:${millis}`;
     console.log(formattedTime);
 
@@ -73,7 +73,7 @@ const Results = () => {
         const hours = now.getHours().toString().padStart(2, "0");
         const minutes = now.getMinutes().toString().padStart(2, "0");
         const seconds = now.getSeconds().toString().padStart(2, "0");
-        const millis = now.getMilliseconds().toString().padStart(3, "0")
+        const millis = now.getMilliseconds().toString().padStart(3, "0");
         const formattedTime = `${hours}:${minutes}:${seconds}:${millis}`;
         console.log(formattedTime);
 
@@ -85,39 +85,11 @@ const Results = () => {
         setData(response.data.results);
         setSize(response.data.size);
 
-        // response.data.results.map((item) => {
-        //   console.log(item.Snippet);
-        // });`
-
         setLoading(false);
       })
       .catch((error) => {
         console.error(error);
       });
-    // Axios.get(
-    //   "https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/Search/WebSearchAPI",
-    //   {
-    //     params: {
-    //       q: query,
-    //       pageNumber: page,
-    //       pageSize: "10",
-    //       autoCorrect: "true",
-    //     },
-    //     headers: {
-    //       "content-type": "application/octet-stream",
-    //       "X-RapidAPI-Key":
-    //         "9bed59de6dmsh99ed317ac6f065bp108d18jsnaa3975d2a67f",
-    //       "X-RapidAPI-Host": "contextualwebsearch-websearch-v1.p.rapidapi.com",
-    //     },
-    //   }
-    // )
-    //   .then((response) => {
-    //     setData(response.data.value);
-    //     setLoading(false);
-    //   })
-    //   .catch((err) => {
-    //     console.error(err);
-    //   });
   }, [query, page]);
 
   return (
@@ -134,12 +106,15 @@ const Results = () => {
             />
 
             {data.map((item, index) => {
+              console.log(item);
+
               return (
                 <PageResult
                   key={index}
                   description={item.Snippet}
                   title={item.title}
                   url={item.URL}
+                  icon={item.hasOwnProperty("Icon") ? item.Icon : null}
                 />
               );
             })}
