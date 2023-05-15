@@ -97,6 +97,7 @@ const SearchField = ({ query, place }) => {
   const [index, setIndex] = useState(-1);
   const [suggestions, setSuggestions] = useState([]);
   const [focused, setFocused] = useState(false);
+  
   const [transcript, setTranscript] = useState("");
   const [isListening, setIsListening] = useState(false);
 
@@ -142,30 +143,30 @@ const SearchField = ({ query, place }) => {
     [index, suggestions]
   );
 
-  // const SpeechRecognition =
-  //   window.SpeechRecognition || window.webkitSpeechRecognition;
-  // const recognition = new SpeechRecognition();
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = new SpeechRecognition();
 
-  // recognition.continuous = false;
-  // recognition.lang = 'es-ES';
+  recognition.continuous = false;
+  recognition.lang = "es-ES";
 
-  // const handleStart = () => {
-  //   console.log("Speech recognition started");
-  //   recognition.start();
-  // };
+  const handleStart = () => {
+    console.log("Speech recognition started");
+    recognition.start();
+  };
 
-  // recognition.onresult = (event) => {
-  //   const current = event.resultIndex;
-  //   const transcript = event.results[current][0].transcript;
-  //   console.log(transcript);
-  //   console.log("Text");
-  //   setTranscript(transcript);
-  // };
+  recognition.onresult = (event) => {
+    const current = event.resultIndex;
+    const transcript = event.results[current][0].transcript;
+    console.log(transcript);
+    console.log("Text");
+    setTranscript(transcript);
+  };
 
-  // const handleStop = () => {
-  //   console.log("Speech recognition Stopped");
-  //   recognition.stop();
-  // };
+  const handleStop = () => {
+    console.log("Speech recognition Stopped");
+    recognition.stop();
+  };
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
@@ -217,7 +218,7 @@ const SearchField = ({ query, place }) => {
 
   return (
     <>
-      {/* <div>{transcript}</div> */}
+      {transcript !== "" ? <div>{transcript}</div> : null}
       {loaded || place === "result" ? (
         <div
           style={{
@@ -256,14 +257,13 @@ const SearchField = ({ query, place }) => {
             >
               <MDBIcon icon="search" />
             </MDBBtn>
-            {/* <MDBBtn
+            <MDBBtn
               rippleColor="dark"
               style={{
                 borderRadius: "15px",
                 backgroundColor: "red",
                 borderWidth: "0",
               }}
-              disabled={text === ""}
               onClick={(e) => {
                 if (isListening === false) {
                   handleStart();
@@ -274,8 +274,14 @@ const SearchField = ({ query, place }) => {
                 }
               }}
             >
-              <MDBIcon icon="fas fa-microphone" />
-            </MDBBtn> */}
+              <MDBIcon
+                icon={
+                  isListening === false
+                    ? "fas fa-microphone"
+                    : "fas fa-ellipsis-h"
+                }
+              />
+            </MDBBtn>
           </MDBInputGroup>
 
           {suggestions.length !== 0 && focused ? (
