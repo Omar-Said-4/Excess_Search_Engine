@@ -9,9 +9,11 @@ import {
 } from "mdb-react-ui-kit";
 import LoadingCircle from "./components/results/LoadingCircle";
 import { motion } from "framer-motion";
-
 import "mdb-react-ui-kit/dist/css/mdb.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
 
 const SearchField = ({ query, place }) => {
   const [text, setText] = useState(query);
@@ -20,7 +22,6 @@ const SearchField = ({ query, place }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [focused, setFocused] = useState(false);
 
-  const [transcript, setTranscript] = useState("");
   const [isListening, setIsListening] = useState(false);
 
   const handleKeyDown = useCallback(
@@ -65,42 +66,26 @@ const SearchField = ({ query, place }) => {
     [index, suggestions]
   );
 
-  const SpeechRecognition =
-    window.SpeechRecognition || window.webkitSpeechRecognition;
-  const recognition = new SpeechRecognition();
-
-  recognition.continuous = false;
-  recognition.lang = "es-ES";
-
-  const handleStart = () => {
-    console.log("Speech recognition started");
-    recognition.start();
-  };
-
-  recognition.onresult = (event) => {
-    const current = event.resultIndex;
-    const transcript = event.results[current][0].transcript;
-    console.log(transcript);
-    console.log("Text");
-    setTranscript(transcript);
-  };
-
-  const handleStop = () => {
-    console.log("Speech recognition Stopped");
-    recognition.stop();
+  window.onload = function () {
+    setLoaded(true);
+    console.log("loaded");
   };
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
+    console.log("test");
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [handleKeyDown]);
 
-  window.onload = function () {
-    setLoaded(true);
-  };
+  const { transcript, resetTranscript, browserSupportsSpeechRecognition } =
+    useSpeechRecognition();
+
+  if (!browserSupportsSpeechRecognition) {
+    return console.log("ERROR");
+  }
 
   const queryChanged = async (e) => {
     setText(e.target.value);
@@ -140,8 +125,8 @@ const SearchField = ({ query, place }) => {
 
   return (
     <>
-      {transcript !== "" ? <div>{transcript}</div> : null}
-      {loaded || place === "result" ? (
+      {/* {transcript !== "" ? <div>{transcript}</div> : null} */}
+      {loaded === false || place === "result" ? (
         <div
           style={{
             width: "40%",
@@ -163,9 +148,9 @@ const SearchField = ({ query, place }) => {
                 boxShadow: focused ? "0 0 10px rgba(0, 0, 0, 1)" : "",
                 backgroundColor: place !== "result" ? "#f2f2f2" : "#c6ddf6",
                 marginRight: "7px",
-                whiteSpace: "normal"
+                whiteSpace: "normal",
               }}
-              value={text}
+              value={transcript === "" ? text : transcript}
               spellCheck={false}
               autoComplete="off"
               placeholder="Search!"
@@ -175,7 +160,7 @@ const SearchField = ({ query, place }) => {
             />
             <MDBBtn
               rippleColor="red"
-              style={{ borderRadius: "15px" }}
+              style={{ borderRadius: "15px", marginRight: "5px" }}
               disabled={text === ""}
               onClick={search}
             >
@@ -190,10 +175,21 @@ const SearchField = ({ query, place }) => {
               }}
               onClick={(e) => {
                 if (isListening === false) {
-                  handleStart();
+                  resetTranscript();
+
+                  SpeechRecognition.startListening({
+                    language: "en-US",
+                    continuous: true,
+                  });
                   setIsListening(true);
                 } else {
-                  handleStop();
+                  if (transcript !== "") {
+                    setText(transcript);
+
+                  }
+
+                  SpeechRecognition.abortListening();
+                  search();
                   setIsListening(false);
                 }
               }}
@@ -222,10 +218,10 @@ const SearchField = ({ query, place }) => {
                 <motion.div
                   initial={{ opacity: "0%" }}
                   animate={{ opacity: "100%" }}
-                  // transition={{
-                  //   type: "tween",
-                  //   duration: 0.9,
-                  // }}
+                  transition={{
+                    type: "tween",
+                    duration: 0.9,
+                  }}
                 >
                   <MDBListGroupItem
                     active
@@ -237,10 +233,10 @@ const SearchField = ({ query, place }) => {
                       // marginBottom: "4px",
                       height: "35px",
                       padding: "0",
-                      paddingTop: "4px",
+                      paddingTop: "6px",
                       userSelect: "none",
                       borderRadius: "5px",
-                      fontSize: "14px"
+                      fontSize: "14px",
                       // marginBottom: "3px",
                     }}
                     onMouseEnter={(event) => {
@@ -276,3 +272,41 @@ const SearchField = ({ query, place }) => {
 };
 
 export default SearchField;
+
+// import React from "react";
+// import SpeechRecognition, {
+//   useSpeechRecognition,
+// } from "react-speech-recognition";
+
+// const Home = () => {
+//   const {
+//     transcript,
+//     listening,
+//     resetTranscript,
+//     browserSupportsSpeechRecognition,
+//   } = useSpeechRecognition();
+
+//   if (!browserSupportsSpeechRecognition) {
+//     return console.log("ERROR");
+//   }
+
+//   return (
+//     <div>
+//       <p>Microphone: {listening ? "on" : "off"}</p>
+//       <button
+//         onClick={() =>
+//           SpeechRecognition.startListening({
+//             language: "en-US",
+//             continuous: true,
+//           })
+//         }
+//       >
+//         Start
+//       </button>
+//       <button onClick={SpeechRecognition.abortListening}>Stop</button>
+//       <button onClick={resetTranscript}>Reset</button>
+//       <p>{transcript}</p>
+//     </div>
+//   );
+// };
+// export default Home;

@@ -31,14 +31,14 @@ public class RankerMain {
                  ObjectInputStream in = new ObjectInputStream(fileIn)) {
                 page = (HashMap<String, Double>) in.readObject();
                 System.out.println("Crawler state loaded from file: " + filePath);
-            } catch (IOException | ClassNotFoundException e) {
+            } catch (IOException |
+                     ClassNotFoundException e) {
                 // Handle the exception appropriately
             }
         }
 
 
-        final HashMap<String,Double> pageR =page;
-
+        final HashMap<String, Double> pageR = page;
 
 
         ArrayList<String> values = QueryProcessor(prompt);
@@ -67,7 +67,7 @@ public class RankerMain {
                     tmp.title = title;
                     double snippetScore = tf * idf * 0.3 + pri;
                     tmp.pri += snippetScore;
-                    if(pageR.containsKey(url))
+                    if (pageR.containsKey(url))
                         tmp.pri *= pageR.get(url);
                     for (String snippet : snips) {
                         tmp.Snippets.merge(snippet, 1000, Integer::sum);
@@ -83,14 +83,18 @@ public class RankerMain {
             Map<String, Integer> descendingMap = attr.Snippets.entrySet().parallelStream()
                     .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (oldValue, newValue) -> oldValue, LinkedHashMap::new));
-            String toShow = MongoInterface.getSnippet(descendingMap.keySet().iterator().next());
-            attr.BestSnip = toShow.replaceAll("[^\\p{ASCII}]", "'");
-            StringBuilder output = new StringBuilder();
-            output.append("Website: ").append(key)
-                    .append(", Priority: ").append(attr.pri)
-                    .append(", Best Snippet: ").append(attr.BestSnip);
-            toDisplay.put(key, attr);
-            System.out.println(output.toString());
+
+            String toShow;
+            if (descendingMap.keySet().iterator().hasNext()) {
+                toShow = MongoInterface.getSnippet(descendingMap.keySet().iterator().next());
+                attr.BestSnip = toShow.replaceAll("[^\\p{ASCII}]", "'");
+                StringBuilder output = new StringBuilder();
+                output.append("Website: ").append(key)
+                        .append(", Priority: ").append(attr.pri)
+                        .append(", Best Snippet: ").append(attr.BestSnip);
+                toDisplay.put(key, attr);
+                System.out.println(output.toString());
+            }
         });
 
 
