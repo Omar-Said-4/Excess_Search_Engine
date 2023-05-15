@@ -1,11 +1,16 @@
 package PageRanker;
 
+import CrawlerState.CrawlerState;
 import MongoDB.MongoInterface;
 import SpringBoot.SpringBootInterface;
 import com.mongodb.MongoException;
 import org.bson.Document;
 
 import javax.swing.plaf.metal.MetalBorders;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -17,6 +22,25 @@ import static QueryProcessor.queryP.QueryProcessor;
 public class RankerMain {
 
     public static Map<String, linkAttr> handleQuery(String prompt, int pageNumber) {
+
+        String filePath = "map.ser";
+        File file = new File(filePath);
+        HashMap<String, Double> page = null;
+        if (file.exists()) {
+            try (FileInputStream fileIn = new FileInputStream(file);
+                 ObjectInputStream in = new ObjectInputStream(fileIn)) {
+                page = (HashMap<String, Double>) in.readObject();
+                System.out.println("Crawler state loaded from file: " + filePath);
+            } catch (IOException | ClassNotFoundException e) {
+                // Handle the exception appropriately
+            }
+        }
+
+
+        final HashMap<String,Double> pageR =page;
+
+
+
         ArrayList<String> values = QueryProcessor(prompt);
         String[] searchQuery = values.toArray(new String[0]);
 
@@ -43,6 +67,8 @@ public class RankerMain {
                     tmp.title = title;
                     double snippetScore = tf * idf * 0.3 + pri;
                     tmp.pri += snippetScore;
+                    if(pageR.containsKey(url))
+                        tmp.pri *= pageR.get(url);
                     for (String snippet : snips) {
                         tmp.Snippets.merge(snippet, 1000, Integer::sum);
                     }
