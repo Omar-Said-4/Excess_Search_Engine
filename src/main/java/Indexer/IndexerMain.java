@@ -139,11 +139,9 @@ public class IndexerMain {
             parsedWords.add(name);
         }
 
-
         // MongoInterface.terminate();
         int c=0;
 
-        List<Thread> threads = new ArrayList<>();
 
        // int c=0;
         for (Map.Entry<String, String> Wentry : webs.entrySet()) {
@@ -156,22 +154,16 @@ public class IndexerMain {
             String Icon = Indexer.fetchIconUrl(toParse,URl);
             webIcon.put(URl,Icon);
 
-            System.out.println(Icon);
+//            System.out.println(Icon);
 
-            Thread t = new Thread(() -> {
+            new Thread(() -> {
                 new IndexerT(URl, document , parsedWords).start();
-            });
-
-
-            threads.add(t);
+            }).start();
 //           webs.remove(URl);
 
         }
-        for (Thread thread : threads) {
-            thread.join();
-        }
 
-        System.out.println("Hello World");
+//        System.out.println("Hello World");
 
 
         try (FileOutputStream fileOut = new FileOutputStream("icon.ser");

@@ -1,16 +1,14 @@
 import Crawler.Crawler;
 import Crawler.Globals;
 import CrawlerState.CrawlerState;
-import MongoDB.MongoInterface;
-import org.bson.Document;
 import org.jsoup.Jsoup;
 
 
-import javax.print.Doc;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main {
 
@@ -126,13 +124,15 @@ public class Main {
 
         System.out.println("Crawler Finished got : "+ links.size()+" websites inserting them to ExcessDB");
         HashMap<String , String> webs = new HashMap<>() ;
+        AtomicInteger count = new AtomicInteger();
 
         if (Globals.count.get() <= 0 ) {
 //            MongoInterface.Initialize();
 
             links.forEach(link -> {
                 try {
-
+                    System.out.println(count.get());
+                    count.getAndIncrement();
                     org.jsoup.nodes.Document doc = Jsoup.connect(link).get();
                     webs.put(link, doc.toString());
                     // Insert the text into the MongoDB collection
