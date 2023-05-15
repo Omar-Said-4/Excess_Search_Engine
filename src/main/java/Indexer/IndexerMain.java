@@ -22,27 +22,29 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.scheduling.support.SimpleTriggerContext;
 
 import javax.print.Doc;
 import javax.swing.event.DocumentEvent;
 
 public class IndexerMain {
 
-    static Map<String,String> webIcon = new HashMap<>();
+
     private static class IndexerT extends Thread{
-        String URl;
+        public String URl;
         String document;
         final Set<String> parsedWords;
 
-        String ICON;
-
+        public String icon;
 
         public IndexerT(String url, String doc ,  Set<String> parsedWords)
         {
             this.URl = url;
             this.document = doc;
             this.parsedWords = parsedWords;
+
         }
+
 
         public void run() {
             HashMap<String, wordAttr> toInsert = new HashMap<>();
@@ -60,12 +62,6 @@ public class IndexerMain {
             String title=toParse.title().toString();
             // System.out.println(count);
             // Indexer.ParseMeta(toParse,toInsert,URl,title);
-
-            String Icon = Indexer.fetchIconUrl(toParse,URl);
-            System.out.println("test");
-
-            webIcon.put(URl,Icon);
-
             Indexer.Parseblockquote(toParse,toInsert,URl,title);
             Indexer.ParseStrong(toParse,toInsert,URl,title);
             Indexer.ParseCode(toParse,toInsert,URl,title);
@@ -115,21 +111,15 @@ public class IndexerMain {
             }
 
             toInsert.clear();
-
-
         }
     }
 
-
-
     public static void main(String[] args) throws InterruptedException {
-
+        Map<String,String> webIcon = new HashMap<>();
 
         String filePath = "Websites.ser";
         File file = new File(filePath);
-
         HashMap<String, String> webs = new HashMap<>();
-
         if (file.exists()) {
             try (FileInputStream fileIn = new FileInputStream(file);
                  ObjectInputStream in = new ObjectInputStream(fileIn)) {
@@ -140,8 +130,6 @@ public class IndexerMain {
                 // Handle the exception appropriately
             }
         }
-
-
 
         Set<String> parsedWords = new HashSet<String>();
 
@@ -164,10 +152,9 @@ public class IndexerMain {
             c++;
             String document=Wentry.getValue();;
             System.out.println(URl);
-
             org.jsoup.nodes.Document toParse =  Jsoup.parse(document);
-
             String Icon = Indexer.fetchIconUrl(toParse,URl);
+            webIcon.put(URl,Icon);
 
             System.out.println(Icon);
 
@@ -175,16 +162,16 @@ public class IndexerMain {
                 new IndexerT(URl, document , parsedWords).start();
             });
 
+
             threads.add(t);
-//            webs.remove(URl);
+//           webs.remove(URl);
 
         }
-
         for (Thread thread : threads) {
             thread.join();
         }
 
-        System.out.println(webIcon.toString());
+        System.out.println("Hello World");
 
 
         try (FileOutputStream fileOut = new FileOutputStream("icon.ser");
