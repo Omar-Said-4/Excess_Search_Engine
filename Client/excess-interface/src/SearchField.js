@@ -15,9 +15,9 @@ import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 
-const SearchField = ({ query, place }) => {
+const SearchField = ({ query, place, loaded }) => {
   const [text, setText] = useState(query);
-  const [loaded, setLoaded] = useState(false);
+  // const [loaded, setLoaded] = useState(false);
   const [index, setIndex] = useState(-1);
   const [suggestions, setSuggestions] = useState([]);
   const [focused, setFocused] = useState(false);
@@ -68,10 +68,12 @@ const SearchField = ({ query, place }) => {
     [index, suggestions]
   );
 
-  window.onload = function () {
-    setLoaded(true);
-    console.log("loaded");
-  };
+  
+  // window.onload = () => {
+  //   console.log('Page loaded successfully');
+  //   setLoaded(true);
+  // };
+
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
@@ -129,7 +131,7 @@ const SearchField = ({ query, place }) => {
   return (
     <>
       {/* {transcript !== "" ? <div>{transcript}</div> : null} */}
-      {loaded === false || place === "result" ? (
+      {loaded === true || place === "result" ? (
         <div
           style={{
             width: "40%",
@@ -146,7 +148,7 @@ const SearchField = ({ query, place }) => {
               style={{
                 // height: "7vh",
                 overflow: "",
-                fontSize: "16px",
+                fontSize: "18px",
                 borderRadius: "15px",
                 boxShadow: focused ? "0 0 10px rgba(0, 0, 0, 1)" : "",
                 backgroundColor: place !== "result" ? "#f2f2f2" : "#c6ddf6",

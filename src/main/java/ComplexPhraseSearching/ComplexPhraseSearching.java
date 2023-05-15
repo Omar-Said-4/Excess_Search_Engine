@@ -16,25 +16,9 @@ import org.jsoup.nodes.Element;
 
 public class ComplexPhraseSearching {
     public static void main(String[] args) {
-        Map<String, Object> result = complexPhraseSearch("\"Football\" AND \"major city in the United States\" AND \"CNN\"", 1);
+        Map<String, Object> result = complexPhraseSearch("\"Baltimore was designated \"", 1);
 
 
-//        for (String r: result)
-//            System.out.println(r);
-//
-//        String html = "<div>jhkgkj<p>Some text</p><span></span></div>";
-//        Document doc = Jsoup.parse(html);
-//        Element div = doc.selectFirst("div");
-//
-//
-//        System.out.println(div.ownText());
-//        assert div != null;
-//        if (div.hasText()) {
-//            System.out.println("The div has non-empty text.");
-//        } else {
-//            System.out.println("The div does not have non-empty text.");
-//        }
-    }
 
     public static Map<String, Object> complexPhraseSearch(String phrase, int pageNumber) {
         List<String> phrases = new ArrayList<>();

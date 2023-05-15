@@ -4,6 +4,7 @@ import MongoDB.MongoInterface;
 import PageRanker.linkAttr;
 import com.mongodb.internal.connection.SslHelper;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -127,6 +128,8 @@ public class PhraseSearching {
         return result;
     }
 
+
+    // Gets the longest snippet that contains the given phrase
     private static Map<String, linkAttr> searchPhraseInSnippets(Element element, String s, String link, String title) {
         Map<String, linkAttr> result = new HashMap<>();
         if (element.children().size() == 0) {
@@ -151,7 +154,15 @@ public class PhraseSearching {
                 }
             }
             for (Element child : element.children()) {
-                result.putAll((searchPhraseInSnippets(child, s, link, title)));
+                Map<String, linkAttr> r = searchPhraseInSnippets(child, s, link, title);
+
+                if (r.get(link) != null && result.get(link) != null) {
+                    System.out.println("test");
+                    if (r.get(link).BestSnip.length() > result.get(link).BestSnip.length())
+                        result.putAll(r);
+                } else if (r.get(link) != null) {
+                    result.putAll(r);
+                }
             }
         }
 
@@ -335,9 +346,9 @@ public class PhraseSearching {
         return results;
     }
 
-    public static Map<String, linkAttr> search(String phrase) {
-        return PhraseSearching.phraseSearching(phrase, null, null, null, null, 0);
-    }
+//    public static Map<String, linkAttr> search(String phrase) {
+//        return PhraseSearching.phraseSearching(phrase, null, null, null, null, 0);
+//    }
 }
 
 

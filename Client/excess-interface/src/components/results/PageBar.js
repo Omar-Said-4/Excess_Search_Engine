@@ -19,7 +19,7 @@ const PageBar = ({
   console.log(size);
 
   return (
-    <Pagination style={{ marginLeft: "9%", marginBottom: "0px", paddingBottom: "10px" }}>
+    <Pagination style={{ marginLeft: "9%", marginBottom: "0", paddingBottom: "10px" }}>
       <Pagination.First
         disabled={previousDisabled}
         onClick={firstPage}

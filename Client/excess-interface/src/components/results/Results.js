@@ -98,10 +98,7 @@ const Results = () => {
       {loading ? (
         <LoadingCircle />
       ) : (
-        <div
-          className="results-section"
-
-        >
+        <div className="results-section">
           <div className="results">
             <ResponseTime
               responseTime={responseTime}

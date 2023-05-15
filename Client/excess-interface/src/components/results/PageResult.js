@@ -19,7 +19,14 @@ const PageResult = ({ title, url, description, icon }) => {
           {icon === null ? (
             <img src={web} alt="text" className="result-image"></img>
           ) : (
-            <img src={icon} alt="text" className="result-image"></img>
+            <img
+              src={icon}
+              onError={(e) => {
+                e.target.src = web;
+              }}
+              alt="text"
+              className="result-image"
+            ></img>
           )}
         </div>
         <span className="url-span">
