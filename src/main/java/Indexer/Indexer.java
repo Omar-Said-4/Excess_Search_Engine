@@ -474,6 +474,23 @@ public static void ParseH4(org.jsoup.nodes.Document toParse, HashMap<String, wor
     }
 
 
+    public static String fetchIconUrl(org.jsoup.nodes.Document toParse, String URl) {
+
+        Elements faviconElements = toParse.select("link[rel~=(?i)^(shortcut|icon)$]");
+
+        for (Element faviconElement : faviconElements) {
+            // Get the href attribute of the favicon link tag
+            String faviconUrl = faviconElement.attr("href");
+
+            // Handle relative URLs
+            if (!faviconUrl.startsWith("http")) {
+                faviconUrl = URl + faviconUrl;
+            }
+            return faviconUrl;
+        }
+
+        return null;
+    }
 
     public static void Parseblockquote(org.jsoup.nodes.Document toParse, HashMap<String, wordAttr> toInsert,String URl,String title)
     {
@@ -632,7 +649,6 @@ public static void ParseH4(org.jsoup.nodes.Document toParse, HashMap<String, wor
         Elements dTags = toParse.getElementsByTag("div");
         String snippetId=null;
         List<String> SnippetList = new ArrayList<>();
-
         for (Element dTag : dTags) {
             snippetId=null;
             dTag.select("p").remove(); // remove all p elements

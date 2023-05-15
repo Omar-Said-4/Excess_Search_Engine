@@ -1,5 +1,8 @@
 package Indexer;
 
+
+
+
 import CrawlerState.CrawlerState;
 import MongoDB.MongoInterface;
 import QueryProcessor.queryP;
@@ -9,10 +12,7 @@ import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.util.*;
@@ -28,11 +28,13 @@ import javax.swing.event.DocumentEvent;
 
 public class IndexerMain {
 
+    static Map<String,String> webIcon;
     private static class IndexerT extends Thread{
         String URl;
         String document;
-
         Set<String> parsedWords;
+
+        String ICON;
 
 
         public IndexerT(String url, String doc ,  Set<String> parsedWords)
@@ -59,6 +61,9 @@ public class IndexerMain {
             // System.out.println(count);
             // Indexer.ParseMeta(toParse,toInsert,URl,title);
 
+            String Icon = Indexer.fetchIconUrl(toParse,URl);
+
+            webIcon.put(URl,Icon);
 
             Indexer.Parseblockquote(toParse,toInsert,URl,title);
             Indexer.ParseStrong(toParse,toInsert,URl,title);
@@ -150,13 +155,13 @@ public class IndexerMain {
 
 
         // MongoInterface.terminate();
-        //int c=0;
+        int c=0;
 
        // int c=0;
         for (Map.Entry<String, String> Wentry : webs.entrySet()) {
             //System.out.println(c++);
             String URl =Wentry.getKey();
-
+            c++;
             String document=Wentry.getValue();;
             System.out.println(URl);
             new Thread(() -> {
@@ -164,6 +169,22 @@ public class IndexerMain {
             }).start();
 //            webs.remove(URl);
         }
+
+        while (c != webs.size())
+        {
+
+        }
+
+        try (FileOutputStream fileOut = new FileOutputStream("icon.ser");
+             ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
+            out.writeObject(webIcon);
+            System.out.println("Icon map saved successfully.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
 
         // MongoInterface.terminate();
     }

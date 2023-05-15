@@ -173,13 +173,11 @@ public class PageRanker {
                 // Getting the neighbors of the current page
                 ConcurrentLinkedQueue<String> neighbors = getIngoingLinks(webpage, outGoingLinks);
                 sum = 0.0;
-
                 for (String neighbor : neighbors) {
                     double neighborPageRank = pageRanks.get(neighbor);
                     int outDegree = outGoingLinks.get(neighbor).size();
                     sum += neighborPageRank / outDegree;
                 }
-
                 double newPageRank = (1 - DAMPING_FACTOR) / outGoingLinks.size() + DAMPING_FACTOR * sum;
 
                 newPageRanks.put(webpage, newPageRank);
