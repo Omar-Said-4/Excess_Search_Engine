@@ -97,7 +97,7 @@ public class ComplexPhraseSearching {
             if (Objects.equals(operators.get(0), "NOT") || Objects.equals(operators.get(1), "NOT"))
                 results = PhraseSearching.phraseSearching(phrases.get(0), phrases.get(1), null, operators.get(0), operators.get(1), 2);
             else {
-                System.out.println("test");
+                //System.out.println("test");
                 results = PhraseSearching.phraseSearching(phrases.get(0), phrases.get(1), phrases.get(2), operators.get(0), operators.get(1), 2);
             }
         }

@@ -28,9 +28,10 @@ public class SpringBootInterface {
 //    public static Map<String, linkAttr> toDisplay;
 
     public static boolean isStringEnclosed(String input) {
-        Pattern pattern = Pattern.compile("^\".*\"$");
-        Matcher matcher = pattern.matcher(input);
-        return matcher.matches();
+//        Pattern pattern = Pattern.compile("\"");
+//        Matcher matcher = pattern.matcher(input);
+//        return matcher.matches();
+        return input.contains("\"");
     }
 
     public static void runSpring() throws InterruptedException {
@@ -99,7 +100,7 @@ public class SpringBootInterface {
                             temp.put("Snippet", value.BestSnip);
                             String icon = finalIcons.get(key);
                             temp.put("Icon", icon);
-                            System.out.println(icon);
+//                            System.out.println(icon);
 
                             return temp;
                         })
@@ -139,7 +140,7 @@ public class SpringBootInterface {
                         temp.put("Snippet", value.BestSnip);
                         String icon = finalIcons.get(key);
                         temp.put("Icon", icon);
-                        System.out.println(icon);
+//                        System.out.println(icon);
 
                         return temp;
                     })

@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class PageRanker {
@@ -118,12 +119,12 @@ public class PageRanker {
                         outGoingLinks.put(x, links);
                     }
                     links.add(y);
-                    System.out.print("True");
+                   // System.out.print("True");
                 }
                 else{
-                    System.out.print("False");
+                   // System.out.print("False");
                 }
-                System.out.println(" " + x + " " + y);
+              //  System.out.println(" " + x + " " + y);
             }
             System.out.println("Finished getting links for " + x);
         }
@@ -153,7 +154,7 @@ public class PageRanker {
         HashMap<String, ConcurrentLinkedQueue<String>> outGoingLinks = getGraph();
 
         for (String page : outGoingLinks.keySet()) {
-            System.out.println(page + " " + outGoingLinks.get(page));
+          //  System.out.println(page + " " + outGoingLinks.get(page));
         }
 
         HashMap<String, Double> pageRanks = new HashMap<>();
@@ -163,13 +164,16 @@ public class PageRanker {
             pageRanks.put(webpage, initialPageRank);
         }
 
-
+        AtomicInteger ia =   new AtomicInteger(0);
         for (int i = 0; i < MAX_ITERATIONS; i++) {
             HashMap<String, Double> newPageRanks = new HashMap<>();
             double sum;
+            System.out.println(ia);
+            ia.incrementAndGet();
 
             // Iterate through the webpages and calculate the new page rank
             for (String webpage : outGoingLinks.keySet()) {
+
                 // Getting the neighbors of the current page
                 ConcurrentLinkedQueue<String> neighbors = getIngoingLinks(webpage, outGoingLinks);
                 sum = 0.0;
@@ -212,10 +216,10 @@ public class PageRanker {
         }
 
         // print the sorted map
-        System.out.println("Sorted HashMap by value:");
+     //   System.out.println("Sorted HashMap by value:");
 
         for (String page : sortedMap.keySet()) {
-            System.out.println(page + ": " + pageRanks.get(page));
+         //   System.out.println(page + ": " + pageRanks.get(page));
         }
 
         return pageRanks;

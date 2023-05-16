@@ -12,12 +12,20 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.json.JSONArray;
+import org.jsoup.Jsoup;
 
 import javax.print.Doc;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
+
+import static com.mongodb.client.model.Projections.include;
 
 public class MongoInterface {
     static MongoClient mongoClient;
@@ -296,7 +304,6 @@ public class MongoInterface {
     }
 
 
-
     public static String getSnippet(String id) {
         MongoDatabase database = mongoClient.getDatabase("ExcessDB");
         MongoCollection<Document> collection = database.getCollection("Snippets");
@@ -324,7 +331,7 @@ public class MongoInterface {
 
         if (!result.iterator().hasNext())
             collection.insertOne(document);
-        
+
     }
 
 
@@ -343,4 +350,89 @@ public class MongoInterface {
 
         return result.toString();
     }
+
+
+    public static Map<String, List<String>> getAllSnippets() {
+        MongoDatabase database = mongoClient.getDatabase("ExcessDB");
+        MongoCollection<org.bson.Document> collection = database.getCollection("Snippets");
+
+        var projection = include("URL", "Snippet");
+
+        var cursor = collection.find().projection(projection).iterator();
+
+        Map<String, List<String>> results = new HashMap<>();
+
+        while (cursor.hasNext()) {
+            Document doc = cursor.next();
+            if (results.get(doc.getString("URL")) == null) {
+                List<String> snippets = new ArrayList<>();
+                snippets.add(doc.getString("Snippet"));
+
+                results.put(doc.getString("URL"), snippets);
+            } else {
+                List<String> snippets = results.get(doc.getString("URL"));
+                snippets.add(doc.getString("Snippet"));
+
+            }
+        }
+
+
+        return results;
+    }
+
+    public static Map<String, String> getAllTitles() {
+//        MongoDatabase database = mongoClient.getDatabase("ExcessDB");
+//        MongoCollection<org.bson.Document> collection = database.getCollection("Snippets");
+//
+//        var projection = include("URL", "Tag", "Snippet");
+//
+//        var cursor = collection.find().projection(projection).iterator();
+//
+//        Map<String, String> results = new HashMap<>();
+//
+//        while (cursor.hasNext()) {
+//            Document doc = cursor.next();
+//            if (results.get(doc.getString("URL")) == null) {
+//                String tag = doc.getString("Tag");
+//
+//                if(tag.equals("title"))
+//                {
+//                    System.out.println(doc.getString("Snippet"));
+//                    results.put(doc.getString("URL"), doc.getString("Snippet"));
+//                }
+//
+//            }
+//        }
+
+        Map<String, String> results = new HashMap<>();
+
+        String filePath = "Websites.ser";
+        File file = new File(filePath);
+        HashMap<String, String> webs = new HashMap<>();
+
+        if (file.exists()) {
+            try (FileInputStream fileIn = new FileInputStream(file);
+                 ObjectInputStream in = new ObjectInputStream(fileIn)) {
+                webs = (HashMap<String, String>) in.readObject();
+                System.out.println("All websites loaded from file: " + filePath);
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+                // Handle the exception appropriately
+            }
+        }
+
+
+        for (String link : webs.keySet()) {
+            String doc = webs.get(link);
+            org.jsoup.nodes.Document document = Jsoup.parse(doc);
+
+            results.put(link, document.title());
+
+        }
+
+
+        return results;
+    }
 }
+
+

@@ -7,10 +7,7 @@ import com.mongodb.MongoException;
 import org.bson.Document;
 
 import javax.swing.plaf.metal.MetalBorders;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -23,6 +20,9 @@ public class RankerMain {
 
 
     static public int PAGE_COUNT = 10;
+
+    static public Map<String, String> titles;
+    public static Map<String, List<String>> snippets;
 
     public static Map<String, Object> handleQuery(String prompt, int pageNumber) {
         Integer size = 0;
@@ -111,7 +111,7 @@ public class RankerMain {
             start = PAGE_COUNT * (pageNumber - 1);
 
             // Calculate end index
-            if(toDisplay.size() < PAGE_COUNT * pageNumber)
+            if (toDisplay.size() < PAGE_COUNT * pageNumber)
                 end = toDisplay.size();
             else end = PAGE_COUNT * pageNumber;
         }
@@ -142,6 +142,53 @@ public class RankerMain {
     public static void main(String[] args) throws InterruptedException {
         try {
             MongoInterface.Initialize();
+//            snippets = MongoInterface.getAllSnippets();
+
+//            titles = MongoInterface.getAllTitles();
+//
+//            try (FileOutputStream fileOut = new FileOutputStream("titles.ser");
+//                 ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
+//                out.writeObject(titles);
+//                System.out.println("Titles map saved successfully.");
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//
+
+            String filePath = "snippets.ser";
+            File file = new File(filePath);
+
+            if (file.exists()) {
+                try (FileInputStream fileIn = new FileInputStream(file);
+                     ObjectInputStream in = new ObjectInputStream(fileIn)) {
+                    snippets = (Map<String, List<String>>) in.readObject();
+                    System.out.println("Crawler state loaded from file: " + filePath);
+                } catch (IOException | ClassNotFoundException e) {
+                    // Handle the exception appropriately
+                }
+            }
+
+            filePath = "titles.ser";
+            file = new File(filePath);
+
+            if (file.exists()) {
+                try (FileInputStream fileIn = new FileInputStream(file);
+                     ObjectInputStream in = new ObjectInputStream(fileIn)) {
+                    titles = (Map<String,String>) in.readObject();
+                    System.out.println("Crawler state loaded from file: " + filePath);
+                } catch (IOException | ClassNotFoundException e) {
+                    // Handle the exception appropriately
+                }
+            }
+//
+//            try (FileOutputStream fileOut = new FileOutputStream("snippets.ser");
+//                 ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
+//                out.writeObject(snippets);
+//                System.out.println("Snippets map saved successfully.");
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+
             SpringBootInterface.runSpring();
         } catch (MongoException e) {
             System.out.println("Error");

@@ -10,9 +10,10 @@ import java.util.regex.Pattern;
 public class query_test {
 
     public static boolean isStringEnclosed(String input) {
-        Pattern pattern = Pattern.compile("^\".*\"$");
-        Matcher matcher = pattern.matcher(input);
-        return matcher.matches();
+        return input.contains("\"");
+//        Pattern pattern = Pattern.compile("^\".*\"$");
+//        Matcher matcher = pattern.matcher(input);
+//        return matcher.matches();
     }
 
     public static String fetchIconUrl(org.jsoup.nodes.Document toParse, String URl) {

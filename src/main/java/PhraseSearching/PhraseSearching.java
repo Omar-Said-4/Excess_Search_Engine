@@ -2,6 +2,9 @@ package PhraseSearching;
 
 import MongoDB.MongoInterface;
 import PageRanker.linkAttr;
+import com.mongodb.ConnectionString;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import com.mongodb.internal.connection.SslHelper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -15,6 +18,9 @@ import java.io.ObjectInputStream;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static PageRanker.RankerMain.snippets;
+import static PageRanker.RankerMain.titles;
 
 
 public class PhraseSearching {
@@ -128,90 +134,118 @@ public class PhraseSearching {
         return result;
     }
 
+    public static String getPageTitle(String url) {
+        try {
+            Document doc = Jsoup.connect(url).get();
+            return doc.title();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("ERROR");
+        }
+        return null;
+    }
 
     // Gets the longest snippet that contains the given phrase
-    private static Map<String, linkAttr> searchPhraseInSnippets(Element element, String s, String link, String title) {
+    private static Map<String, linkAttr> searchPhraseInSnippets(Map<String, List<String>> snippets, String s, String link, String title) {
+//        Map<String, linkAttr> result = new HashMap<>();
+//        if (element.children().size() == 0) {
+//            // This is a leaf node
+//            if ((element.tagName().equals("h1") || element.tagName().equals("h2") || element.tagName().equals("h3") || element.tagName().equals("h4") || element.tagName().equals("h5") || element.tagName().equals("h6") || element.tagName().equals("p") || element.tagName().equals("div") || element.tagName().equals("b") || element.tagName().equals("i") || element.tagName().equals("strong") || element.tagName().equals("scan") || element.tagName().equals("q") || element.tagName().equals("a") || element.tagName().equals("code") || element.tagName().equals("cite") || element.tagName().equals("li") || element.tagName().equals("caption") || element.tagName().equals("dd")) && !hasNoneDisplayParent(element)) {
+//
+//                if (findPhraseInSnippet(removeStoppingWords(s), element.ownText())) {
+//                    linkAttr attributes = new linkAttr();
+//                    attributes.BestSnip = element.text();
+//                    attributes.title = title;
+//                    result.put(link, attributes);
+//                }
+//            }
+//        } else {
+//            // Recursively find leaf nodes in each child element
+//            if (!element.ownText().equals("")) {
+//                if (!hasNoneDisplayParent(element) && findPhraseInSnippet(removeStoppingWords(s), element.ownText())) {
+//                    linkAttr attributes = new linkAttr();
+//                    attributes.BestSnip = element.text();
+//                    attributes.title = title;
+//                    result.put(link, attributes);
+//                }
+//            }
+//            for (Element child : element.children()) {
+//                Map<String, linkAttr> r = searchPhraseInSnippets(child, s, link, title);
+//
+//                if (r.get(link) != null && result.get(link) != null) {
+//                    //System.out.println("test");
+//                    if (r.get(link).BestSnip.length() > result.get(link).BestSnip.length())
+//                        result.putAll(r);
+//                } else if (r.get(link) != null) {
+//                    result.putAll(r);
+//                }
+//            }
+//        }
+//
+//        return result;
         Map<String, linkAttr> result = new HashMap<>();
-        if (element.children().size() == 0) {
-            // This is a leaf node
-            if ((element.tagName().equals("h1") || element.tagName().equals("h2") || element.tagName().equals("h3") || element.tagName().equals("h4") || element.tagName().equals("h5") || element.tagName().equals("h6") || element.tagName().equals("p") || element.tagName().equals("div") || element.tagName().equals("b") || element.tagName().equals("i") || element.tagName().equals("strong") || element.tagName().equals("scan") || element.tagName().equals("q") || element.tagName().equals("a") || element.tagName().equals("code") || element.tagName().equals("cite") || element.tagName().equals("li") || element.tagName().equals("caption") || element.tagName().equals("dd")) && !hasNoneDisplayParent(element)) {
 
-                if (findPhraseInSnippet(removeStoppingWords(s), element.ownText())) {
+        List<String> mySnippets = snippets.get(link);
+
+        if (mySnippets != null) {
+
+            mySnippets.parallelStream().forEach(snippet -> {
+                if (findPhraseInSnippet(removeStoppingWords(s), snippet)) {
                     linkAttr attributes = new linkAttr();
-                    attributes.BestSnip = element.text();
+                    attributes.BestSnip = snippet;
                     attributes.title = title;
                     result.put(link, attributes);
                 }
-            }
-        } else {
-            // Recursively find leaf nodes in each child element
-            if (!element.ownText().equals("")) {
-                if (!hasNoneDisplayParent(element) && findPhraseInSnippet(removeStoppingWords(s), element.ownText())) {
-                    linkAttr attributes = new linkAttr();
-                    attributes.BestSnip = element.text();
-                    attributes.title = title;
-                    result.put(link, attributes);
-                }
-            }
-            for (Element child : element.children()) {
-                Map<String, linkAttr> r = searchPhraseInSnippets(child, s, link, title);
-
-                if (r.get(link) != null && result.get(link) != null) {
-                    System.out.println("test");
-                    if (r.get(link).BestSnip.length() > result.get(link).BestSnip.length())
-                        result.putAll(r);
-                } else if (r.get(link) != null) {
-                    result.putAll(r);
-                }
-            }
+            });
         }
 
         return result;
     }
 
-    public static Map<String, linkAttr> phraseSearching(String firstString, String secondString, String thirdString, String op0, String op1, int complexity) {
+    public static Map<String, linkAttr> phraseSearching(String firstString, String secondString, String
+            thirdString, String op0, String op1, int complexity) {
         System.out.println(firstString + " " + secondString + " " + thirdString);
         System.out.println(op0 + " " + op1);
 
-        String filePath = "Websites.ser";
-        File file = new File(filePath);
+//        String filePath = "Websites.ser";
+//        File file = new File(filePath);
+//
+//
+//
+//        HashMap<String, String> webPages = new HashMap<>();
+//        if (file.exists()) {
+//            try (FileInputStream fileIn = new FileInputStream(file);
+//                 ObjectInputStream in = new ObjectInputStream(fileIn)) {
+//                webPages = (HashMap<String, String>) in.readObject();
+//
+//                System.out.println("All websites loaded from file: " + filePath);
+//            } catch (IOException |
+//                     ClassNotFoundException e) {
+//                e.printStackTrace();
+//                // Handle the exception appropriately
+//            }
+//        }
 
         Map<String, linkAttr> results = new HashMap<>();
 
-        HashMap<String, String> webPages = new HashMap<>();
 
-        if (file.exists()) {
-            try (FileInputStream fileIn = new FileInputStream(file);
-                 ObjectInputStream in = new ObjectInputStream(fileIn)) {
-                webPages = (HashMap<String, String>) in.readObject();
-
-                System.out.println("All websites loaded from file: " + filePath);
-            } catch (IOException |
-                     ClassNotFoundException e) {
-                e.printStackTrace();
-                // Handle the exception appropriately
-            }
-        }
-
-        System.out.println(webPages.size());
+//        System.out.println(webPages.size());
 
         String doc_string;
 
-        for (String link : webPages.keySet()) {
-            doc_string = webPages.get(link);
+//        Map<String, List<String>> snippets = MongoInterface.getAllSnippets();
 
-            org.jsoup.nodes.Document doc = Jsoup.parse(doc_string);
-
-            String title = doc.title();
-
-
+        for (String link : snippets.keySet()) {
+//            doc_string = webPages.get(link);
+//            org.jsoup.nodes.Document doc = Jsoup.parse(doc_string);
+            String title = null;
+            if (titles.get(link) != null)
+                title = titles.get(link);
+            else title = "NO Title";
             // Get All the Rendered Text
-            Map<String, linkAttr> firstElements = searchPhraseInSnippets(doc.body(), firstString, link, title);
-
-
+            Map<String, linkAttr> firstElements = searchPhraseInSnippets(snippets, firstString, link, title);
             Map<String, linkAttr> secondElements = new HashMap<>();
             Map<String, linkAttr> thirdElements = new HashMap<>();
-
             if (complexity == 0) {
                 if (firstElements.size() > 0) {
                     results.putAll(firstElements);
@@ -235,11 +269,8 @@ public class PhraseSearching {
                     }
                     continue;
                 }
-
 //                secondElements = doc.getElementsContainingOwnText(secondString);
-
-                secondElements = searchPhraseInSnippets(doc.body(), secondString, link, title);
-
+                secondElements = searchPhraseInSnippets(snippets, secondString, link, title);
                 if (Objects.equals(op0, "AND")) {
                     if (firstElements.size() > 0 && secondElements.size() > 0) {
                         results.putAll(firstElements);
@@ -272,11 +303,11 @@ public class PhraseSearching {
 
             } else if (complexity == 2) {
 
-                secondElements = searchPhraseInSnippets(doc.body(), secondString, link, title);
+                secondElements = searchPhraseInSnippets(snippets, secondString, link, title);
 
                 if (!Objects.equals(op0, "NOT") && !Objects.equals(op1, "NOT")) {
 
-                    thirdElements = searchPhraseInSnippets(doc.body(), thirdString, link, title);
+                    thirdElements = searchPhraseInSnippets(snippets, thirdString, link, title);
 
                 }
 
