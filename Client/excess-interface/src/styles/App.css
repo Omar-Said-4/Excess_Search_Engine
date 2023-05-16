@@ -287,8 +287,18 @@
 .results-section{
   background-image: linear-gradient(to left, #addef9, #d9dbe6 50%); 
   background-size: 200% 200%;
-  animation: gradient 5s ease-in-out infinite;
+  animation: gradient 5s ease-in-out infinite, fadeIn 1s ease-in-out;
 }
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 
 
 @keyframes gradient {

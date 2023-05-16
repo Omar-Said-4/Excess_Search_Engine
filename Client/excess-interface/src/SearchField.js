@@ -68,12 +68,10 @@ const SearchField = ({ query, place, loaded }) => {
     [index, suggestions]
   );
 
-  
   // window.onload = () => {
   //   console.log('Page loaded successfully');
   //   setLoaded(true);
   // };
-
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
@@ -226,51 +224,51 @@ const SearchField = ({ query, place, loaded }) => {
               className="my-list"
             >
               {suggestions.map((suggestion, i) => (
-                <motion.div
-                  initial={{ opacity: "0%" }}
-                  animate={{ opacity: "100%" }}
-                  transition={{
-                    type: "tween",
-                    duration: 0.9,
+                <MDBListGroupItem
+                  active
+                  aria-current="true"
+                  className="px-3"
+                  style={{
+                    backgroundColor: index === i ? "#5ea8e9" : "#e2e0e0",
+                    color: "black",
+                    // marginBottom: "4px",
+                    height: "35px",
+                    padding: "0",
+                    paddingTop: "6px",
+                    userSelect: "none",
+                    borderRadius: "5px",
+                    fontSize: "14px",
+                    // marginBottom: "3px",
+                  }}
+                  onMouseEnter={(event) => {
+                    event.target.style.backgroundColor = "#5ea8e9";
+                    setIndex(i);
+                  }}
+                  onMouseLeave={(event) => {
+                    event.target.style.backgroundColor = "#e0e1e2";
+                    setIndex(-1);
+                  }}
+                  onClick={(event) => {
+                    console.log(event);
+
+                    setText(event.target.innerHTML);
+
+                    document.getElementById("input-field").value =
+                      event.target.innerHTML;
+                    makeSearch();
                   }}
                 >
-                  <MDBListGroupItem
-                    active
-                    aria-current="true"
-                    className="px-3"
-                    style={{
-                      backgroundColor: index === i ? "#5ea8e9" : "#e2e0e0",
-                      color: "black",
-                      // marginBottom: "4px",
-                      height: "35px",
-                      padding: "0",
-                      paddingTop: "6px",
-                      userSelect: "none",
-                      borderRadius: "5px",
-                      fontSize: "14px",
-                      // marginBottom: "3px",
-                    }}
-                    onMouseEnter={(event) => {
-                      event.target.style.backgroundColor = "#5ea8e9";
-                      setIndex(i);
-                    }}
-                    onMouseLeave={(event) => {
-                      event.target.style.backgroundColor = "#e0e1e2";
-                      setIndex(-1);
-                    }}
-                    onClick={(event) => {
-                      console.log(event);
-
-                      setText(event.target.innerHTML);
-
-                      document.getElementById("input-field").value =
-                        event.target.innerHTML;
-                      makeSearch();
+                  <motion.span
+                    initial={{ opacity: "0%" }}
+                    animate={{ opacity: "100%" }}
+                    transition={{
+                      type: "tween",
+                      duration: 0.6,
                     }}
                   >
-                    {suggestion}
-                  </MDBListGroupItem>
-                </motion.div>
+                    <span style={{backgroundColor: index === i ? "#5ea8e9" : "#e2e0e0", overflow: "clip"}}>{suggestion}</span>
+                  </motion.span>
+                </MDBListGroupItem>
               ))}
             </MDBListGroup>
           ) : null}
