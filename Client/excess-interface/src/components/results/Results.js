@@ -47,7 +47,7 @@ const Results = () => {
   useEffect(() => {
     setLoading(true);
 
-    const startTime = performance.now();
+    const startTime = performance.now().toPrecision(3);
 
     const now = new Date();
     const hours = now.getHours().toString().padStart(2, "0");
@@ -67,7 +67,7 @@ const Results = () => {
       },
     })
       .then((response) => {
-        const endTime = performance.now();
+        const endTime = performance.now().toPrecision(3);
 
         const now = new Date();
         const hours = now.getHours().toString().padStart(2, "0");
