@@ -15,12 +15,11 @@ import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 
-const SearchField = ({ query, place, loaded }) => {
+const SearchField = ({ query, place, loaded, focused, setFocused }) => {
   const [text, setText] = useState(query);
   // const [loaded, setLoaded] = useState(false);
   const [index, setIndex] = useState(-1);
   const [suggestions, setSuggestions] = useState([]);
-  const [focused, setFocused] = useState(false);
 
   const [isListening, setIsListening] = useState(false);
 
@@ -67,11 +66,6 @@ const SearchField = ({ query, place, loaded }) => {
     },
     [index, suggestions]
   );
-
-  // window.onload = () => {
-  //   console.log('Page loaded successfully');
-  //   setLoaded(true);
-  // };
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
@@ -128,7 +122,6 @@ const SearchField = ({ query, place, loaded }) => {
 
   return (
     <>
-      {/* {transcript !== "" ? <div>{transcript}</div> : null} */}
       {loaded === true || place === "result" ? (
         <div
           style={{
@@ -158,8 +151,12 @@ const SearchField = ({ query, place, loaded }) => {
               autoComplete="off"
               placeholder="Search!"
               onChange={(e) => queryChanged(e)}
-              onFocus={(e) => setFocused(true)}
-              onBlur={(e) => setFocused(true)}
+              onFocus={(e) => {
+                setFocused(true);
+              }}
+              onBlur={(e) => {
+                setFocused(false);
+              }}
             />
             <MDBBtn
               rippleColor="red"
@@ -251,10 +248,10 @@ const SearchField = ({ query, place, loaded }) => {
                   onClick={(event) => {
                     console.log(event);
 
-                    setText(event.target.innerHTML);
+                    setText(suggestions.at(i));
 
                     document.getElementById("input-field").value =
-                      event.target.innerHTML;
+                      suggestions.at(i);
                     makeSearch();
                   }}
                 >
@@ -266,7 +263,14 @@ const SearchField = ({ query, place, loaded }) => {
                       duration: 0.6,
                     }}
                   >
-                    <span style={{backgroundColor: index === i ? "#5ea8e9" : "#e2e0e0", overflow: "clip"}}>{suggestion}</span>
+                    <span
+                      style={{
+                        backgroundColor: index === i ? "#5ea8e9" : "#e2e0e0",
+                        overflow: "clip",
+                      }}
+                    >
+                      {suggestion}
+                    </span>
                   </motion.span>
                 </MDBListGroupItem>
               ))}
@@ -281,41 +285,3 @@ const SearchField = ({ query, place, loaded }) => {
 };
 
 export default SearchField;
-
-// import React from "react";
-// import SpeechRecognition, {
-//   useSpeechRecognition,
-// } from "react-speech-recognition";
-
-// const Home = () => {
-//   const {
-//     transcript,
-//     listening,
-//     resetTranscript,
-//     browserSupportsSpeechRecognition,
-//   } = useSpeechRecognition();
-
-//   if (!browserSupportsSpeechRecognition) {
-//     return console.log("ERROR");
-//   }
-
-//   return (
-//     <div>
-//       <p>Microphone: {listening ? "on" : "off"}</p>
-//       <button
-//         onClick={() =>
-//           SpeechRecognition.startListening({
-//             language: "en-US",
-//             continuous: true,
-//           })
-//         }
-//       >
-//         Start
-//       </button>
-//       <button onClick={SpeechRecognition.abortListening}>Stop</button>
-//       <button onClick={resetTranscript}>Reset</button>
-//       <p>{transcript}</p>
-//     </div>
-//   );
-// };
-// export default Home;

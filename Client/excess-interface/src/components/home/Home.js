@@ -4,6 +4,7 @@ import logo from "../../icons/image.png";
 
 const Home = () => {
   const [loaded, setLoaded] = useState(false);
+  const [focused, setFocused] = useState(false);
 
   return (
     <div
@@ -13,11 +14,17 @@ const Home = () => {
       }}
     >
       <img src={logo} alt="logo" className="search-field-image"></img>
-      <div className="description-home">
+      <div className="description-home" id="slogan">
         "Find what you're looking for, faster than ever before!"
-        <br />
+        {/* <br /> */}
       </div>
-      <SearchField place={"home"} query={""} loaded={loaded}/>
+      <SearchField
+        place={"home"}
+        query={""}
+        loaded={loaded}
+        focused={focused}
+        setFocused={setFocused}
+      />
     </div>
   );
 };

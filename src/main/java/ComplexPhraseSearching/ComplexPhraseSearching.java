@@ -18,6 +18,8 @@ public class ComplexPhraseSearching {
     public static void main(String[] args) {
         Map<String, Object> result = complexPhraseSearch("\"Baltimore was designated \"", 1);
 
+    }
+
 
 
     public static Map<String, Object> complexPhraseSearch(String phrase, int pageNumber) {

@@ -1,8 +1,10 @@
 import SearchField from "../../SearchField";
 import logo from "../../icons/logo.png";
+import { useState } from "react";
 
 const Bar = ({ query }) => {
   console.log(query);
+  const [focused, setFocused] = useState(false);
 
   return (
     <div className="bar">
@@ -16,7 +18,7 @@ const Bar = ({ query }) => {
         }}
         onMouseEnter={(e)=> e.target.style.cursor = "pointer"}
       />
-      <SearchField query={query} place={"result"} />
+      <SearchField query={query} place={"result"} focused={focused} setFocused={setFocused}/>
     </div>
   );
 };

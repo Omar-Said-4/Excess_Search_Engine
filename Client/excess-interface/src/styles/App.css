@@ -251,7 +251,27 @@
 
   margin-top: 20px;
   user-select: none;
+
+  animation: fadeInOut 7s ease-in-out infinite;
 }
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  70%{
+    opacity: 1;
+  }
+  100%{
+    opacity: 0;
+  }
+
+}
+
+
 
 
 .search-field{
@@ -298,8 +318,6 @@
     opacity: 1;
   }
 }
-
-
 
 @keyframes gradient {
   0% {
