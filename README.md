@@ -1,6 +1,6 @@
 <h1 align="center"> "Excess"</h1>
 <h3 align="center"> Find what you are looking for, faster than ever before!</h3>
-![Interface]![](https://gyazo.com/eb5c5741b6a9a16c692170a41a49c858.png =250x250)
+![](https://gyazo.com/eb5c5741b6a9a16c692170a41a49c858.png =250x250)
 <h2>Introduction</h2>
 <div>
 <p>
