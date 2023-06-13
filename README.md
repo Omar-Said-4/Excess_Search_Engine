@@ -1,6 +1,6 @@
 <h1 align="center"> "Excess"</h1>
 <h3 align="center"> Find what you are looking for, faster than ever before!</h3>
-![Interface](https://github.com/Omar-Said-4/Excess_Search_Engine/assets/87082462/e34ec627-88fe-4959-b1fb-d94e2d32e620)
+![Interface](https://github.com/Omar-Said-4/Excess_Search_Engine/assets/87082462/e34ec627-88fe-4959-b1fb-d94e2d32e620 =250x250)
 <h2>Introduction</h2>
 <div>
 <p>
