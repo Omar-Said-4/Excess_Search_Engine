@@ -235,6 +235,7 @@ public class PhraseSearching {
 
 //        Map<String, List<String>> snippets = MongoInterface.getAllSnippets();
 
+
         for (String link : snippets.keySet()) {
 //            doc_string = webPages.get(link);
 //            org.jsoup.nodes.Document doc = Jsoup.parse(doc_string);

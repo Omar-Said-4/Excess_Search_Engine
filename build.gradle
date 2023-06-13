@@ -36,3 +36,9 @@ dependencies {
     runtimeOnly 'org.springframework.boot:spring-boot-devtools'
 
 }
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
+
+}

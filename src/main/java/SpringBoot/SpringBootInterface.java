@@ -22,6 +22,8 @@ import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 @SpringBootApplication
 @RestController
 public class SpringBootInterface {
@@ -104,7 +106,8 @@ public class SpringBootInterface {
 
                             return temp;
                         })
-                        .toList();
+                        .collect(Collectors.toList());
+
 
                 resultList.forEach(phraseSearchResult::put);
 
@@ -144,7 +147,8 @@ public class SpringBootInterface {
 
                         return temp;
                     })
-                    .toList();
+                    .collect(Collectors.toList());
+
             resultList.forEach(toDisp::put);
 
             if (toDisp.length() != 0)
