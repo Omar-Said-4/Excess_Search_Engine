@@ -1,6 +1,7 @@
 <h1 align="center"> "Excess"</h1>
 <h3 align="center"> Find what you are looking for, faster than ever before!</h3>
-![](https://gyazo.com/eb5c5741b6a9a16c692170a41a49c858.png =250x250)
+<img src="https://github.com/Omar-Said-4/Excess_Search_Engine/assets/87082462/02aad990-8b85-4020-935b-409e2a9ce267" width="200" height="400" />
+
 <h2>Introduction</h2>
 <div>
 <p>
