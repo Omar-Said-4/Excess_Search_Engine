@@ -1,5 +1,5 @@
-<h1 style="text-align: center;"> "Excess"</h1>
-<h3 style="text-align: center;"> Find what you are looking for, faster than ever before!</h3>
+<h1 align="center"> "Excess"</h1>
+<h3 align="center"> Find what you are looking for, faster than ever before!</h3>
 ![Interface](img.png)
 <h2>Introduction</h2>
 <div>
