@@ -1,4 +1,4 @@
-<h1 align="center"> "Excess"</h1>
+![image](https://github.com/Omar-Said-4/Excess_Search_Engine/assets/87082462/f6a1309d-61d6-4352-afd2-a73482f5b8a9)![image](https://github.com/Omar-Said-4/Excess_Search_Engine/assets/87082462/abafaa62-a448-44d4-ab8e-3c6727647e58)![image](https://github.com/Omar-Said-4/Excess_Search_Engine/assets/87082462/73490c51-5608-40fd-8b20-9a9894bdf61d)<h1 align="center"> "Excess"</h1>
 <h3 align="center"> Find what you are looking for, faster than ever before!</h3>
 <img align="center" src="https://github.com/Omar-Said-4/Excess_Search_Engine/assets/87082462/1e460f12-af6c-4a21-ae73-9f1921d067bf" width="800" height="400" />
 
@@ -80,13 +80,16 @@ To re-index navigate to `Indexer` package then run `IndexerMain`
 </div>
 
 <h2>Screenshots</h2>
-<img align="center" src="https://github.com/Omar-Said-4/Excess_Search_Engine/assets/87082462/753cc194-b344-4c90-8b44-3031f5f6d847" width="800" height="400" />
+<img align="center" src="https://github.com/Omar-Said-4/Excess_Search_Engine/assets/87082462/2aed65c7-ca55-4f1b-9ce3-76e7572832bf" width="800" height="400" />
+
 <br>
 <br>
-<img align="center" src="https://github.com/Omar-Said-4/Excess_Search_Engine/assets/87082462/aa73f68f-7738-4f56-8778-0fbb61a56889" width="800" height="400" />
+<img align="center" src="https://github.com/Omar-Said-4/Excess_Search_Engine/assets/87082462/c31793a6-e97f-4af3-a054-b2a0a0e4442c" width="800" height="400" />
+
 <br>
 <br>
-<img align="center" src=https://github.com/Omar-Said-4/Excess_Search_Engine/assets/87082462/eba1420d-82ea-4146-af3c-a7385188e311" />
+<img align="center" src="https://github.com/Omar-Said-4/Excess_Search_Engine/assets/87082462/3233075b-c30b-4649-b7dc-dde69b8880ef" />
+
 
 ## My Teammates
 - [@Mahmoud-Abdel-Motaleb](https://github.com/Mahmoud-Abdel-Motaleb)
