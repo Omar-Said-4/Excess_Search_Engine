@@ -41,9 +41,9 @@ There are different packages each one resembles a part of the search-engine stru
 3. *<strong>`QueryProcessor`</strong>:* For processing the search query through removing stop words and stemming.
 4. *<strong>`PageRanker`</strong>:* For applying page ranking algorithm on collected webpages
 5. *<strong>`Ranker`</strong>:* For Ranking search query results based on term frequency and document frequency.
-6. *<strong>`MongoDB`</strong>:* an interface for handling mongoDB connections.
+6. *<strong>`MongoDB`</strong>:* an interface for handling MongoDB connections.
 7. *<strong>`ComplexPhraseSearching` </strong>:* for handling both normal and operator-separated search queries.
-8. *<strong>`SpringBoot` </strong>:* To interface with backend
+8. *<strong>`SpringBoot` </strong>:* To interface frontend with backend
 
 <h2>Guidelines</h2>
    <h2>Guidelines</h2>
