@@ -16,7 +16,7 @@ applying the basic search engines structure and hierarchy.
   <li>
    <strong>Phrase Searching: </strong>
 Instead of some keywords, excess supports phrase searching to search for an exact match or a semi-exact match of a phrase.<br>
-You can also concatenate phrases with operators such as (AND, OR, NOT) and retrieve the results if you want to use complex search queries.
+You can also concatenate phrases with operators such as (AND, OR, NOT) and retrieve the results for complex search queries.
   </li>
  <li>
    <strong>Keywords Suggestion: </strong>
