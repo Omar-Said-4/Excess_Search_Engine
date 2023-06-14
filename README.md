@@ -88,4 +88,8 @@ To re-index navigate to `Indexer` package then run `IndexerMain`
 <br>
 <img align="center" src=https://github.com/Omar-Said-4/Excess_Search_Engine/assets/87082462/eba1420d-82ea-4146-af3c-a7385188e311" />
 
+## My Teammates
+- [@Mahmoud-Abdel-Motaleb](https://github.com/Mahmoud-Abdel-Motaleb)
+- [@Aly-Abdel-Motaleb](https://github.com/Aly-Abdel-Motaleb)
+- [@kirobaghdad](https://github.com/kirobaghdad)
 
