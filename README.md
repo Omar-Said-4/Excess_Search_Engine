@@ -36,7 +36,7 @@ Based on your search history, excess can anticipate your keyword, thus facilitat
 There are different packages each one resembles a part of the search-engine structure
 </p>
 
-1. *<strong> `Crawler`</strong>:* A thread-safe multithreaded crawler responsible for crawling web pages starting from the seed of links provided in the file seed.txt (maximum number of pages tested was 10000), the output of the crawler is a serializable file with crawled html documents together with URLs.
+1. *<strong> `Crawler`</strong>:* A thread-safe multithreaded crawler responsible for crawling web pages starting from the seed of links provided in the file `seed.txt` (maximum number of pages tested was 10000), the output of the crawler is a serializable file with crawled html documents together with URLs.
 2. *<strong>`Indexer`</strong>:* A thread-safe multithreaded indexer for indexing crawled web pages and uploading the inverted file to a Cloud MongoDB database.
 3. *<strong>`QueryProcessor`</strong>:* For processing the search query through removing stop words and stemming.
 4. *<strong>`PageRanker`</strong>:* For applying page ranking algorithm on collected webpages
