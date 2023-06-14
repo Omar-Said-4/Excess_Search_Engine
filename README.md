@@ -1,4 +1,4 @@
-![image](https://github.com/Omar-Said-4/Excess_Search_Engine/assets/87082462/f6a1309d-61d6-4352-afd2-a73482f5b8a9)![image](https://github.com/Omar-Said-4/Excess_Search_Engine/assets/87082462/abafaa62-a448-44d4-ab8e-3c6727647e58)![image](https://github.com/Omar-Said-4/Excess_Search_Engine/assets/87082462/73490c51-5608-40fd-8b20-9a9894bdf61d)<h1 align="center"> "Excess"</h1>
+<h1 align="center"> "Excess"</h1>
 <h3 align="center"> Find what you are looking for, faster than ever before!</h3>
 <img align="center" src="https://github.com/Omar-Said-4/Excess_Search_Engine/assets/87082462/1e460f12-af6c-4a21-ae73-9f1921d067bf" width="800" height="400" />
 
