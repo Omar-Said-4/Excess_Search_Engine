@@ -79,3 +79,5 @@ To re- crawl navigate to `Main.java` and run it
 To re-index navigate to `Indexer` package then run `IndexerMain`
 </div>
 
+<h2>Screenshots</h2>
+<img align="center" src="https://github.com/Omar-Said-4/Excess_Search_Engine/assets/87082462/753cc194-b344-4c90-8b44-3031f5f6d847" width="800" height="400" />
